@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
-if os.path.isfile("env.py"):
+if os.path.exists("env.py"):
+    print("Importing environment variables from env.py...")
     import env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -24,7 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "not_a_secret_for_development_only"
+# SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = '1234567890'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
