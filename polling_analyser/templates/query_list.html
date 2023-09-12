@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Query List</h2>
+{% for query in query_list %}
+    <p>{{ query.survey_name }}</p>
+{% endfor %}
+
+{% endblock %}
