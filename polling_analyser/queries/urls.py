@@ -4,4 +4,5 @@ from . import views
 
 urlpatterns = [
     path('', views.QueryList.as_view(), name='home'),
+    path('create/', views.QueryCreate.as_view(), name='create'),
 ]

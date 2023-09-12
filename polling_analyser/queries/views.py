@@ -14,3 +14,20 @@ class QueryList(generic.ListView):
     queryset = Query.objects.all()
     template_name = 'query_list.html'
     paginate_by = 10
+
+
+class QueryCreate(generic.CreateView):
+    """
+    A class to create Query objects and save to db.
+    """
+    model = Query
+    form_class = QueryForm
+    template_name = 'query_form.html'
+
+    def form_valid(self, form):
+        """
+        A function to validate form and save to db.
+        """
+        form.instance.user = self.request.user
+        super().form_valid(form)
+        return redirect(reverse('home'))

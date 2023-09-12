@@ -2,5 +2,11 @@
 {% block content %}
 
 <h2>Query Form</h2>
+<form method="POST" enctype="multipart/form-data">
+    <h3>{{user.username}}'s new polling query</h3>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save query</button>
+</form>
 
 {% endblock %}
