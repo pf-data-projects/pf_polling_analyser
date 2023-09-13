@@ -31,3 +31,24 @@ class QueryCreate(generic.CreateView):
         form.instance.user = self.request.user
         super().form_valid(form)
         return redirect(reverse('home'))
+
+class QueryDetail(View):
+    """
+    A class to display Query object details.
+    """
+    def get(self, request, pk):
+        """
+        A method to display Query object details.
+        """
+        queries = Query.objects.all()
+        query = get_object_or_404(queries, pk=pk)
+        return render(request, 'query_detail.html', {'query': query})
+
+    def post(self, request, pk):
+        """
+        A method to query the api with
+        the specified Query instance.
+        """
+        print(pk)
+        print(request)
+        print("Let's make a request!")

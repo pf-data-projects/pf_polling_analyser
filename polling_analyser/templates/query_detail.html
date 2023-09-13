@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Query details</h2>
+<h3>{{query.user.username}}'s query: {{query.survey_name}}</h3>
+<p>{{query.starting_qid}}</p>
+<p>{{query.ending_qid}}</p>
+<p><a href="{% url 'home' %}">Back to query list</a></p>
+
+<form action="POST">
+    <button type="submit">make a request to api for this survey.</button>
+</form>
+
+{% endblock %}
