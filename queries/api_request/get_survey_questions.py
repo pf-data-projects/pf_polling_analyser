@@ -4,7 +4,7 @@ import requests
 def get_survey_questions(api_token, api_token_secret, id):
     """
     Makes a get request to the endpoint for the survey specified
-    by the id passed and returns the json response.
+    by the id passed and returns the survey's questions.
     """
     # Base URL for the Alchemer API
     base_url = "https://api.alchemer.com"
@@ -21,17 +21,12 @@ def get_survey_questions(api_token, api_token_secret, id):
 
     # Make the GET request with the authentication parameters
     response = requests.get(url, params=params, timeout=10)
-    if response.status_code == 200:
-        print(f'status: {response.status_code}, success!')
-        return response.json()
-    else:
-        print(f'status: {response.status_code}, something went wrong.')
-        return None
+    return response.json() if response.status_code == 200 else None
 
 def get_questions_json(survey_id):
     """
-    Makes a get request to the endpoint for the survey specified,
-    processes the json response, dumping it into a separate file.
+    Makes a get request to the endpoint for the survey specified
+    and returns survey question data to the view.
     """
     print("getting data for this survey's questions...")
     survey_questions = get_survey_questions(

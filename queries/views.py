@@ -14,6 +14,7 @@ from .api_request.get_processed_questions import (
     extract_data_from_question_objects,
     extract_questions_from_pages
 )
+from .api_request.get_survey_responses import get_responses_json
 
 from .forms import QueryForm
 from .models import Query
@@ -77,5 +78,7 @@ def make_request(request, pk):
     survey_questions = get_questions_json(survey_id)
     questions = extract_questions_from_pages(survey_questions)
     question_data = extract_data_from_question_objects(questions)
+    response_list = get_responses_json(survey_id)
+    
 
     return redirect(reverse('home'))
