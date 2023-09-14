@@ -10,6 +10,10 @@ from django.views import generic, View
 from .api_request.get_survey_metadata import get_all_pages_of_surveys
 from .api_request.get_survey_id import get_survey_id
 from .api_request.get_survey_questions import get_questions_json
+from .api_request.get_processed_questions import (
+    extract_data_from_question_objects,
+    extract_questions_from_pages
+)
 
 from .forms import QueryForm
 from .models import Query
@@ -59,6 +63,10 @@ def make_request(request, pk):
     """
     A function to make a request to alchemer api.
     """
+    if not request.user.is_authenticated:
+        print('you are not authorised to make this request.')
+        return redirect(reverse('home'))
+
     print('making request to the api...')
     query = get_object_or_404(Query, pk=pk)
     survey_list = get_all_pages_of_surveys()
@@ -67,5 +75,7 @@ def make_request(request, pk):
     print("manual api request throttle. Please wait 60 seconds.")
     sleep(60)
     survey_questions = get_questions_json(survey_id)
+    questions = extract_questions_from_pages(survey_questions)
+    question_data = extract_data_from_question_objects(questions)
 
     return redirect(reverse('home'))

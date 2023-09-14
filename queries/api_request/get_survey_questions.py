@@ -21,14 +21,19 @@ def get_survey_questions(api_token, api_token_secret, id):
 
     # Make the GET request with the authentication parameters
     response = requests.get(url, params=params, timeout=10)
-    print(response.status_code)
-    return response.json()
+    if response.status_code == 200:
+        print(f'status: {response.status_code}, success!')
+        return response.json()
+    else:
+        print(f'status: {response.status_code}, something went wrong.')
+        return None
 
 def get_questions_json(survey_id):
     """
     Makes a get request to the endpoint for the survey specified,
     processes the json response, dumping it into a separate file.
     """
+    print("getting data for this survey's questions...")
     survey_questions = get_survey_questions(
         api_token=os.environ["API_TOKEN"],
         api_token_secret=os.environ["API_SECRET"],
