@@ -54,7 +54,7 @@ def make_request(request, pk):
     """
     A function to make a request to alchemer api.
     """
-    print('makeing request to the api...')
+    print('making request to the api...')
     query = get_object_or_404(Query, pk=pk)
 
     return redirect(reverse('home'))

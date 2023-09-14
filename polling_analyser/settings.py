@@ -15,7 +15,6 @@ from pathlib import Path
 from django.contrib.messages import constants as messages
 
 if os.path.exists("env.py"):
-    print("Importing environment variables from env.py...")
     import env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,7 +27,7 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = os.getenv("SECRET_KEY")
-SECRET_KEY = '1234567890'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
