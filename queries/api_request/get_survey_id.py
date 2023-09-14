@@ -9,4 +9,7 @@ def get_survey_id(survey_list, survey_name):
             survey_id = survey['id']
         else:
             continue
+    if survey_id == "":
+        print("Survey not found.")
+        return None
     return survey_id

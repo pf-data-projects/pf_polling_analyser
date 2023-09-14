@@ -56,7 +56,7 @@ def get_all_pages_of_surveys():
         page=1)
     pages = response['total_pages']
     for i in range(1, pages + 1):
-        print(i)
+        print(f'getting page {i} out of {pages} pages of data.')
         page_data = get_survey_list(
             endpoint="/v5/survey",
             api_token=os.environ["API_TOKEN"],
@@ -64,6 +64,4 @@ def get_all_pages_of_surveys():
             page=i)
         main_list.extend(page_data['data'])
 
-    print(len(main_list))
-
-get_all_pages_of_surveys()
+    return main_list

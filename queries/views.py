@@ -1,5 +1,6 @@
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Other 3rd party
-import requests
+# ~~~~~~~~  Imports ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Standard library
+from time import sleep
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Django
 from django.shortcuts import render, redirect, reverse, get_object_or_404
@@ -11,6 +12,7 @@ from .models import Query
 
 from .get_survey_metadata import get_all_pages_of_surveys
 from .get_survey_id import get_survey_id
+from .get_survey_questions import get_questions_json
 
 
 class QueryList(generic.ListView):
@@ -61,4 +63,9 @@ def make_request(request, pk):
     query = get_object_or_404(Query, pk=pk)
     survey_list = get_all_pages_of_surveys()
     survey_id = get_survey_id(survey_list, query.survey_name)
+    print(survey_id)
+    print("manual api request throttle. Please wait 60 seconds.")
+    sleep(60)
+    survey_questions = get_questions_json(survey_id)
+
     return redirect(reverse('home'))
