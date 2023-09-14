@@ -7,12 +7,12 @@ from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.views import generic, View
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal
+from .api_request.get_survey_metadata import get_all_pages_of_surveys
+from .api_request.get_survey_id import get_survey_id
+from .api_request.get_survey_questions import get_questions_json
+
 from .forms import QueryForm
 from .models import Query
-
-from .get_survey_metadata import get_all_pages_of_surveys
-from .get_survey_id import get_survey_id
-from .get_survey_questions import get_questions_json
 
 
 class QueryList(generic.ListView):
