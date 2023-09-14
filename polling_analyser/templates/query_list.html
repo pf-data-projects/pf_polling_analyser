@@ -2,9 +2,9 @@
 {% block content %}
 <h2>Query List</h2>
 {% for query in query_list %}
-    <p>{{ query.survey_name }}</p>
+    <p><a href="{% url 'detail' query.pk %}">{{ query.survey_name }}</a></p>
 {% endfor %}
-
+<hr/>
 <p><a href="{% url 'create' %}">Click here to create a query</a></p>
 
 {% endblock %}

@@ -5,9 +5,6 @@
 <p>{{query.starting_qid}}</p>
 <p>{{query.ending_qid}}</p>
 <p><a href="{% url 'home' %}">Back to query list</a></p>
-
-<form action="POST">
-    <button type="submit">make a request to api for this survey.</button>
-</form>
-
+<hr/>
+<p><a href="{% url 'make-request' query.pk %}">Make a query with these details.</a></p>
 {% endblock %}

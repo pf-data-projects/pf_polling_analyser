@@ -32,6 +32,7 @@ class QueryCreate(generic.CreateView):
         super().form_valid(form)
         return redirect(reverse('home'))
 
+
 class QueryDetail(View):
     """
     A class to display Query object details.
@@ -44,11 +45,14 @@ class QueryDetail(View):
         query = get_object_or_404(queries, pk=pk)
         return render(request, 'query_detail.html', {'query': query})
 
-    def post(self, request, pk):
-        """
-        A method to query the api with
-        the specified Query instance.
-        """
-        print(pk)
-        print(request)
-        print("Let's make a request!")
+
+def make_request(request, pk):
+    """
+    A function to make a request to alchemer api.
+    """
+    print('makeing request to the api...')
+    query = get_object_or_404(Query, pk=pk)
+    print(query.survey_name)
+    print(query.starting_qid)
+    print(query.ending_qid)
+    return redirect(reverse('home'))
