@@ -1,4 +1,8 @@
-from django.shortcuts import render, reverse, redirect, get_object_or_404
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Other 3rd party
+import requests
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Django
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.views import generic, View
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal
@@ -52,7 +56,5 @@ def make_request(request, pk):
     """
     print('makeing request to the api...')
     query = get_object_or_404(Query, pk=pk)
-    print(query.survey_name)
-    print(query.starting_qid)
-    print(query.ending_qid)
+
     return redirect(reverse('home'))
