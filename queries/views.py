@@ -9,6 +9,9 @@ from django.views import generic, View
 from .forms import QueryForm
 from .models import Query
 
+from .get_survey_metadata import get_all_pages_of_surveys
+from .get_survey_id import get_survey_id
+
 
 class QueryList(generic.ListView):
     """
@@ -56,5 +59,6 @@ def make_request(request, pk):
     """
     print('making request to the api...')
     query = get_object_or_404(Query, pk=pk)
-
+    survey_list = get_all_pages_of_surveys()
+    survey_id = get_survey_id(survey_list, query.survey_name)
     return redirect(reverse('home'))
