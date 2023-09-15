@@ -1,13 +1,13 @@
 import pandas as pd
 
 
-def process_responses():
+def process_responses(response_list):
     """
     checks which responses are valid, and
     """
 
     # filters out the responses that are not complete
-    valid = [x for x in data['data'] if x['status'] == 'Complete']
+    valid = [x for x in response_list['data'] if x['status'] == 'Complete']
     print(len(valid))
 
     # creating a matrix of question titles with
@@ -19,17 +19,6 @@ def process_responses():
         id = key
         question = value['question']
         question_answer_df[f'{id} : {question}'] = []
-
-    # workaround for some valid responses not having
-    # question 180 displayed to them
-    for i in valid:
-        if "180" in i['survey_data']:
-            continue
-        else:
-            i['survey_data']["180"] = {
-                "answer": "N/A",
-                "question": "You said that at least some of the money spent on the NHS is wasted.<br /><br />\nWhich of the following, if any, do you think of as ways the money spent on the NHS is wasted?<br /><br /><em>Select any which apply</em>",
-            }
 
     # Searches each response and appends each answer to
     # each question to the respective list in the matrix
@@ -50,4 +39,4 @@ def process_responses():
 
     # Turn the matrix into a dataframe and output to csv
     data_frame = pd.DataFrame(question_answer_df)
-    data_frame.to_csv('survey_responses.csv', index=False, index_label=None)
+    return question_answer_df
