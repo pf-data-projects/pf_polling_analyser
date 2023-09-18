@@ -34,8 +34,6 @@ def extract_data_from_question_objects(question_list):
         elif question['properties']['required'] is False:
             question_rebase.append(True)
 
-        print(question['id'], question['properties']['required'])
-
         # adds data from json dictionary to the lists
         question_ids.append(question['id'])
         question_texts.append(question['base_type'])
@@ -85,5 +83,5 @@ def extract_data_from_question_objects(question_list):
         'question_rebase': question_rebase
     }
     question_data = pd.DataFrame(question_dict)
-    print(question_data.head())
+    question_data.to_csv('question_data.csv', encoding='utf-8-sig')
     return question_data
