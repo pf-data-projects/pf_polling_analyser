@@ -29,38 +29,40 @@ def get_survey_responses(api_token, api_token_secret, survey_id, page):
     response = requests.get(url, params=params, timeout=10)
     return response.json() if response.status_code == 200 else None
 
-def get_responses_json(survey_id):
-    """
-    Makes a get request to the endpoint for the survey specified,
-    processes the json response, dumping it into a separate file.
-    """
-    main_list = []
-    response = get_survey_responses(
-        api_token=os.environ["API_TOKEN"],
-        api_token_secret=os.environ["API_SECRET"],
-        survey_id=survey_id,
-        page=1)
-    pages = response['total_pages']
-    for i in range(1, pages + 1):
-        print(f'getting page {i} out of {pages} pages of data.')
-        page_data = get_survey_responses(
-            api_token=os.environ["API_TOKEN"],
-            api_token_secret=os.environ["API_SECRET"],
-            survey_id=survey_id,
-            page=i
-        )
-        main_list.extend(page_data['data'])
-        time.sleep(1)
-    return main_list
-
 # def get_responses_json(survey_id):
 #     """
-#     TEST - just gets data for one page.
+#     Makes a get request to the endpoint for the survey specified,
+#     processes the json response, dumping it into a separate file.
 #     """
+#     main_list = []
 #     response = get_survey_responses(
 #         api_token=os.environ["API_TOKEN"],
 #         api_token_secret=os.environ["API_SECRET"],
 #         survey_id=survey_id,
-#         page=1
-#     )
-#     return response
+#         page=1)
+#     pages = response['total_pages']
+#     for i in range(1, pages + 1):
+#         print(f'getting page {i} out of {pages} pages of data.')
+#         page_data = get_survey_responses(
+#             api_token=os.environ["API_TOKEN"],
+#             api_token_secret=os.environ["API_SECRET"],
+#             survey_id=survey_id,
+#             page=i
+#         )
+#         main_list.extend(page_data['data'])
+#         time.sleep(1)
+#     return main_list
+
+def get_responses_json(survey_id):
+    """
+    TESTING - just gets data for one page
+    so that I don't have to make requests for all pages
+    and wait ages.
+    """
+    response = get_survey_responses(
+        api_token=os.environ["API_TOKEN"],
+        api_token_secret=os.environ["API_SECRET"],
+        survey_id=survey_id,
+        page=1
+    )
+    return response
