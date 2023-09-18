@@ -1,4 +1,7 @@
-""" Defines the functions that will make re """
+""" 
+Defines the functions that will make requests to the
+survey response API endpoints.
+"""
 
 import os
 import time

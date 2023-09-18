@@ -1,9 +1,10 @@
 """
-Creates a table filled with zeros.
+Defines the create_blank_table function.
 
-The first column will be a list of questions/answers.
-The subsequent columns will be a total column
-and a column for each crossbreak.
+This function will add all the crossbreaks and questions
+to a big table full of zeros ready to receive the total
+number of respondents in each crossbreak who answered a
+certain way.
 """
 
 import pandas as pd
@@ -20,6 +21,7 @@ def create_blank_table():
     questions = pd.read_csv('question_data.csv')
 
     table = {
+        'IDs':[],
         'Answers': [],
         'Total': [],
         f'{cb.GENDER[0]}': [],
@@ -46,15 +48,19 @@ def create_blank_table():
 
     for i in range(len(questions.index)-1):
         table['Answers'].append(
-            f'{questions.iloc[i, 1]}: {questions.iloc[i, 4]}'
+            f'{questions.iloc[i, 4]}'
         )
 
-    LIST_ZEROS = [0] * len(table['Answers'])
+    for j in range(len(questions.index)-1):
+        table['IDs'].append(
+            f'{questions.iloc[j, 1]}'
+        )
 
-    for key in table.items():
-        if key != 'Answers':
-            table[key] = LIST_ZEROS
+    list_zeros = [0] * len(table['Answers'])
+    for key, value in table.items():
+        if key != 'Answers' and key != 'IDs':
+            table[key] = list_zeros
 
     dataframe = pd.DataFrame(table)
-    print(dataframe.head(10))
+    dataframe.to_csv('blank_table.csv', encoding='utf-8-sig', index=False)
     return dataframe
