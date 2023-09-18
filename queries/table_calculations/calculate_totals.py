@@ -34,4 +34,8 @@ def columns_with_substring(df, substring):
 
 for question in question_list:
     filtered_df = results[columns_with_substring(results, question['qid'])]
-    print(filtered_df.head(10))
+    all_options = question_data.loc[(question_data['question_text'] == 'Option')]
+    relevant_options = all_options.loc[
+        (all_options['question_id'] == int(question_list[81]['qid']))
+        ]
+    print(relevant_options)
