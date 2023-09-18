@@ -1,3 +1,5 @@
+""" Defines the functions that will make re """
+
 import os
 import time
 
