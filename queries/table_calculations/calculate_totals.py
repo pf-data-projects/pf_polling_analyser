@@ -10,7 +10,6 @@ questions_only = question_data.loc[
 question_iterator = results.columns.tolist()
 
 table = create_blank_table()
-print(table.head(20))
 questions = table['Answers'].tolist()
 question_ids = table['IDs'].tolist()
 
@@ -31,20 +30,38 @@ def columns_with_substring(df, substring):
         col for col in df.columns if col.split(" : ", 1)[0] == substring
         ]
 
+# filtered_df = results[columns_with_substring(results, question_list[180]['qid'])]
+# print(filtered_df)
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Work out the totals for each question
 
-# for question in question_list:
-#     if question['question'] == "Skip / Disqualify Logic":
-#         continue
-#     filtered_df = results[columns_with_substring(results, question['qid'])]
-#     all_options = question_data.loc[(question_data['question_text'] == 'Option')]
-#     relevant_options = all_options.loc[
-#         (all_options['question_id'] == int(question['qid']))
-#     ]
-#     options = relevant_options['question_title'].tolist()
-#     print(options)
-#     second_filtered_df = filtered_df.loc[
-#         (filtered_df[f'{question["qid"]} : {question["question"]}'] == options[1])
-#         ]
+for question in question_list:
+    filtered_df = results[columns_with_substring(results, question['qid'])]
+    if not filtered_df.empty:
+        all_options = question_data.loc[(question_data['question_text'] == 'Option')]
+        relevant_options = all_options.loc[
+            (all_options['question_id'] == int(question['qid']))
+        ]
+        options = relevant_options['question_title'].tolist()
+        # print(options)
+        if len(options) > 0:
+            for i, option in enumerate(options):
+                second_filtered_df = filtered_df[filtered_df.iloc[:, 0] == options[i]]
+                # print(question['qid'], options[i], len(second_filtered_df.index))
+                position = table[(
+                    table['Answers'] == options[i]
+                ) & (
+                    table['IDs'] == question['qid']
+                )].index
+                if len(position) > 0:
+                    position_int = int(position[0])
+                    table.iat[position_int, 2] = len(second_filtered_df.index)
+                else:
+                    continue
+        else:
+            continue
+    else:
+        continue
 
-# print("OK")
+print("OK")
+table.to_csv('totals_calculated.csv', encoding="utf-8-sig")
