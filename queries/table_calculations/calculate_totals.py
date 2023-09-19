@@ -1,5 +1,6 @@
 import pandas as pd
 from create_blank_table import create_blank_table
+from define_standard_crossbreaks import columns_with_substring
 
 
 results = pd.read_csv('response_data.csv')
@@ -17,18 +18,6 @@ for i in range(len(questions)):
     }
     question_list.append(item)
 
-def columns_with_substring(df, substring):
-    """
-    Helper function that returns the column
-    of a dataframe which contains a specified substring.
-    """
-    return [
-        col for col in df.columns if col.split(" : ", 1)[0] == substring
-        ]
-
-# filtered_df = results[columns_with_substring(results, question_list[180]['qid'])]
-# print(filtered_df)
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Work out the totals for each question
 
 # loops through all question options to find
@@ -37,7 +26,9 @@ for question in question_list:
     filtered_df = results[columns_with_substring(results, question['qid'])]
     # checks that question exists in responses.
     if not filtered_df.empty:
-        all_options = question_data.loc[(question_data['question_text'] == 'Option')]
+        all_options = question_data.loc[
+            (question_data['question_text'] == 'Option')
+            ]
         relevant_options = all_options.loc[
             (all_options['question_id'] == int(question['qid']))
         ]
@@ -46,7 +37,9 @@ for question in question_list:
         # E.G. Age crossbreak question has no options.
         if len(options) > 0:
             for i, option in enumerate(options):
-                second_filtered_df = filtered_df[filtered_df.iloc[:, 0] == options[i]]
+                second_filtered_df = filtered_df[
+                    filtered_df.iloc[:, 0] == options[i]
+                    ]
                 position = table[(
                     table['Answers'] == options[i]
                 ) & (
@@ -66,4 +59,4 @@ for question in question_list:
         continue
 
 print("OK")
-table.to_csv('totals_calculated.csv', encoding="utf-8-sig")
+table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
