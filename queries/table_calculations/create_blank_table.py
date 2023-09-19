@@ -20,6 +20,11 @@ def create_blank_table():
     """
     questions = pd.read_csv('question_data.csv')
 
+    # filters out entries that aren't 'Questions' or 'Options'.
+    questions = questions[
+        questions['question_text'].str.contains('Question|Option', na=False)
+    ]
+
     table = {
         'IDs':[],
         'Answers': [],

@@ -10,6 +10,7 @@ questions_only = question_data.loc[
 question_iterator = results.columns.tolist()
 
 table = create_blank_table()
+print(table.head(20))
 questions = table['Answers'].tolist()
 question_ids = table['IDs'].tolist()
 
@@ -32,18 +33,18 @@ def columns_with_substring(df, substring):
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Work out the totals for each question
 
-for question in question_list:
-    if question['question'] == "Skip / Disqualify Logic":
-        continue
-    filtered_df = results[columns_with_substring(results, question['qid'])]
-    all_options = question_data.loc[(question_data['question_text'] == 'Option')]
-    relevant_options = all_options.loc[
-        (all_options['question_id'] == int(question['qid']))
-    ]
-    options = relevant_options['question_title'].tolist()
-    print(options)
-    second_filtered_df = filtered_df.loc[
-        (filtered_df[f'{question["qid"]} : {question["question"]}'] == options[1])
-        ]
+# for question in question_list:
+#     if question['question'] == "Skip / Disqualify Logic":
+#         continue
+#     filtered_df = results[columns_with_substring(results, question['qid'])]
+#     all_options = question_data.loc[(question_data['question_text'] == 'Option')]
+#     relevant_options = all_options.loc[
+#         (all_options['question_id'] == int(question['qid']))
+#     ]
+#     options = relevant_options['question_title'].tolist()
+#     print(options)
+#     second_filtered_df = filtered_df.loc[
+#         (filtered_df[f'{question["qid"]} : {question["question"]}'] == options[1])
+#         ]
 
-print("OK")
+# print("OK")
