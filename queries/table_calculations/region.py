@@ -63,4 +63,26 @@ def calc_region(category, col_index):
     table.to_csv('region.csv', encoding="utf-8-sig", index=False)
     print(category, "done!")
 
-calc_region('London', 11)
+
+def iterate_regions():
+    """
+    Loops through the list of regions and
+    builds a list of dictionaries which
+    contain the necessary arguments for a call
+    of the calc_region function.
+    """
+    regions = cb.REGION
+    table_col = 11
+    regions_iterator = []
+    for region in regions:
+        iteration = {
+            'region': region,
+            'col': table_col
+        }
+        regions_iterator.append(iteration)
+        table_col += 1
+    for iteration in regions_iterator:
+        calc_region(iteration['region'], iteration['col'])
+
+
+iterate_regions()

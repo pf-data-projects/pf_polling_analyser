@@ -18,14 +18,6 @@ for i in range(len(questions)):
     question_list.append(item)
 
 
-
-# filtered_df = results[cb.columns_with_substring_question(results, gender_q)]
-# get_gender = results[cb.columns_with_substring_question(results, gender_q)]
-# filtered_df = results.loc[(results[get_gender.columns[0]] == 'Female')]
-# filtered_df = filtered_df[cb.columns_with_substring(results, question_list[81]['qid'])]
-# print(len(filtered_df.index))
-# print(filtered_df)
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ work out how males answered the survey
 
 
