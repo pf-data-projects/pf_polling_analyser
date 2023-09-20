@@ -17,17 +17,18 @@ for i in range(len(questions)):
     }
     question_list.append(item)
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Calculate responses by region
-
-def calc_region(category, col_index):
+def calc_age(category, col_index):
     """
     A function to run table calculations
     for gender crossbreaks.
     """
-    region_q = 'In what region of the UK do you live?'
+    age_q = 'How old are you?'
     for question in question_list:
-        get_gender = results[cb.columns_with_substring_question(results, region_q)]
-        filtered_df = results.loc[(results[get_gender.columns[0]] == category)]
+        get_age = results[cb.columns_with_substring_question(results, age_q)]
+        filtered_df = results.loc[
+            (results[get_age.columns[0]] >= category[0])
+            ]
+        filtered_df = filtered_df.loc[(results[get_age.columns[0]] <= category[1])]
         filtered_df = filtered_df[cb.columns_with_substring(results, question['qid'])]
         # checks that question exists in responses.
         if not filtered_df.empty:
@@ -39,10 +40,10 @@ def calc_region(category, col_index):
             # checks that there are options for the question.
             # E.G. Age crossbreak question has no options.
             if len(options) > 0:
-                for j, option in enumerate(options):
-                    second_filtered_df = filtered_df[filtered_df.iloc[:, 0] == options[j]]
+                for i, option in enumerate(options):
+                    second_filtered_df = filtered_df[filtered_df.iloc[:, 0] == options[i]]
                     position = table[(
-                        table['Answers'] == options[j]
+                        table['Answers'] == options[i]
                     ) & (
                         table['IDs'] == int(question['qid'])
                     )].index
@@ -60,28 +61,45 @@ def calc_region(category, col_index):
         else:
             continue
     print(table.head(20))
-    table.to_csv('region.csv', encoding="utf-8-sig", index=False)
-    print(category, "done!")
+    table.to_csv('age.csv', encoding="utf-8-sig", index=False)
+    print(category[0], "done!")
 
 
-def iterate_regions():
+def iterage_age_brackets():
+    """ 
+    Builds a list of age brackets from the cb module
+    and calls the calc_age func based on the data
+    in the list of age bracket objects.
     """
-    Loops through the list of regions and
-    builds a list of dictionaries which
-    contain the necessary arguments for a call
-    of the calc_region function.
-    """
-    regions = cb.REGION
-    table_col = 11
-    regions_iterator = []
-    for region in regions:
-        iteration = {
-            'region': region,
-            'col': table_col
-        }
-        regions_iterator.append(iteration)
+    ages = cb.AGE
+    table_col = 5
+    age_brackets = []
+    for age in ages:
+        if "-" in age:
+            num1 = int(age.split("-", 1)[0])
+            num2 = int(age.split("-", 1)[1])
+            bracket = {
+                'num1': num1,
+                'num2': num2,
+                'col': table_col
+            }
+            age_brackets.append(bracket)
+        else:
+            num1 = int(age.split("+", 1)[0])
+            num2 = 200
+            bracket = {
+                'num1': num1,
+                'num2': num2,
+                'col': table_col
+            }
+            age_brackets.append(bracket)
         table_col += 1
-    for iteration in regions_iterator:
-        calc_region(iteration['region'], iteration['col'])
+    for bracket in age_brackets:
+        calc_age([bracket['num1'], bracket['num2']], bracket['col'])
 
-iterate_regions()
+iterage_age_brackets()
+
+# example = [65, 200]
+# col = 5
+
+# calc_age(example, col)
