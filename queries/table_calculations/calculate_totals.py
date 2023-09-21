@@ -1,6 +1,8 @@
 import pandas as pd
 from create_blank_table import create_blank_table
-from define_standard_crossbreaks import columns_with_substring
+from define_standard_crossbreaks import columns_with_substring, columns_with_substring_question
+from gender import calc_gender
+from age import iterage_age_brackets
 
 
 results = pd.read_csv('response_data.csv')
@@ -59,4 +61,7 @@ for question in question_list:
         continue
 
 print("OK")
-table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
+# table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
+table = calc_gender("Male", 3, table, question_list, results, question_data)
+table = calc_gender("Female", 4, table, question_list, results, question_data)
+table = calc

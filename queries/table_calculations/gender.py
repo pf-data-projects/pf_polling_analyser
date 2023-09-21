@@ -4,24 +4,21 @@ import define_standard_crossbreaks as cb
 
 results = pd.read_csv('response_data.csv')
 table = pd.read_csv('totals_calculated.csv')
-question_data = pd.read_csv('question_data.csv')
+# question_data = pd.read_csv('question_data.csv')
 
-questions = table['Answers'].tolist()
-question_ids = table['IDs'].tolist()
+# questions = table['Answers'].tolist()
+# question_ids = table['IDs'].tolist()
 
-question_list = []
-for i in range(len(questions)):
-    item = {
-        'qid': f'{question_ids[i]}',
-        'question': questions[i]
-    }
-    question_list.append(item)
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ work out how males answered the survey
+# question_list = []
+# for i in range(len(questions)):
+#     item = {
+#         'qid': f'{question_ids[i]}',
+#         'question': questions[i]
+#     }
+#     question_list.append(item)
 
 
-def calc_gender(category, col_index):
+def calc_gender(category, col_index, table, question_list, results, question_data):
     """
     A function to run table calculations
     for gender crossbreaks.
@@ -46,9 +43,10 @@ def calc_gender(category, col_index):
                     position = table[(
                         table['Answers'] == options[i]
                     ) & (
-                        table['IDs'] == int(question['qid'])
+                        table['IDs'] == question['qid']
                     )].index
-
+                    # print(options[i])
+                    # print(question['qid'])
                     # Checks that this exists in the table.
                     # I think the different indexers for
                     # different loops are not quite the same.
@@ -62,8 +60,8 @@ def calc_gender(category, col_index):
         else:
             continue
     print(table.head(20))
-    table.to_csv('gender.csv', encoding="utf-8-sig", index=False)
+    # table.to_csv('gender.csv', encoding="utf-8-sig", index=False)
     print(category, "done!")
+    return table
 
-calc_gender("Male", 3)
-calc_gender("Female", 4)
+# calc_gender("Male", 3, table, question_list, results, question_data)
