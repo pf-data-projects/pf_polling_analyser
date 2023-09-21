@@ -7,7 +7,10 @@ import os
 import time
 
 import requests
+import pandas as pd
 
+# from . import get_processed_responses
+from get_processed_responses import process_responses
 if os.path.exists("env.py"):
     import env
 
@@ -64,10 +67,45 @@ def get_responses_json(survey_id):
     so that I don't have to make requests for all pages
     and wait ages.
     """
+    print("getting number of pages...")
     response = get_survey_responses(
         api_token=os.environ["API_TOKEN"],
         api_token_secret=os.environ["API_SECRET"],
         survey_id=survey_id,
         page=1
     )
-    return response
+    pages = response['total_pages']
+    print(f'there are {pages} pages')
+    data = {}
+    data = pd.DataFrame(data)
+    for i in range(1, pages + 1):
+        print("page:", i)
+        page_data = get_survey_responses(
+            api_token=os.environ["API_TOKEN"],
+            api_token_secret=os.environ["API_SECRET"],
+            survey_id=survey_id,
+            page=i
+        )
+        page_data = process_responses(page_data)
+        if i > 1:
+            frames = [data, page_data] # This line and the next should add pages of results together.
+            data = pd.concat(frames)
+        else:
+            data = page_data
+    print(data)
+    data.to_csv('DEFINITELY-A-TEST.csv', encoding="utf-8-sig", index=False)
+
+# print("hello!")
+get_responses_json(7499039)
+
+def testy_test(survey_id):
+    response = get_survey_responses(
+        api_token=os.environ["API_TOKEN"],
+        api_token_secret=os.environ["API_SECRET"],
+        survey_id=survey_id,
+        page=12
+    )
+    data = process_responses(response)
+    # print(data)
+
+# testy_test(7499039)

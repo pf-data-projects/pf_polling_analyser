@@ -74,14 +74,14 @@ def make_request(request, pk):
     survey_list = get_all_pages_of_surveys()
     survey_id = get_survey_id(survey_list, query.survey_name)
     print(survey_id)
-    for i in range(0, 60):
-        print(f'Manual throttle: waiting {60 - i} seconds...')
-        sleep(1)
-    survey_questions = get_questions_json(survey_id)
-    questions = extract_questions_from_pages(survey_questions)
-    question_data = extract_data_from_question_objects(questions)
-    response_list = get_responses_json(survey_id)
-    response_data = process_responses(response_list)
-    print(response_data.head(5))
+    # for i in range(0, 60):
+    #     print(f'Manual throttle: waiting {60 - i} seconds...')
+    #     sleep(1)
+    # survey_questions = get_questions_json(survey_id)
+    # questions = extract_questions_from_pages(survey_questions)
+    # question_data = extract_data_from_question_objects(questions)
+    # response_list = get_responses_json(survey_id)
+    # response_data = process_responses(response_list)
+    # print(response_data.head(5))
 
     return redirect(reverse('home'))
