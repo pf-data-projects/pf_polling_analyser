@@ -2,24 +2,23 @@ import pandas as pd
 
 import define_standard_crossbreaks as cb
 
-results = pd.read_csv('response_data.csv')
-table = pd.read_csv('totals_calculated.csv')
-question_data = pd.read_csv('question_data.csv')
+# results = pd.read_csv('response_data.csv')
+# table = pd.read_csv('totals_calculated.csv')
+# question_data = pd.read_csv('question_data.csv')
 
-questions = table['Answers'].tolist()
-question_ids = table['IDs'].tolist()
+# questions = table['Answers'].tolist()
+# question_ids = table['IDs'].tolist()
 
-question_list = []
-for i in range(len(questions)):
-    item = {
-        'qid': f'{question_ids[i]}',
-        'question': questions[i]
-    }
-    question_list.append(item)
+# question_list = []
+# for i in range(len(questions)):
+#     item = {
+#         'qid': f'{question_ids[i]}',
+#         'question': questions[i]
+#     }
+#     question_list.append(item)
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Calculate responses by region
 
-def calc_region(category, col_index):
+def calc_region(category, col_index, table, question_list, results, question_data):
     """
     A function to run table calculations
     for gender crossbreaks.
@@ -44,7 +43,7 @@ def calc_region(category, col_index):
                     position = table[(
                         table['Answers'] == options[j]
                     ) & (
-                        table['IDs'] == int(question['qid'])
+                        table['IDs'] == question['qid']
                     )].index
 
                     # Checks that this exists in the table.
@@ -59,12 +58,13 @@ def calc_region(category, col_index):
                 continue
         else:
             continue
-    print(table.head(20))
+    # print(table.head(20))
     table.to_csv('region.csv', encoding="utf-8-sig", index=False)
     print(category, "done!")
+    return table
 
 
-def iterate_regions():
+def iterate_regions(table, question_list, results, question_data):
     """
     Loops through the list of regions and
     builds a list of dictionaries which
@@ -82,6 +82,8 @@ def iterate_regions():
         regions_iterator.append(iteration)
         table_col += 1
     for iteration in regions_iterator:
-        calc_region(iteration['region'], iteration['col'])
-
-iterate_regions()
+        table = calc_region(
+            iteration['region'],
+            iteration['col'], table, question_list, results, question_data
+            )
+    return table

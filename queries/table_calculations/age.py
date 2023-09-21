@@ -2,21 +2,6 @@ import pandas as pd
 
 import define_standard_crossbreaks as cb
 
-# results = pd.read_csv('response_data.csv')
-# table = pd.read_csv('totals_calculated.csv')
-# question_data = pd.read_csv('question_data.csv')
-
-# questions = table['Answers'].tolist()
-# question_ids = table['IDs'].tolist()
-
-# question_list = []
-# for i in range(len(questions)):
-#     item = {
-#         'qid': f'{question_ids[i]}',
-#         'question': questions[i]
-#     }
-#     question_list.append(item)
-
 def calc_age(category, col_index, table, question_list, results, question_data):
     """
     A function to run table calculations
@@ -45,7 +30,7 @@ def calc_age(category, col_index, table, question_list, results, question_data):
                     position = table[(
                         table['Answers'] == options[i]
                     ) & (
-                        table['IDs'] == int(question['qid'])
+                        table['IDs'] == question['qid']
                     )].index
 
                     # Checks that this exists in the table.
@@ -60,12 +45,13 @@ def calc_age(category, col_index, table, question_list, results, question_data):
                 continue
         else:
             continue
-    print(table.head(20))
-    table.to_csv('age.csv', encoding="utf-8-sig", index=False)
+    # print(table.head(20))
+    # table.to_csv('age.csv', encoding="utf-8-sig", index=False)
     print(category[0], "done!")
+    return table
 
 
-def iterage_age_brackets(table, question_list, results, question_data):
+def iterate_age_brackets(table, question_list, results, question_data):
     """ 
     Builds a list of age brackets from the cb module
     and calls the calc_age func based on the data
@@ -95,11 +81,13 @@ def iterage_age_brackets(table, question_list, results, question_data):
             age_brackets.append(bracket)
         table_col += 1
     for bracket in age_brackets:
-        calc_age([bracket['num1'], bracket['num2']], bracket['col'])
-
-# iterage_age_brackets()
-
-# example = [65, 200]
-# col = 5
-
-# calc_age(example, col)
+        table = calc_age(
+            [bracket['num1'], bracket['num2']],
+            bracket['col'],
+            table,
+            question_list,
+            results,
+            question_data
+        )
+        # print(table)
+    return table
