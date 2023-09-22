@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 
     'profiles',
     'queries',
+    'upload',
 ]
 
 SITE_ID = 1

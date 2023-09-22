@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Upload CSV</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Upload</button>
+    </form>
+
+    {% if data %}
+    <h2>CSV Data</h2>
+    <table>
+        <thead>
+            <tr>
+                {% for header in data.0.keys %}
+                <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                {% for _, value in row.items %}
+                <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr>
+    <p><a href="">Back to query list</a></p>
+    <p><a href="">Make survey database query</a></p>
+    {% endif %}
+{% endblock %}
