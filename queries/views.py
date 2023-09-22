@@ -83,12 +83,13 @@ def make_request(request, pk):
         sleep(1)
 
     # get all questions of survey from db, unpaginate, return relevant data.
-    survey_questions = get_questions_json(survey_id)
-    questions = extract_questions_from_pages(survey_questions)
-    question_data = extract_data_from_question_objects(questions)
+    # survey_questions = get_questions_json(survey_id)
+    # questions = extract_questions_from_pages(survey_questions)
+    # question_data = extract_data_from_question_objects(questions)
+    # print(question_data)
 
     # get all responses to the survey in dataframe format.
-    response_data = get_responses(survey_id)
-    print(response_data)
+    # response_data = get_responses(survey_id)
+    # print(response_data)
 
     return redirect(reverse('home'))

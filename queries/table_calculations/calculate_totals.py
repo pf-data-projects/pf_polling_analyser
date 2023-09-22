@@ -67,8 +67,12 @@ table = calc_gender("Female", 4, table, question_list, results, question_data)
 table = iterate_age_brackets(table, question_list, results, question_data)
 table = iterate_regions(table, question_list, results, question_data)
 
-total_respondents = len(table.index)
-constant = 1 / total_respondents
+# Make numbers in table a percentage of all respondents.
+total_respondents = len(results.index)
+constant = total_respondents
+print(constant)
+table = table.applymap(
+    lambda x: x / constant * 100 if isinstance(x, int) else x)
 
 
 table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)

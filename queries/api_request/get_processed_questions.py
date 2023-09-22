@@ -29,10 +29,13 @@ def extract_data_from_question_objects(question_list):
     for question in question_list:
 
         # checks if the question is shown to all respondents
-        if question['properties']['required'] is True:
-            question_rebase.append(False)
-        elif question['properties']['required'] is False:
-            question_rebase.append(True)
+        if 'required' in question['properties']:
+            if question['properties']['required'] is True:
+                question_rebase.append(False)
+            elif question['properties']['required'] is False:
+                question_rebase.append(True)
+        else:
+            question_rebase.append('N/A')
 
         # adds data from json dictionary to the lists
         question_ids.append(question['id'])

@@ -33,7 +33,8 @@ def get_survey_list(endpoint, api_token, api_token_secret, page):
     }
 
     # Make the GET request with the authentication parameters
-    response = requests.get(url, params=params, timeout=10)
+    session = requests.Session()
+    response = session.get(url, params=params, timeout=10)
 
     # Check for a successful response
     if response.status_code == 200:
