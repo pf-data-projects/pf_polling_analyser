@@ -13,11 +13,11 @@ def upload_csv(request):
         form = CSVUploadForm(request.POST, request.FILES)
         if form.is_valid():
             csv_file = request.FILES['csv_file']
-            data = pd.read_csv(csv_file)
+            data = pd.read_excel(csv_file)
+            print(data.head(10))
     else:
         form = CSVUploadForm()
 
-    return render(request, 'upload.html', {
+    return render(request, 'upload_form.html', {
         'form': form,
-        'data': data.to_dict(orient='records') if data is not None else None,
     })
