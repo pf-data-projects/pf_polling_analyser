@@ -8,6 +8,8 @@
         {{ form.as_p }}
         <button type="submit">Upload</button>
     </form>
+    <p><a href="{% url 'home' %}">Back to query list</a></p>
+    <p><a href="{% url 'create' %}">Make survey database query</a></p>
 
     {% if data %}
     <h2>CSV Data</h2>
@@ -30,7 +32,7 @@
         </tbody>
     </table>
     <hr>
-    <p><a href="">Back to query list</a></p>
-    <p><a href="">Make survey database query</a></p>
+
     {% endif %}
+
 {% endblock %}
