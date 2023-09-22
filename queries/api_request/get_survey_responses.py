@@ -9,8 +9,7 @@ import time
 import requests
 import pandas as pd
 
-# from . import get_processed_responses
-from get_processed_responses import process_responses
+from .get_processed_responses import process_responses
 if os.path.exists("env.py"):
     import env
 
@@ -37,31 +36,7 @@ def get_survey_responses(api_token, api_token_secret, survey_id, page):
     response = requests.get(url, params=params, timeout=10)
     return response.json() if response.status_code == 200 else None
 
-# def get_responses_json(survey_id):
-#     """
-#     Makes a get request to the endpoint for the survey specified,
-#     processes the json response, dumping it into a separate file.
-#     """
-#     main_list = []
-#     response = get_survey_responses(
-#         api_token=os.environ["API_TOKEN"],
-#         api_token_secret=os.environ["API_SECRET"],
-#         survey_id=survey_id,
-#         page=1)
-#     pages = response['total_pages']
-#     for i in range(1, pages + 1):
-#         print(f'getting page {i} out of {pages} pages of data.')
-#         page_data = get_survey_responses(
-#             api_token=os.environ["API_TOKEN"],
-#             api_token_secret=os.environ["API_SECRET"],
-#             survey_id=survey_id,
-#             page=i
-#         )
-#         main_list.extend(page_data['data'])
-#         time.sleep(1)
-#     return main_list
-
-def get_responses_json(survey_id):
+def get_responses(survey_id):
     """
     TESTING - just gets data for one page
     so that I don't have to make requests for all pages
@@ -88,24 +63,12 @@ def get_responses_json(survey_id):
         )
         page_data = process_responses(page_data)
         if i > 1:
-            frames = [data, page_data] # This line and the next should add pages of results together.
+            # sticks all response data together into one df
+            frames = [data, page_data]
             data = pd.concat(frames)
         else:
             data = page_data
-    print(data)
     data.to_csv('DEFINITELY-A-TEST.csv', encoding="utf-8-sig", index=False)
+    return data
 
-# print("hello!")
-get_responses_json(7499039)
-
-def testy_test(survey_id):
-    response = get_survey_responses(
-        api_token=os.environ["API_TOKEN"],
-        api_token_secret=os.environ["API_SECRET"],
-        survey_id=survey_id,
-        page=12
-    )
-    data = process_responses(response)
-    # print(data)
-
-# testy_test(7499039)
+# get_responses(7499039)
