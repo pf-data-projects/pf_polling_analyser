@@ -1,6 +1,6 @@
 import pandas as pd
 
-import define_standard_crossbreaks as cb
+from . import define_standard_crossbreaks as cb
 
 results = pd.read_csv('response_data.csv')
 table = pd.read_csv('totals_calculated.csv')

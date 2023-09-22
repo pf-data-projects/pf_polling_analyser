@@ -19,6 +19,8 @@ from .api_request.get_processed_questions import (
 )
 from .api_request.get_survey_responses import get_responses
 
+from .table_calculations.calculate_totals import table_calculation
+
 from .forms import QueryForm
 from .models import Query
 
@@ -83,13 +85,16 @@ def make_request(request, pk):
         sleep(1)
 
     # get all questions of survey from db, unpaginate, return relevant data.
-    # survey_questions = get_questions_json(survey_id)
-    # questions = extract_questions_from_pages(survey_questions)
-    # question_data = extract_data_from_question_objects(questions)
-    # print(question_data)
+    survey_questions = get_questions_json(survey_id)
+    questions = extract_questions_from_pages(survey_questions)
+    question_data = extract_data_from_question_objects(questions)
 
     # get all responses to the survey in dataframe format.
-    # response_data = get_responses(survey_id)
+    response_data = get_responses(survey_id)
     # print(response_data)
+
+    # process the data
+    table = table_calculation(response_data, question_data)
+
 
     return redirect(reverse('home'))

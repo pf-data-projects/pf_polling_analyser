@@ -33,7 +33,8 @@ def get_survey_responses(api_token, api_token_secret, survey_id, page):
     }
 
     # Make the GET request with the authentication parameters
-    response = requests.get(url, params=params, timeout=10)
+    session = requests.Session()
+    response = session.get(url, params=params, timeout=10)
     return response.json() if response.status_code == 200 else None
 
 def get_responses(survey_id):
@@ -70,5 +71,3 @@ def get_responses(survey_id):
             data = page_data
     data.to_csv('DEFINITELY-A-TEST.csv', encoding="utf-8-sig", index=False)
     return data
-
-# get_responses(7499039)

@@ -8,7 +8,7 @@ certain way.
 """
 
 import pandas as pd
-import define_standard_crossbreaks as cb
+from . import define_standard_crossbreaks as cb
 
 def create_blank_table():
     """

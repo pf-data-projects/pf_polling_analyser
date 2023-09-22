@@ -1,6 +1,6 @@
 import pandas as pd
 
-import define_standard_crossbreaks as cb
+from . import define_standard_crossbreaks as cb
 
 def calc_age(category, col_index, table, question_list, results, question_data):
     """
