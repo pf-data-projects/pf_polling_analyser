@@ -5,6 +5,7 @@ from django.shortcuts import render
 from .forms import CSVUploadForm
 
 from .clean_data.clean_survey_legend import clean_survey_legend
+from .clean_data.clean_order import clean_order
 
 def read_word_file(file):
     """ 
@@ -33,7 +34,8 @@ def upload_csv(request):
             order = pd.read_excel(order_file)
             legend_text = read_word_file(survey_legend)
 
-            clean_survey_legend(legend_text)
+            # clean_survey_legend(legend_text)
+            clean_order(order)
             # print(data.head(10))
             # print(order.head(10))
             # print(legend_text)

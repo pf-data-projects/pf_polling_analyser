@@ -10,5 +10,9 @@ def clean_survey_legend(legend):
     for each question and returns the information
     as a pandas dataframe.
     """
+    question_list = []
     pages = legend.split(sep="\nPage")
-    print(pages[0])
+    # print(pages[0])
+    for page in pages:
+        question = page.split("QID")
+        print(question)
