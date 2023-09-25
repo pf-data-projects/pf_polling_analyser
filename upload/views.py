@@ -4,6 +4,8 @@ from docx import Document
 from django.shortcuts import render
 from .forms import CSVUploadForm
 
+from .clean_data.clean_survey_legend import clean_survey_legend
+
 def read_word_file(file):
     """ 
     Helper function to convert word file into string.
@@ -26,14 +28,15 @@ def upload_csv(request):
             data_file = request.FILES['data_file']
             order_file = request.FILES['order_file']
             survey_legend = request.FILES['survey_legend_file']
-
+            # convert the data to python-readable formats
             data = pd.read_excel(data_file)
             order = pd.read_excel(order_file)
             legend_text = read_word_file(survey_legend)
 
-            print(data.head(10))
-            print(order.head(10))
-            print(legend_text)
+            clean_survey_legend(legend_text)
+            # print(data.head(10))
+            # print(order.head(10))
+            # print(legend_text)
     else:
         form = CSVUploadForm()
 
