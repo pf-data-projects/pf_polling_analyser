@@ -7,6 +7,8 @@ from .forms import CSVUploadForm
 from .clean_data.clean_survey_legend import clean_survey_legend
 from .clean_data.clean_order import clean_order
 
+from queries.table_calculations.calculate_totals import table_calculation
+
 def read_word_file(file):
     """ 
     Helper function to convert word file into string.
@@ -35,10 +37,11 @@ def upload_csv(request):
             legend_text = read_word_file(survey_legend)
 
             # clean_survey_legend(legend_text)
-            clean_order(order)
+            cleaned_order = clean_order(order)
             # print(data.head(10))
-            # print(order.head(10))
+            # print(cleaned_order.head(10))
             # print(legend_text)
+            table_calculation(data, cleaned_order)
     else:
         form = CSVUploadForm()
 

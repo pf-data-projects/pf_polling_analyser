@@ -19,7 +19,7 @@ def columns_with_substring(df, substring):
     Searches by question id.
     """
     return [
-        col for col in df.columns if col.split(" : ", 1)[0] == substring
+        col for col in df.columns if col.split(": ", 1)[0] == substring
         ]
 
 

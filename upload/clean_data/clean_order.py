@@ -12,29 +12,24 @@ def clean_order(order):
     """
     # filters the df by records that pertain to actual questions
     filtered = order[order['Key'].str.contains('q-')]
-    print(filtered)
 
     # filters out records that are option headers from the df
     filtered = filtered[
         ~filtered['Key'].str.contains('optionheader', case=False)
         ]
-    print(filtered)
 
     # filters out instructions to select 'other'
     filtered = filtered[
         ~filtered['Key'].str.contains('other', case=False)
         ]
-    print(filtered)
 
     # filters out disqualification message
     filtered = filtered[
         ~filtered['Key'].str.contains('disqualify', case=False)
         ]
-    print(filtered)
 
     # added_columns = filter_valid_questions['Opt/Quest.'] = "Question"
     print("NO ERROR")
-    print(filtered)
 
     cleaned_dataframe = {
         "QID": [],
@@ -50,11 +45,17 @@ def clean_order(order):
         cleaned_dataframe['Question'].append(question)
 
         if "-o-" in row['Key']:
-            cleaned_dataframe['Type'].append("option")
+            cleaned_dataframe['Type'].append("Option")
         else:
-            cleaned_dataframe['Type'].append("question")
+            cleaned_dataframe['Type'].append("Question")
 
     cleaned_order = pd.DataFrame(cleaned_dataframe)
+    cleaned_order = cleaned_order.rename(columns={
+        "QID": "question_id",
+        "Question": "question_title",
+        "Type": "question_text"
+    })
     cleaned_order.to_csv("testy_test.csv", encoding="utf-8-sig", index=False)
 
-    print(cleaned_order.head(10))
+    # print(cleaned_order.head(10))
+    return cleaned_order

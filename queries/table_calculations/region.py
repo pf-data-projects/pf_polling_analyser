@@ -44,7 +44,7 @@ def calc_region(category, col_index, table, question_list, results, question_dat
         else:
             continue
     # print(table.head(20))
-    table.to_csv('region.csv', encoding="utf-8-sig", index=False)
+    # table.to_csv('region.csv', encoding="utf-8-sig", index=False)
     print(category, "done!")
     return table
 
