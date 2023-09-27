@@ -14,7 +14,7 @@ def table_calculation(results, question_data):
     A function that controls the flow of logic for the
     creation of the table.
     """
-    print(question_data.head(10))
+    # print(question_data.head(10))
 
     table = create_blank_table()
     questions = table['Answers'].tolist()
@@ -34,7 +34,7 @@ def table_calculation(results, question_data):
     # number of respondents who answered a certain way
     for question in question_list:
         filtered_df = results[columns_with_substring(results, question['qid'])]
-        
+
         # checks that question exists in responses.
         if not filtered_df.empty:
             all_options = question_data.loc[
@@ -43,6 +43,10 @@ def table_calculation(results, question_data):
             relevant_options = all_options.loc[
                 (all_options['question_id'] == int(question['qid']))
             ]
+            if len(relevant_options.index) == 0:
+                relevant_options = all_options.loc[
+                    (all_options['question_id'] == question['qid'])
+                ]
             options = relevant_options['question_title'].tolist()
             # checks that there are options for the question.
             # E.G. Age crossbreak question has no options.
@@ -70,8 +74,8 @@ def table_calculation(results, question_data):
             continue
     print(table)
     # print("OK")
-    # table = calc_gender("Male", 3, table, question_list, results, question_data)
-    # table = calc_gender("Female", 4, table, question_list, results, question_data)
+    table = calc_gender("Male", 3, table, question_list, results, question_data)
+    table = calc_gender("Female", 4, table, question_list, results, question_data)
     # table = iterate_age_brackets(table, question_list, results, question_data)
     # table = iterate_regions(table, question_list, results, question_data)
 
@@ -82,5 +86,5 @@ def table_calculation(results, question_data):
     table = table.applymap(
         lambda x: x / constant * 100 if isinstance(x, int) else x)
     # create a csv for manual QA
-    table.to_csv('totals_calculated_from_other_data.csv', encoding="utf-8-sig", index=False)
+    table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
     return table

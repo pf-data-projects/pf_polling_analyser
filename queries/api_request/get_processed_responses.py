@@ -31,7 +31,7 @@ def process_responses(response_list):
     for key, value in aggregated_responses.items():
         question_id = key
         question = value[0]['question']
-        question_answer_df[f'{question_id} : {question}'] = []
+        question_answer_df[f'{question_id}: {question}'] = []
 
     # Searches each response and appends each answer to
     # each question to the respective list in the matrix
@@ -44,30 +44,30 @@ def process_responses(response_list):
                     continue
                 if 'answer' in response['survey_data'][key]:
                     question_answer_df[
-                        key + ' : ' + value[0]['question']
+                        key + ': ' + value[0]['question']
                     ].append(response['survey_data'][key]['answer'])
                 elif 'options' in response['survey_data'][key]:
                     question_answer_df[
-                        key + ' : ' + value[0]['question']
+                        key + ': ' + value[0]['question']
                     ].append(response['survey_data'][key]['options'])
                 elif 'shown' in response['survey_data'][key]:
                     shown = response['survey_data'][key]['shown']
                     if shown is False:
                         question_answer_df[
-                            key + ' : ' + value[0]['question']
+                            key + ': ' + value[0]['question']
                         ].append('Not answered by respondent')
                     # extra condition if shown is true and there is no answer for question.
                     elif shown is True and 'answer' not in response['survey_data'][key]:
                         question_answer_df[
-                            key + ' : ' + value[0]['question']
+                            key + ': ' + value[0]['question']
                         ].append('N/A')
                 else:
                     question_answer_df[
-                        key + ' : ' + value[0]['question']
+                        key + ': ' + value[0]['question']
                     ].append('N/A')
             else:
                 question_answer_df[
-                    key + ' : ' + value[0]['question']
+                    key + ': ' + value[0]['question']
                 ].append('N/A')
             # print(len(question_answer_df["208 : What is the maximum you would be willing to pay for your ideal private number plate?"]))
             # print(len(question_answer_df["207 : At present, personalized (private) licence plates on vehicles have to match the style of non-personalised plates on vehicles. For example, the current format of two letters, two numbers a space and three letters - AB18 ABC. Or the older \u201cprefix\u201d format of A123 ABC.<br /><br />\nSuppose the government changed the rules to allow you to have any licence plate you like \u2013 for example your name, a love one\u2019s name, the name of your business or your job. How much more likely would you be to purchase a personalised number plate?"]))
