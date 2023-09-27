@@ -31,5 +31,6 @@ def columns_with_substring_question(df, substring):
     Searches by question title/text
     """
     return [
-        col for col in df.columns if col.split(": ", 1)[1] == substring
+        col for col in df.columns
+        if (": " in col) and (col.split(": ", 1)[1] == substring)
         ]
