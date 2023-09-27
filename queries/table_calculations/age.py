@@ -21,6 +21,10 @@ def calc_age(category, col_index, table, question_list, results, question_data):
             relevant_options = all_options.loc[
                 (all_options['question_id'] == int(question['qid']))
             ]
+            if len(relevant_options.index) == 0:
+                relevant_options = all_options.loc[
+                    (all_options['question_id'] == question['qid'])
+                ]
             options = relevant_options['question_title'].tolist()
             # checks that there are options for the question.
             # E.G. Age crossbreak question has no options.

@@ -32,8 +32,8 @@ def upload_csv(request):
             order_file = request.FILES['order_file']
             survey_legend = request.FILES['survey_legend_file']
             # convert the data to python-readable formats
-            # data = pd.read_excel(data_file, header=0)
-            data = pd.read_csv(data_file, encoding="utf-8-sig")
+            data = pd.read_excel(data_file, header=0)
+            # data = pd.read_csv(data_file, encoding="utf-8-sig")
             order = pd.read_excel(order_file)
             legend_text = read_word_file(survey_legend)
 

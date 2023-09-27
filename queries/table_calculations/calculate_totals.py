@@ -76,8 +76,8 @@ def table_calculation(results, question_data):
     # print("OK")
     table = calc_gender("Male", 3, table, question_list, results, question_data)
     table = calc_gender("Female", 4, table, question_list, results, question_data)
-    # table = iterate_age_brackets(table, question_list, results, question_data)
-    # table = iterate_regions(table, question_list, results, question_data)
+    table = iterate_age_brackets(table, question_list, results, question_data)
+    table = iterate_regions(table, question_list, results, question_data)
 
     # Make numbers in table a percentage of all respondents.
     total_respondents = len(results.index)
