@@ -33,15 +33,20 @@ def get_survey_list(endpoint, api_token, api_token_secret, page):
     }
 
     # Make the GET request with the authentication parameters
-    session = requests.Session()
-    response = session.get(url, params=params, timeout=10)
+    try:
+        session = requests.Session()
+        response = session.get(url, params=params, timeout=10)
 
-    # Check for a successful response
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(response.status_code)
-        response.raise_for_status()
+        # Check for a successful response
+        if response.status_code == 200:
+            print("RESPONSE:", response.status_code)
+            return response.json()
+        else:
+            print(response.status_code)
+            response.raise_for_status()
+
+    except Exception as e:
+        print(f"Error occured: {e}")
 
 
 def get_all_pages_of_surveys():
@@ -50,6 +55,7 @@ def get_all_pages_of_surveys():
     to get all the pages of survey data.
     """
     main_list = []
+    print("working")
     response = get_survey_list(
         endpoint="/v5/survey",
         api_token=os.environ["API_TOKEN"],

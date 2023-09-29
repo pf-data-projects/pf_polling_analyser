@@ -70,7 +70,8 @@ def make_request(request, pk):
     A function to make a request to alchemer api.
     """
     if not request.user.is_authenticated:
-        print('you are not authorised to make this request.')
+        print('You are not logged in to the PF polling analyser.')
+        print('You cannot make this request until you log in.')
         return redirect(reverse('home'))
 
     # get all survey metadata to find the survey id for the user.
