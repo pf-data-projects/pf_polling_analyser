@@ -10,8 +10,8 @@ def calc_region(category, col_index, table, question_list, results, question_dat
     """
     region_q = 'In what region of the UK do you live?'
     for question in question_list:
-        get_gender = results[cb.columns_with_substring_question(results, region_q)]
-        filtered_df = results.loc[(results[get_gender.columns[0]] == category)]
+        get_region = results[cb.columns_with_substring_question(results, region_q)]
+        filtered_df = results.loc[(results[get_region.columns[0]] == category)]
         filtered_df = filtered_df[cb.columns_with_substring(results, question['qid'])]
         # checks that question exists in responses.
         if not filtered_df.empty:

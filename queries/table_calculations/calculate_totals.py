@@ -1,13 +1,14 @@
 import pandas as pd
 from .create_blank_table import create_blank_table
-from .define_standard_crossbreaks import columns_with_substring, columns_with_substring_question
+from .define_standard_crossbreaks import (
+    columns_with_substring, columns_with_substring_question)
 from .gender import calc_gender
 from .age import iterate_age_brackets
 from .region import iterate_regions
 
 
-results = pd.read_csv('DEFINITELY-A-TEST.csv')
-question_data = pd.read_csv('question_data.csv')
+# results = pd.read_csv('DEFINITELY-A-TEST.csv')
+# question_data = pd.read_csv('question_data.csv')
 
 def table_calculation(results, question_data):
     """
@@ -16,7 +17,7 @@ def table_calculation(results, question_data):
     """
     # print(question_data.head(10))
 
-    table = create_blank_table()
+    table = create_blank_table(question_data)
     questions = table['Answers'].tolist()
     question_ids = table['IDs'].tolist()
 
@@ -74,12 +75,15 @@ def table_calculation(results, question_data):
             continue
     print(table)
     # print("OK")
+    print("---- PROCESSING GENDER CROSSBREAKS ----")
     table = calc_gender("Male", 3, table, question_list, results, question_data)
     table = calc_gender("Female", 4, table, question_list, results, question_data)
+    print("---- PROCESSING AGE CROSSBREAKS ----")
     table = iterate_age_brackets(table, question_list, results, question_data)
+    print("---- PROCESSING REGION CROSSBREAKS ----")
     table = iterate_regions(table, question_list, results, question_data)
 
-    # Make numbers in table a percentage of all respondents.
+    # Make numbers in the table a percentage of all respondents.
     total_respondents = len(results.index)
     constant = total_respondents
     print(constant)

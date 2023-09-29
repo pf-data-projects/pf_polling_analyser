@@ -32,7 +32,10 @@ def clean_order(order):
     print("NO ERROR")
 
     cleaned_dataframe = {
+        "blank1":[],
         "QID": [],
+        "blank2":[],
+        "blank3":[],
         "Question": [],
         "Type": []
     }
@@ -48,6 +51,9 @@ def clean_order(order):
             cleaned_dataframe['Type'].append("Option")
         else:
             cleaned_dataframe['Type'].append("Question")
+        cleaned_dataframe['blank1'].append("blank")
+        cleaned_dataframe['blank2'].append("blank")
+        cleaned_dataframe['blank3'].append("blank")
 
     cleaned_order = pd.DataFrame(cleaned_dataframe)
     cleaned_order = cleaned_order.rename(columns={

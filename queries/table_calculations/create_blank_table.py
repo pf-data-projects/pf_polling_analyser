@@ -10,7 +10,7 @@ certain way.
 import pandas as pd
 from . import define_standard_crossbreaks as cb
 
-def create_blank_table():
+def create_blank_table(question_data):
     """
     Creates a table filled with zeros.
 
@@ -18,7 +18,7 @@ def create_blank_table():
     The subsequent columns will be a total column
     and a column for each crossbreak.
     """
-    questions = pd.read_csv('question_data.csv')
+    questions = question_data
 
     # filters out entries that aren't 'Questions' or 'Options'.
     questions = questions[
