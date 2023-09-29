@@ -53,12 +53,12 @@ def create_blank_table(question_data):
 
     for i in range(len(questions.index)-1):
         table['Answers'].append(
-            f'{questions.iloc[i, 4]}'
+            f'{questions.iloc[i, 3]}'
         )
 
     for j in range(len(questions.index)-1):
         table['IDs'].append(
-            f'{questions.iloc[j, 1]}'
+            f'{questions.iloc[j, 0]}'
         )
 
     list_zeros = [0] * len(table['Answers'])

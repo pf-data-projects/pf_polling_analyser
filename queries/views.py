@@ -1,10 +1,12 @@
 # ~~~~~~~~  Imports ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Standard library
 from time import sleep
+from io import StringIO
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Django
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.views import generic, View
+from django.core.cache import cache
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Other 3rd party
 import pandas as pd
@@ -64,7 +66,7 @@ class QueryDetail(View):
         query = get_object_or_404(queries, pk=pk)
         return render(request, 'query_detail.html', {'query': query})
 
-# WARNING: This view is asynchronous and needs time to execute.
+# WARNING: This view needs time to execute fully.
 def make_request(request, pk):
     """
     A function to make a request to alchemer api.

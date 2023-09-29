@@ -9,11 +9,11 @@ def calc_age(category, col_index, table, question_list, results, question_data):
     """
     age_q = 'How old are you?'
     for question in question_list:
-        get_age = results[cb.columns_with_substring_question(results, age_q)]
+        get_age = results[cb.columns_with_substring_question(results, age_q)].astype(int)
         filtered_df = results.loc[
             (results[get_age.columns[0]] >= category[0])
             ]
-        filtered_df = filtered_df.loc[(results[get_age.columns[0]] <= category[1])]
+        filtered_df = filtered_df.loc[(int(results[get_age.columns[0]]) <= category[1])]
         filtered_df = filtered_df[cb.columns_with_substring(results, question['qid'])]
         # checks that question exists in responses.
         if not filtered_df.empty:
