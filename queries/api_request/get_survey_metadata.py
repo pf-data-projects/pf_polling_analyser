@@ -48,7 +48,6 @@ def get_survey_list(endpoint, api_token, api_token_secret, page):
     except Exception as e:
         print(f"Error occured: {e}")
 
-
 def get_all_pages_of_surveys():
     """
     Makes a series of GET requests to the Alchemer API

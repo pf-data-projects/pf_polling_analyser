@@ -7,6 +7,7 @@ from io import StringIO
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.views import generic, View
 from django.core.cache import cache
+from django.http import HttpResponse
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Other 3rd party
 import pandas as pd
@@ -99,5 +100,19 @@ def make_request(request, pk):
     # process the data
     table = table_calculation(response_data, question_data)
 
+    csv_buffer = StringIO()
+    table.to_csv(csv_buffer, index=False)
+    unique_id = "csv_for_user_" + str(request.user.id)  # or generate a random unique ID
+    cache.set(unique_id, csv_buffer.getvalue(), 300)
 
     return redirect(reverse('home'))
+
+def download_csv(request):
+    unique_id = "csv_for_user_" + str(request.user.id)
+    csv_data = cache.get(unique_id)
+    if csv_data:
+        response = HttpResponse(csv_data, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="table.csv"'
+        return response
+    else:
+        return HttpResponse("CSV NOT FOUND")

@@ -1,8 +1,12 @@
+from io import StringIO
+
 import pandas as pd
 from docx import Document
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect, reverse
 from .forms import CSVUploadForm
+from django.core.cache import cache
+from django.http import HttpResponse
 
 from .clean_data.clean_survey_legend import clean_survey_legend
 from .clean_data.clean_order import clean_order
@@ -42,7 +46,12 @@ def upload_csv(request):
             # print(data.head(10))
             # print(cleaned_order.head(10))
             # print(legend_text)
-            table_calculation(data, cleaned_order)
+            table = table_calculation(data, cleaned_order)
+            csv_buffer = StringIO()
+            table.to_csv(csv_buffer, index=False)
+            unique_id = "csv_for_user_" + str(request.user.id)  # or generate a random unique ID
+            cache.set(unique_id, csv_buffer.getvalue(), 300)
+            return redirect(reverse('home'))
     else:
         form = CSVUploadForm()
 
