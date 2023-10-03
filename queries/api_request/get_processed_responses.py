@@ -1,9 +1,6 @@
 import json
 import pandas as pd
 
-with open('response_list.json', 'r') as f:
-    response_list = json.load(f)
-
 def process_responses(response_list):
     """
     checks which responses are valid, and
