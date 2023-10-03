@@ -5,8 +5,6 @@ def process_responses(response_list):
     """
     checks which responses are valid, and
     """
-    with open('response_list.json', 'w') as f:
-        json.dump(response_list, f, indent=2)
 
     # filters out the responses that are not complete
     valid = [x for x in response_list['data'] if x['status'] == 'Complete']

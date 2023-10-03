@@ -2,8 +2,8 @@ import pandas as pd
 
 from . import define_standard_crossbreaks as cb
 
-results = pd.read_csv('response_data.csv')
-table = pd.read_csv('totals_calculated.csv')
+# results = pd.read_csv('response_data.csv')
+# table = pd.read_csv('totals_calculated.csv')
 # question_data = pd.read_csv('question_data.csv')
 
 # questions = table['Answers'].tolist()
