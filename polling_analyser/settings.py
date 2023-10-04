@@ -34,7 +34,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 if "DEV" in os.environ:
     DEBUG = True
 else:
-    DEBUG = True
+    DEBUG = False
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
