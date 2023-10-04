@@ -43,14 +43,11 @@ def upload_csv(request):
 
             # clean_survey_legend(legend_text)
             cleaned_order = clean_order(order)
-            # print(data.head(10))
-            # print(cleaned_order.head(10))
-            # print(legend_text)
             table = table_calculation(data, cleaned_order)
             csv_buffer = StringIO()
             table.to_csv(csv_buffer, index=False)
-            # unique_id = "csv_for_user_" + str(request.user.id)
-            # cache.set(unique_id, csv_buffer.getvalue(), 300)
+            unique_id = "csv_for_user_" + str(request.user.id)
+            cache.set(unique_id, csv_buffer.getvalue(), 300)
             return redirect(reverse('home'))
     else:
         form = CSVUploadForm()
