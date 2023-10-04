@@ -39,7 +39,7 @@ def upload_csv(request):
             data = pd.read_excel(data_file, header=0, sheet_name="Worksheet")
             # data = pd.read_csv(data_file, encoding="utf-8-sig")
             order = pd.read_excel(order_file)
-            legend_text = read_word_file(survey_legend)
+            # legend_text = read_word_file(survey_legend)
 
             # clean_survey_legend(legend_text)
             cleaned_order = clean_order(order)
@@ -49,8 +49,8 @@ def upload_csv(request):
             table = table_calculation(data, cleaned_order)
             csv_buffer = StringIO()
             table.to_csv(csv_buffer, index=False)
-            unique_id = "csv_for_user_" + str(request.user.id)  # or generate a random unique ID
-            cache.set(unique_id, csv_buffer.getvalue(), 300)
+            # unique_id = "csv_for_user_" + str(request.user.id)
+            # cache.set(unique_id, csv_buffer.getvalue(), 300)
             return redirect(reverse('home'))
     else:
         form = CSVUploadForm()
