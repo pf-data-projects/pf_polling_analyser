@@ -34,11 +34,11 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 if "DEV" in os.environ:
     DEBUG = True
 else:
-    DEBUG = False
+    DEBUG = True
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS")
+ALLOWED_HOSTS = ['127.0.0.1', 'polling-table-maker.onrender.com']
 
 CACHES = {
     'default': {
