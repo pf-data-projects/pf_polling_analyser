@@ -90,5 +90,5 @@ def table_calculation(results, question_data):
     table = table.applymap(
         lambda x: x / constant * 100 if isinstance(x, int) else x)
     # create a csv for manual QA
-    table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
+    # table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
     return table
