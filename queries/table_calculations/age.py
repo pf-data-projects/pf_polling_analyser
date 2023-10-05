@@ -49,8 +49,6 @@ def calc_age(category, col_index, table, question_list, results, question_data):
                 continue
         else:
             continue
-    # print(table.head(20))
-    # table.to_csv('age.csv', encoding="utf-8-sig", index=False)
     print(category[0], "done!")
     return table
 
@@ -93,5 +91,4 @@ def iterate_age_brackets(table, question_list, results, question_data):
             results,
             question_data
         )
-        # print(table)
     return table

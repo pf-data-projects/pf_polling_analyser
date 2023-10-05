@@ -67,5 +67,4 @@ def create_blank_table(question_data):
             table[key] = list_zeros
 
     dataframe = pd.DataFrame(table)
-    dataframe.to_csv('blank_table.csv', encoding='utf-8-sig', index=False)
     return dataframe

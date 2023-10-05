@@ -29,7 +29,6 @@ def clean_order(order):
         ]
 
     # added_columns = filter_valid_questions['Opt/Quest.'] = "Question"
-    print("NO ERROR")
 
     cleaned_dataframe = {
         "QID": [],
@@ -59,7 +58,5 @@ def clean_order(order):
         "Question": "question_title",
         "Type": "question_text"
     })
-    cleaned_order.to_csv("testy_test.csv", encoding="utf-8-sig", index=False)
 
-    # print(cleaned_order.head(10))
     return cleaned_order

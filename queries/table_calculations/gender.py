@@ -50,4 +50,3 @@ def calc_gender(category, col_index, table, question_list, results, question_dat
     print(table.head(20))
     print(category, "done!")
     return table
-

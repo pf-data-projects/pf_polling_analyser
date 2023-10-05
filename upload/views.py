@@ -45,7 +45,7 @@ def upload_csv(request):
             cleaned_order = clean_order(order)
             table = table_calculation(data, cleaned_order)
             csv_buffer = StringIO()
-            table.to_csv(csv_buffer, index=False)
+            table.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
             unique_id = "csv_for_user_" + str(request.user.id)
             cache.set(unique_id, csv_buffer.getvalue(), 300)
             return redirect(reverse('home'))
