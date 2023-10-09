@@ -48,6 +48,7 @@ def upload_csv(request):
             table.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
             unique_id = "csv_for_user_" + str(request.user.id)
             cache.set(unique_id, csv_buffer.getvalue(), 300)
+            print("SUCCESS!!")
             return redirect(reverse('home'))
     else:
         form = CSVUploadForm()

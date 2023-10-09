@@ -74,13 +74,13 @@ def table_calculation(results, question_data):
         else:
             continue
     print(table)
-    print("---- PROCESSING GENDER CROSSBREAKS ----")
-    table = calc_gender("Male", 3, table, question_list, results, question_data)
-    table = calc_gender("Female", 4, table, question_list, results, question_data)
-    print("---- PROCESSING AGE CROSSBREAKS ----")
-    table = iterate_age_brackets(table, question_list, results, question_data)
-    print("---- PROCESSING REGION CROSSBREAKS ----")
-    table = iterate_regions(table, question_list, results, question_data)
+    # print("---- PROCESSING GENDER CROSSBREAKS ----")
+    # table = calc_gender("Male", 3, table, question_list, results, question_data)
+    # table = calc_gender("Female", 4, table, question_list, results, question_data)
+    # print("---- PROCESSING AGE CROSSBREAKS ----")
+    # table = iterate_age_brackets(table, question_list, results, question_data)
+    # print("---- PROCESSING REGION CROSSBREAKS ----")
+    # table = iterate_regions(table, question_list, results, question_data)
 
     # Make numbers in the table a percentage of all respondents.
     total_respondents = len(results.index)
@@ -89,4 +89,5 @@ def table_calculation(results, question_data):
         lambda x: x / constant * 100 if isinstance(x, int) else x)
     # create a csv for manual QA
     # table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
+    print("table created")
     return table
