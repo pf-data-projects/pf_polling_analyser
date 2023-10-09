@@ -38,7 +38,10 @@ else:
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'polling-table-maker.onrender.com']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'pf-polling-analyser-h34v-main-irw7hkckaa-ew.a.run.app'
+    ]
 
 CACHES = {
     'default': {
