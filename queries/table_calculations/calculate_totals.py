@@ -34,8 +34,19 @@ def table_calculation(results, question_data):
     # loops through all question options to find
     # number of respondents who answered a certain way
     for question in question_list:
+        # adds the total respondents to table
         table.iat[0, 2] = len(results.index)
+        # finds column that contains question id
         filtered_df = results[columns_with_substring(results, question['qid'])]
+
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # IDEA FOR MULTI-SELECTS / TABLE QUESTIONS:
+        # - checks to see if the table has more than one col
+        # (if statement just below this changes to check empty AND one col size)
+        # - for each of the multiselect columns, check which substring exists in title
+        # - check how many of each option features in each col
+        # - maybe just use all options related to the QID but filter out duplicates?
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         # checks that question exists in responses.
         if not filtered_df.empty:
@@ -83,7 +94,6 @@ def table_calculation(results, question_data):
     print("---- PROCESSING REGION CROSSBREAKS ----")
     table = iterate_regions(table, question_list, results, question_data)
 
-    
     # create a csv for manual QA
     # table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
     print("table created")
