@@ -2,6 +2,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Standard library
 from time import sleep
 from io import StringIO
+import json
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Django
 from django.shortcuts import render, redirect, reverse, get_object_or_404
@@ -84,14 +85,18 @@ def make_request(request, pk):
     survey_id = get_survey_id(survey_list, query.survey_name)
     # manually throttle app to prevent from exceeding 240/min limit.
     print(survey_id)
-    for i in range(0, 60):
-        print(f'Manual throttle: waiting {60 - i} seconds...')
-        sleep(1)
+    # for i in range(0, 60):
+    #     print(f'Manual throttle: waiting {60 - i} seconds...')
+    #     sleep(1)
 
     # get all questions of survey from db, unpaginate, return relevant data.
     survey_questions = get_questions_json(survey_id)
     questions = extract_questions_from_pages(survey_questions)
+    with open("questions_list.json", "w") as outfile:
+        json.dump(survey_questions, outfile, indent=2)
     question_data = extract_data_from_question_objects(questions)
+    question_data.to_csv(
+        "question_data.csv", index=False, encoding="utf-8-sig")
 
     # get all responses to the survey in dataframe format.
     response_data = get_responses(survey_id)

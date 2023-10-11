@@ -1,4 +1,5 @@
 from io import StringIO
+from io import BytesIO
 
 import pandas as pd
 from docx import Document
@@ -44,8 +45,9 @@ def upload_csv(request):
             # clean_survey_legend(legend_text)
             cleaned_order = clean_order(order)
             table = table_calculation(data, cleaned_order)
-            csv_buffer = StringIO()
+            csv_buffer = BytesIO()
             table.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
+            csv_buffer.seek(0)
             unique_id = "csv_for_user_" + str(request.user.id)
             cache.set(unique_id, csv_buffer.getvalue(), 300)
             print("SUCCESS!!")
