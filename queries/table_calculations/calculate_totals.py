@@ -83,12 +83,11 @@ def table_calculation(results, question_data):
     print("---- PROCESSING REGION CROSSBREAKS ----")
     table = iterate_regions(table, question_list, results, question_data)
 
-    # Make numbers in the table a percentage of all respondents.
-    total_respondents = len(results.index)
-    constant = total_respondents
-    table = table.applymap(
-        lambda x: x / constant * 100 if isinstance(x, int) else x)
+    
     # create a csv for manual QA
     # table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
     print("table created")
+    # Display all values as a percentage of the total for each crossbreak.
+    first_row_values = table.iloc[0, 2:]
+    table.iloc[1:, 2:] = table.iloc[1:, 2:].div(first_row_values) * 100
     return table
