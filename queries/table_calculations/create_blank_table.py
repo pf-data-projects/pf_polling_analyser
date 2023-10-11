@@ -26,29 +26,29 @@ def create_blank_table(question_data):
     ]
 
     table = {
-        'IDs':[],
-        'Answers': [],
-        'Total': [],
-        f'{cb.GENDER[0]}': [],
-        f'{cb.GENDER[1]}': [],
-        f'{cb.AGE[0]}': [],
-        f'{cb.AGE[1]}': [],
-        f'{cb.AGE[2]}': [],
-        f'{cb.AGE[3]}': [],
-        f'{cb.AGE[4]}': [],
-        f'{cb.AGE[5]}': [],
-        f'{cb.REGION[0]}': [],
-        f'{cb.REGION[1]}': [],
-        f'{cb.REGION[2]}': [],
-        f'{cb.REGION[3]}': [],
-        f'{cb.REGION[4]}': [],
-        f'{cb.REGION[5]}': [],
-        f'{cb.REGION[6]}': [],
-        f'{cb.REGION[7]}': [],
-        f'{cb.REGION[8]}': [],
-        f'{cb.REGION[9]}': [],
-        f'{cb.REGION[10]}': [],
-        f'{cb.REGION[11]}': [],
+        'IDs':["Total", "Weighted",],
+        'Answers': ["Total", "Weighted",],
+        'Total': [0, 0,],
+        f'{cb.GENDER[0]}': [0, 0,],
+        f'{cb.GENDER[1]}': [0, 0,],
+        f'{cb.AGE[0]}': [0, 0,],
+        f'{cb.AGE[1]}': [0, 0,],
+        f'{cb.AGE[2]}': [0, 0,],
+        f'{cb.AGE[3]}': [0, 0,],
+        f'{cb.AGE[4]}': [0, 0,],
+        f'{cb.AGE[5]}': [0, 0,],
+        f'{cb.REGION[0]}': [0, 0,],
+        f'{cb.REGION[1]}': [0, 0,],
+        f'{cb.REGION[2]}': [0, 0,],
+        f'{cb.REGION[3]}': [0, 0,],
+        f'{cb.REGION[4]}': [0, 0,],
+        f'{cb.REGION[5]}': [0, 0,],
+        f'{cb.REGION[6]}': [0, 0,],
+        f'{cb.REGION[7]}': [0, 0,],
+        f'{cb.REGION[8]}': [0, 0,],
+        f'{cb.REGION[9]}': [0, 0,],
+        f'{cb.REGION[10]}': [0, 0,],
+        f'{cb.REGION[11]}': [0, 0,],
     }
 
     for i in range(len(questions.index)-1):
@@ -67,4 +67,5 @@ def create_blank_table(question_data):
             table[key] = list_zeros
 
     dataframe = pd.DataFrame(table)
+    print(dataframe.head(5))
     return dataframe

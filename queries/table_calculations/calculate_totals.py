@@ -34,6 +34,7 @@ def table_calculation(results, question_data):
     # loops through all question options to find
     # number of respondents who answered a certain way
     for question in question_list:
+        table.iat[0, 2] = len(results.index)
         filtered_df = results[columns_with_substring(results, question['qid'])]
 
         # checks that question exists in responses.

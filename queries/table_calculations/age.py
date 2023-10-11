@@ -14,6 +14,7 @@ def calc_age(category, col_index, table, question_list, results, question_data):
             (results[get_age.columns[0]].astype(int) >= category[0])
             ]
         filtered_df = filtered_df.loc[(filtered_df[get_age.columns[0]].astype(int) <= category[1])]
+        table.iat[0, col_index] = len(filtered_df.index)
         filtered_df = filtered_df[cb.columns_with_substring(results, question['qid'])]
         # checks that question exists in responses.
         if not filtered_df.empty:

@@ -12,6 +12,7 @@ def calc_region(category, col_index, table, question_list, results, question_dat
     for question in question_list:
         get_region = results[cb.columns_with_substring_question(results, region_q)]
         filtered_df = results.loc[(results[get_region.columns[0]] == category)]
+        table.iat[0, col_index] = len(filtered_df.index)
         filtered_df = filtered_df[cb.columns_with_substring(results, question['qid'])]
         # checks that question exists in responses.
         if not filtered_df.empty:
