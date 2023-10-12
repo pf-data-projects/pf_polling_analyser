@@ -34,7 +34,7 @@ def table_calculation(results, question_data):
     # number of respondents who answered a certain way
     for question in question_list:
         # adds the total respondents to table
-        table.iat[0, 2] = len(results.index)
+        table.iat[0, 4] = len(results.index)
         # finds column that contains question id
         filtered_df = results[columns_with_substring(results, question['qid'])]
 
@@ -82,7 +82,7 @@ def table_calculation(results, question_data):
                     # different loops are not quite the same.
                     if len(position) > 0:
                         position_int = int(position[0])
-                        table.iat[position_int, 2] = len(second_filtered_df.index)
+                        table.iat[position_int, 4] = len(second_filtered_df.index)
                     else:
                         continue
             else:
@@ -91,8 +91,8 @@ def table_calculation(results, question_data):
             continue
     print(table)
     # print("---- PROCESSING GENDER CROSSBREAKS ----")
-    # table = calc_gender("Male", 3, table, question_list, results, question_data)
-    # table = calc_gender("Female", 4, table, question_list, results, question_data)
+    # table = calc_gender("Male", 5, table, question_list, results, question_data)
+    # table = calc_gender("Female", 6, table, question_list, results, question_data)
     # print("---- PROCESSING AGE CROSSBREAKS ----")
     # table = iterate_age_brackets(table, question_list, results, question_data)
     # print("---- PROCESSING REGION CROSSBREAKS ----")
@@ -102,6 +102,6 @@ def table_calculation(results, question_data):
     # table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
     print("table created")
     # Display all values as a percentage of the total for each crossbreak.
-    first_row_values = table.iloc[0, 2:]
-    table.iloc[1:, 2:] = table.iloc[1:, 2:].div(first_row_values) * 100
+    first_row_values = table.iloc[0, 4:]
+    table.iloc[1:, 4:] = table.iloc[1:, 4:].div(first_row_values) * 100
     return table

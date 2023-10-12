@@ -27,7 +27,9 @@ def create_blank_table(question_data):
 
     table = {
         'IDs':["Total", "Weighted",],
+        'Types': ["Total", "Weighted",],
         'Answers': ["Total", "Weighted",],
+        'Rebase comment needed': ["Total", "Weighted",],
         'Total': [0, 0,],
         f'{cb.GENDER[0]}': [0, 0,],
         f'{cb.GENDER[1]}': [0, 0,],
@@ -57,15 +59,28 @@ def create_blank_table(question_data):
         )
 
     for j in range(len(questions.index)-1):
+        table['Rebase comment needed'].append(
+            f'{questions.iloc[j, 4]}'
+        )
+
+    for j in range(len(questions.index)-1):
+        table['Types'].append(
+            f'{questions.iloc[j, 2]}'
+        )
+
+    for j in range(len(questions.index)-1):
         table['IDs'].append(
             f'{questions.iloc[j, 0]}'
         )
 
     list_zeros = [0] * len(table['Answers'])
+    protected_keys = [
+        'Answers', 'IDs', 'Types', 'Rebase comment needed']
     for key, value in table.items():
-        if key != 'Answers' and key != 'IDs':
+        if key not in protected_keys:
             table[key] = list_zeros
 
     dataframe = pd.DataFrame(table)
+    dataframe.to_csv()
     print(dataframe.head(5))
     return dataframe

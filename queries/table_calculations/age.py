@@ -61,7 +61,7 @@ def iterate_age_brackets(table, question_list, results, question_data):
     in the list of age bracket objects.
     """
     ages = cb.AGE
-    table_col = 5
+    table_col = 7
     age_brackets = []
     for age in ages:
         if "-" in age:

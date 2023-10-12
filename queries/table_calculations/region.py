@@ -60,7 +60,7 @@ def iterate_regions(table, question_list, results, question_data):
     of the calc_region function.
     """
     regions = cb.REGION
-    table_col = 11
+    table_col = 13
     regions_iterator = []
     for region in regions:
         iteration = {
