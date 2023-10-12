@@ -6,7 +6,6 @@ from .gender import calc_gender
 from .age import iterate_age_brackets
 from .region import iterate_regions
 
-
 # results = pd.read_csv('DEFINITELY-A-TEST.csv')
 # question_data = pd.read_csv('question_data.csv')
 
@@ -39,10 +38,15 @@ def table_calculation(results, question_data):
         # finds column that contains question id
         filtered_df = results[columns_with_substring(results, question['qid'])]
 
+        if filtered_df.shape[1] < 1:
+            print(filtered_df)
+            print("______________________")
+            print(question["qid"])
+
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # IDEA FOR MULTI-SELECTS / TABLE QUESTIONS:
-        # - checks to see if the table has more than one col
-        # (if statement just below this changes to check empty AND one col size)
+        # - checks to see if the filtered_df has more than one col
+        # (if statement just below this changes to check empty AND one col size) -> This doesn't work... I need to understand how this is actually working...
         # - for each of the multiselect columns, check which substring exists in title
         # - check how many of each option features in each col
         # - maybe just use all options related to the QID but filter out duplicates?
@@ -86,13 +90,13 @@ def table_calculation(results, question_data):
         else:
             continue
     print(table)
-    print("---- PROCESSING GENDER CROSSBREAKS ----")
-    table = calc_gender("Male", 3, table, question_list, results, question_data)
-    table = calc_gender("Female", 4, table, question_list, results, question_data)
-    print("---- PROCESSING AGE CROSSBREAKS ----")
-    table = iterate_age_brackets(table, question_list, results, question_data)
-    print("---- PROCESSING REGION CROSSBREAKS ----")
-    table = iterate_regions(table, question_list, results, question_data)
+    # print("---- PROCESSING GENDER CROSSBREAKS ----")
+    # table = calc_gender("Male", 3, table, question_list, results, question_data)
+    # table = calc_gender("Female", 4, table, question_list, results, question_data)
+    # print("---- PROCESSING AGE CROSSBREAKS ----")
+    # table = iterate_age_brackets(table, question_list, results, question_data)
+    # print("---- PROCESSING REGION CROSSBREAKS ----")
+    # table = iterate_regions(table, question_list, results, question_data)
 
     # create a csv for manual QA
     # table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)

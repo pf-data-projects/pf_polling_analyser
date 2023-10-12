@@ -61,18 +61,18 @@ def extract_data_from_question_objects(question_list):
                     question_rebase.append(False)
                 elif sub_question['properties']['required'] is False:
                     question_rebase.append(True)
-                question_ids.append(sub_question['id'])
-                question_texts.append(sub_question['base_type'])
-                question_types.append(sub_question['type'])
+                question_ids.append(question['id'])
+                question_texts.append(f"sub_{sub_question['base_type']}")
+                question_types.append(f"{question['type']} | {sub_question['type']}")
                 question_titles.append(sub_question['title']['English'])
 
                 # checks if the subquestion has options and
                 # adds their data to the lists
                 if sub_question['options']:
                     for option in sub_question['options']:
-                        question_ids.append(sub_question['id'])
-                        question_texts.append('Option')
-                        question_types.append(sub_question['type'])
+                        question_ids.append(question['id'])
+                        question_texts.append('sub_option')
+                        question_types.append(f"{question['type']} | {sub_question['type']}")
                         question_titles.append(option['title']['English'])
                         question_rebase.append(not sub_question['properties']['required'])
 

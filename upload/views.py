@@ -1,5 +1,5 @@
-from io import StringIO
 from io import BytesIO
+import json
 
 import pandas as pd
 from docx import Document
@@ -13,6 +13,11 @@ from .clean_data.clean_survey_legend import clean_survey_legend
 from .clean_data.clean_order import clean_order
 
 from queries.table_calculations.calculate_totals import table_calculation
+from queries.api_request.get_survey_questions import get_questions_json
+from queries.api_request.get_processed_questions import (
+    extract_questions_from_pages,
+    extract_data_from_question_objects
+)
 
 def read_word_file(file):
     """ 
@@ -39,12 +44,19 @@ def upload_csv(request):
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Worksheet")
             # data = pd.read_csv(data_file, encoding="utf-8-sig")
-            order = pd.read_excel(order_file)
+            survey_questions = get_questions_json(7387003)
+            questions = extract_questions_from_pages(survey_questions)
+            with open("questions_list.json", "w") as outfile:
+                json.dump(survey_questions, outfile, indent=2)
+            question_data = extract_data_from_question_objects(questions)
+            question_data.to_csv(
+                "question_data.csv", index=False, encoding="utf-8-sig")
+            # order = pd.read_excel(order_file)
             # legend_text = read_word_file(survey_legend)
 
             # clean_survey_legend(legend_text)
-            cleaned_order = clean_order(order)
-            table = table_calculation(data, cleaned_order)
+            # cleaned_order = clean_order(order)
+            table = table_calculation(data, question_data)
             csv_buffer = BytesIO()
             table.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
             csv_buffer.seek(0)
