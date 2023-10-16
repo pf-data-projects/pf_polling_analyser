@@ -45,6 +45,7 @@ def table_calculation(results, question_data):
         # adds the total respondents to table
         table.iat[0, 5] = len(results.index)
 
+    
         if question['Base Type'] == 'Question' and question['type'] == 'CHECKBOX':
             options_df = question_data[
                 (question_data['question_id'] == int(question['qid'])) &
@@ -66,6 +67,7 @@ def table_calculation(results, question_data):
         elif question['Base Type'] == 'Option' and question['type'] == 'CHECKBOX':
             continue
 
+        # Calculates totals for the table-style questions
         elif question['Base Type'] == 'Question' and question['type'] == 'TABLE':
             sub_questions_df = question_data[
                 (question_data['question_id'] == int(question['qid'])) &
@@ -78,10 +80,10 @@ def table_calculation(results, question_data):
             ]
             options = options_df['question_title'].tolist()
             for sub_question in sub_questions:
-                filtered_df = results[columns_with_substring_answers(results, sub_question, question['qid'])]
+                table_filtered_df = results[columns_with_substring_answers(results, sub_question, question['qid'])]
                 i = 1
                 for option in options:
-                    responses_df = (filtered_df == option).sum()
+                    responses_df = (table_filtered_df == option).sum()
                     responses = int(responses_df.iloc[0])
                     sub_question_position = table[(
                         table['Answers'] == sub_question
@@ -124,8 +126,6 @@ def table_calculation(results, question_data):
                             table['IDs'] == question['qid']
                         )].index
                         # Checks that this exists in the table.
-                        # I think the different indexers for
-                        # different loops are not quite the same.
                         if len(position) > 0:
                             position_int = int(position[0])
                             table.iat[position_int, 5] = len(second_filtered_df.index)
@@ -136,18 +136,19 @@ def table_calculation(results, question_data):
             else:
                 continue
     # print(table)
-    # print("---- PROCESSING GENDER CROSSBREAKS ----")
-    # table = calc_gender("Male", 6, table, question_list, results, question_data)
-    # table = calc_gender("Female", 7, table, question_list, results, question_data)
-    # print("---- PROCESSING AGE CROSSBREAKS ----")
-    # table = iterate_age_brackets(table, question_list, results, question_data)
-    # print("---- PROCESSING REGION CROSSBREAKS ----")
-    # table = iterate_regions(table, question_list, results, question_data)
+    print("---- PROCESSING GENDER CROSSBREAKS ----")
+    table = calc_gender("Male", 6, table, question_list, results, question_data)
+    table = calc_gender("Female", 7, table, question_list, results, question_data)
+    print("---- PROCESSING AGE CROSSBREAKS ----")
+    table = iterate_age_brackets(table, question_list, results, question_data)
+    print("---- PROCESSING REGION CROSSBREAKS ----")
+    table = iterate_regions(table, question_list, results, question_data)
 
     # create a csv for manual QA
     # table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
-    print("table created")
+    # print("table created")
+
     # Display all values as a percentage of the total for each crossbreak.
-    # first_row_values = table.iloc[0, 5:]
-    # table.iloc[1:, 5:] = table.iloc[1:, 5:].div(first_row_values) * 100
+    first_row_values = table.iloc[0, 5:]
+    table.iloc[1:, 5:] = table.iloc[1:, 5:].div(first_row_values) * 100
     return table
