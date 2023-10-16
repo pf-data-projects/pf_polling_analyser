@@ -28,6 +28,7 @@ def create_blank_table(question_data):
     table = {
         'IDs':["Total", "Weighted",],
         'Types': ["Total", "Weighted",],
+        'Base Type': ["Total", "Weighted"],
         'Answers': ["Total", "Weighted",],
         'Rebase comment needed': ["Total", "Weighted",],
         'Total': [0, 0,],
@@ -66,6 +67,11 @@ def create_blank_table(question_data):
     for j in range(len(questions.index)-1):
         table['Types'].append(
             f'{questions.iloc[j, 2]}'
+        )
+
+    for j in range(len(questions.index)-1):
+        table['Base Type'].append(
+            f'{questions.iloc[j, 1]}'
         )
 
     for j in range(len(questions.index)-1):

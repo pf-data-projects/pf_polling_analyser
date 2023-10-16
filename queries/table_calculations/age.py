@@ -53,7 +53,6 @@ def calc_age(category, col_index, table, question_list, results, question_data):
     print(category[0], "done!")
     return table
 
-
 def iterate_age_brackets(table, question_list, results, question_data):
     """ 
     Builds a list of age brackets from the cb module
@@ -61,7 +60,7 @@ def iterate_age_brackets(table, question_list, results, question_data):
     in the list of age bracket objects.
     """
     ages = cb.AGE
-    table_col = 7
+    table_col = 8
     age_brackets = []
     for age in ages:
         if "-" in age:
