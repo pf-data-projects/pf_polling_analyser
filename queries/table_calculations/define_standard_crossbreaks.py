@@ -34,3 +34,12 @@ def columns_with_substring_question(df, substring):
         col for col in df.columns
         if (": " in col) and (col.split(": ", 1)[1] == substring)
         ]
+
+def columns_with_substring_answers(df, substring, qid):
+    """
+    Another helper function for checkbox questions
+    """
+    return [
+        col for col in df.columns
+        if qid in col and substring in col
+    ]

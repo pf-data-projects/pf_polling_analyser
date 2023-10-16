@@ -22,7 +22,7 @@ def create_blank_table(question_data):
 
     # filters out entries that aren't 'Questions' or 'Options'.
     questions = questions[
-        questions['question_text'].str.contains('Question|Option', na=False)
+        questions['question_text'].str.contains('Question|Option|sub', na=False)
     ]
 
     table = {
@@ -81,7 +81,7 @@ def create_blank_table(question_data):
 
     list_zeros = [0] * len(table['Answers'])
     protected_keys = [
-        'Answers', 'IDs', 'Types', 'Rebase comment needed']
+        'Answers', 'IDs', 'Types', 'Rebase comment needed', 'Base Type']
     for key, value in table.items():
         if key not in protected_keys:
             table[key] = list_zeros
