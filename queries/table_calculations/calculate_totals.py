@@ -10,9 +10,6 @@ from .gender import calc_gender
 from .age import iterate_age_brackets
 from .region import iterate_regions
 
-# results = pd.read_csv('DEFINITELY-A-TEST.csv')
-# question_data = pd.read_csv('question_data.csv')
-
 def table_calculation(results, question_data):
     """
     A function that controls the flow of logic for the
@@ -21,6 +18,7 @@ def table_calculation(results, question_data):
     # make sure all results are in string format.
     results = results.astype(str)
 
+    # Builds a dictionary used to iterate over all questions/answers
     table = create_blank_table(question_data)
     questions = table['Answers'].tolist()
     question_ids = table['IDs'].tolist()
@@ -42,11 +40,12 @@ def table_calculation(results, question_data):
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Work out the totals for each question
 
     # loops through all question options to find
-    # number of respondents who answered a certain way
+    # number of respondents who answered each question a certain way
     for question in question_list:
         # adds the total respondents to table
         table.iat[0, 5] = len(results.index)
 
+        # ~~~~~~~~~~~~~ Calculates responses for checkbox/multiselect questions
 
         if question['Base Type'] == 'Question' and question['type'] == 'CHECKBOX':
             options_df = question_data[
@@ -59,11 +58,6 @@ def table_calculation(results, question_data):
                 if checkbox_filtered_df.empty:
                     continue
                 responses_df = (checkbox_filtered_df == option).sum()
-                print(option)
-                print("____________________")
-                print(checkbox_filtered_df.head(10))
-                print("____________________")
-                print(responses_df)
                 responses = int(responses_df.iloc[0])
                 # finds the position in the table to add the data
                 position = table[(
@@ -78,7 +72,8 @@ def table_calculation(results, question_data):
         elif question['Base Type'] == 'Option' and question['type'] == 'CHECKBOX':
             continue
 
-        # Calculates totals for the table-style questions
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Calculates responses for table questions
+
         elif question['Base Type'] == 'Question' and question['type'] == 'TABLE':
             sub_questions_df = question_data[
                 (question_data['question_id'] == int(question['qid'])) &
@@ -109,6 +104,8 @@ def table_calculation(results, question_data):
         elif question['Base Type'] == 'Option' and question['type'] == 'TABLE':
             continue
 
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Calculates responses for rank questions
+
         elif question['Base Type'] == 'Question' and question['type'] == 'RANK':
             sub_questions_df = question_data[
                 (question_data['question_id'] == int(question['qid'])) &
@@ -138,6 +135,8 @@ def table_calculation(results, question_data):
 
         elif question['Base Type'] == 'Option' and question['type'] == 'Rank':
             continue
+
+        # ~~~~~~~ Calculates responses for Single-select radio button questions
 
         else:
             # finds column that contains question id
@@ -185,10 +184,6 @@ def table_calculation(results, question_data):
     table = iterate_age_brackets(table, question_list, results, question_data)
     print("---- PROCESSING REGION CROSSBREAKS ----")
     table = iterate_regions(table, question_list, results, question_data)
-
-    # create a csv for manual QA
-    # table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
-    # print("table created")
 
     # Display all values as a percentage of the total for each crossbreak.
     first_row_values = table.iloc[0, 5:]

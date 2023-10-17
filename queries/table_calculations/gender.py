@@ -13,6 +13,8 @@ def calc_gender(category, col_index, table, question_list, results, question_dat
         filtered_df = results.loc[(results[get_gender.columns[0]] == category)]
         table.iat[0, col_index] = len(filtered_df.index)
 
+        # ~~~~~~~~~~~~~ Calculates responses for checkbox/multiselect questions
+
         if question['Base Type'] == 'Question' and question['type'] == 'CHECKBOX':
             options_df = question_data[
                 (question_data['question_id'] == int(question['qid'])) &
@@ -36,6 +38,8 @@ def calc_gender(category, col_index, table, question_list, results, question_dat
 
         elif question['Base Type'] == 'Option' and question['type'] == 'CHECKBOX':
             continue
+
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Calculates responses for table questions
 
         elif question['Base Type'] == 'Question' and question['type'] == 'TABLE':
             sub_questions_df = question_data[
@@ -67,6 +71,8 @@ def calc_gender(category, col_index, table, question_list, results, question_dat
         elif question['Base Type'] == 'Option' and question['type'] == 'TABLE':
             continue
 
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Calculates responses for rank questions
+
         elif question['Base Type'] == 'Question' and question['type'] == 'RANK':
             sub_questions_df = question_data[
                 (question_data['question_id'] == int(question['qid'])) &
@@ -95,7 +101,9 @@ def calc_gender(category, col_index, table, question_list, results, question_dat
                     i += 1
 
         elif question['Base Type'] == 'Option' and question['type'] == 'Rank':
-            continue 
+            continue
+
+        # ~~~~~~~ Calculates responses for Single-select radio button questions
 
         else:
             filtered_df = filtered_df[cb.columns_with_substring(results, question['qid'])]
