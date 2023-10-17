@@ -177,13 +177,13 @@ def table_calculation(results, question_data):
             else:
                 continue
     # print(table)
-    print("---- PROCESSING GENDER CROSSBREAKS ----")
-    table = calc_gender("Male", 6, table, question_list, results, question_data)
-    table = calc_gender("Female", 7, table, question_list, results, question_data)
-    print("---- PROCESSING AGE CROSSBREAKS ----")
-    table = iterate_age_brackets(table, question_list, results, question_data)
-    print("---- PROCESSING REGION CROSSBREAKS ----")
-    table = iterate_regions(table, question_list, results, question_data)
+    # print("---- PROCESSING GENDER CROSSBREAKS ----")
+    # table = calc_gender("Male", 6, table, question_list, results, question_data)
+    # table = calc_gender("Female", 7, table, question_list, results, question_data)
+    # print("---- PROCESSING AGE CROSSBREAKS ----")
+    # table = iterate_age_brackets(table, question_list, results, question_data)
+    # print("---- PROCESSING REGION CROSSBREAKS ----")
+    # table = iterate_regions(table, question_list, results, question_data)
 
     # Display all values as a percentage of the total for each crossbreak.
     first_row_values = table.iloc[0, 5:]

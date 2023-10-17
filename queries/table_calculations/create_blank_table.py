@@ -22,8 +22,10 @@ def create_blank_table(question_data):
 
     # filters out entries that aren't 'Questions' or 'Options'.
     questions = questions[
-        questions['question_text'].str.contains('Question|Option|sub', na=False)
+        questions['question_text'].str.contains('Question|Option|sub_option|sub_question', na=False)
     ]
+
+    print(questions)
 
     table = {
         'IDs':["Total", "Weighted",],
@@ -54,27 +56,27 @@ def create_blank_table(question_data):
         f'{cb.REGION[11]}': [0, 0,],
     }
 
-    for i in range(len(questions.index)-1):
+    for i in range(len(questions.index)):
         table['Answers'].append(
             f'{questions.iloc[i, 3]}'
         )
 
-    for j in range(len(questions.index)-1):
+    for j in range(len(questions.index)):
         table['Rebase comment needed'].append(
             f'{questions.iloc[j, 4]}'
         )
 
-    for j in range(len(questions.index)-1):
+    for j in range(len(questions.index)):
         table['Types'].append(
             f'{questions.iloc[j, 2]}'
         )
 
-    for j in range(len(questions.index)-1):
+    for j in range(len(questions.index)):
         table['Base Type'].append(
             f'{questions.iloc[j, 1]}'
         )
 
-    for j in range(len(questions.index)-1):
+    for j in range(len(questions.index)):
         table['IDs'].append(
             f'{questions.iloc[j, 0]}'
         )
@@ -87,6 +89,6 @@ def create_blank_table(question_data):
             table[key] = list_zeros
 
     dataframe = pd.DataFrame(table)
-    dataframe.to_csv()
+    dataframe.to_csv('blank_table.csv')
     print(dataframe.head(5))
     return dataframe
