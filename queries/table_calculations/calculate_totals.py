@@ -55,10 +55,17 @@ def table_calculation(results, question_data):
             ]
             options = options_df['question_title'].tolist()
             for option in options:
-                filtered_df_len = results[columns_with_substring_answers(results, option, question['qid'])].count()
-                if len(filtered_df_len) < 1:
+                checkbox_filtered_df = results[columns_with_substring_answers(results, option, question['qid'])]
+                if checkbox_filtered_df.empty:
                     continue
-                responses = int(filtered_df_len.iloc[0])
+                responses_df = (checkbox_filtered_df == option).sum()
+                print(option)
+                print("____________________")
+                print(checkbox_filtered_df.head(10))
+                print("____________________")
+                print(responses_df)
+                responses = int(responses_df.iloc[0])
+                # finds the position in the table to add the data
                 position = table[(
                     table['Answers'] == option
                 ) & (
@@ -135,10 +142,6 @@ def table_calculation(results, question_data):
         else:
             # finds column that contains question id
             filtered_df = results[columns_with_substring(results, question['qid'])]
-            if question['qid'] == "39":
-                print(question['question'])
-                print(filtered_df)
-                # filtered_df = filtered_df.astype(str)
             # checks that question exists in responses.
             if not filtered_df.empty:
                 all_options = question_data.loc[
