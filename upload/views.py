@@ -44,7 +44,7 @@ def upload_csv(request):
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Worksheet")
             # data = pd.read_csv(data_file, encoding="utf-8-sig")
-            survey_questions = get_questions_json(7387003)
+            survey_questions = get_questions_json(7187635)
             questions = extract_questions_from_pages(survey_questions)
             with open("questions_list.json", "w") as outfile:
                 json.dump(survey_questions, outfile, indent=2)

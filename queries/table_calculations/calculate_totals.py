@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from .create_blank_table import create_blank_table
 from .define_standard_crossbreaks import (
@@ -45,7 +46,7 @@ def table_calculation(results, question_data):
         # adds the total respondents to table
         table.iat[0, 5] = len(results.index)
 
-    
+
         if question['Base Type'] == 'Question' and question['type'] == 'CHECKBOX':
             options_df = question_data[
                 (question_data['question_id'] == int(question['qid'])) &
@@ -54,6 +55,8 @@ def table_calculation(results, question_data):
             options = options_df['question_title'].tolist()
             for option in options:
                 filtered_df_len = results[columns_with_substring_answers(results, option, question['qid'])].count()
+                if len(filtered_df_len) < 1:
+                    continue
                 responses = int(filtered_df_len.iloc[0])
                 position = table[(
                     table['Answers'] == option
@@ -78,7 +81,8 @@ def table_calculation(results, question_data):
                 (question_data['question_id'] == int(question['qid'])) &
                 (question_data['question_text'] == 'Option')
             ]
-            options = options_df['question_title'].tolist()
+            options_list = options_df['question_title'].tolist()
+            options = list(dict.fromkeys(options_list))
             for sub_question in sub_questions:
                 table_filtered_df = results[columns_with_substring_answers(results, sub_question, question['qid'])]
                 i = 1
@@ -95,6 +99,38 @@ def table_calculation(results, question_data):
                     i += 1
 
         elif question['Base Type'] == 'Option' and question['type'] == 'TABLE':
+            continue
+
+        elif question['Base Type'] == 'Question' and question['type'] == 'RANK':
+            sub_questions_df = question_data[
+                (question_data['question_id'] == int(question['qid'])) &
+                (question_data['question_text'] == 'Option')
+            ]
+            sub_questions = sub_questions_df['question_title'].tolist()
+            print(sub_questions)
+            options_df = question_data[
+                (question_data['question_id'] == int(question['qid'])) &
+                (question_data['question_text'] == 'sub_option')
+            ]
+            options_list = options_df['question_title'].tolist()
+            options = list(dict.fromkeys(options_list))
+            print(options)
+            for sub_question in sub_questions:
+                table_filtered_df = results[columns_with_substring_answers(results, sub_question, question['qid'])]
+                i = 1
+                for option in options:
+                    responses_df = (table_filtered_df == option).sum()
+                    responses = int(responses_df.iloc[0])
+                    sub_question_position = table[(
+                        table['Answers'] == sub_question
+                    ) & (
+                        table['IDs'] == question['qid']
+                    )].index
+                    sq_position_int = int(sub_question_position[0]) + i
+                    table.iat[sq_position_int, 5] = responses
+                    i += 1
+
+        elif question['Base Type'] == 'Option' and question['type'] == 'Rank':
             continue
 
         else:
@@ -136,19 +172,19 @@ def table_calculation(results, question_data):
             else:
                 continue
     # print(table)
-    print("---- PROCESSING GENDER CROSSBREAKS ----")
-    table = calc_gender("Male", 6, table, question_list, results, question_data)
-    table = calc_gender("Female", 7, table, question_list, results, question_data)
-    print("---- PROCESSING AGE CROSSBREAKS ----")
-    table = iterate_age_brackets(table, question_list, results, question_data)
-    print("---- PROCESSING REGION CROSSBREAKS ----")
-    table = iterate_regions(table, question_list, results, question_data)
+    # print("---- PROCESSING GENDER CROSSBREAKS ----")
+    # table = calc_gender("Male", 6, table, question_list, results, question_data)
+    # table = calc_gender("Female", 7, table, question_list, results, question_data)
+    # print("---- PROCESSING AGE CROSSBREAKS ----")
+    # table = iterate_age_brackets(table, question_list, results, question_data)
+    # print("---- PROCESSING REGION CROSSBREAKS ----")
+    # table = iterate_regions(table, question_list, results, question_data)
 
     # create a csv for manual QA
     # table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
     # print("table created")
 
     # Display all values as a percentage of the total for each crossbreak.
-    first_row_values = table.iloc[0, 5:]
-    table.iloc[1:, 5:] = table.iloc[1:, 5:].div(first_row_values) * 100
+    # first_row_values = table.iloc[0, 5:]
+    # table.iloc[1:, 5:] = table.iloc[1:, 5:].div(first_row_values) * 100
     return table

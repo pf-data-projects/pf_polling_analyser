@@ -21,6 +21,8 @@ def calc_region(category, col_index, table, question_list, results, question_dat
                 options = options_df['question_title'].tolist()
                 for option in options:
                     filtered_df_len = filtered_df[cb.columns_with_substring_answers(results, option, question['qid'])].count()
+                    if len(filtered_df_len) < 1:
+                        continue
                     responses = int(filtered_df_len.iloc[0])
                     position = table[(
                         table['Answers'] == option
