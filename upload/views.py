@@ -39,30 +39,30 @@ def upload_csv(request):
         form = CSVUploadForm(request.POST, request.FILES)
         if form.is_valid():
             data_file = request.FILES['data_file']
-            order_file = request.FILES['order_file']
-            survey_legend = request.FILES['survey_legend_file']
+            survey_id = form.cleaned_data['survey_id']
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Worksheet")
             # data = pd.read_csv(data_file, encoding="utf-8-sig")
-            survey_questions = get_questions_json(7387003)
+            survey_questions = get_questions_json(survey_id)
             questions = extract_questions_from_pages(survey_questions)
             with open("questions_list.json", "w") as outfile:
                 json.dump(survey_questions, outfile, indent=2)
             question_data = extract_data_from_question_objects(questions)
             question_data.to_csv(
                 "question_data.csv", index=False, encoding="utf-8-sig")
-            # order = pd.read_excel(order_file)
-            # legend_text = read_word_file(survey_legend)
 
-            # clean_survey_legend(legend_text)
-            # cleaned_order = clean_order(order)
+            # Run calculations
             table = table_calculation(data, question_data)
+
+            # Store results in cache
             csv_buffer = BytesIO()
             table.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
             csv_buffer.seek(0)
             unique_id = "csv_for_user_" + str(request.user.id)
             cache.set(unique_id, csv_buffer.getvalue(), 300)
             print("SUCCESS!!")
+
+            # Redirect user to homepage.
             return redirect(reverse('home'))
     else:
         form = CSVUploadForm()
