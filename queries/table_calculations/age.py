@@ -49,7 +49,8 @@ def calc_age(category, col_index, table, question_list, results, question_data):
                 (question_data['question_id'] == int(question['qid'])) &
                 (question_data['question_text'] == 'Option')
             ]
-            options = options_df['question_title'].tolist()
+            options_list = options_df['question_title'].tolist()
+            options = list(dict.fromkeys(options_list))
             for sub_question in sub_questions:
                 table_filtered_df = filtered_df[cb.columns_with_substring_answers(results, sub_question, question['qid'])]
                 i = 1
@@ -74,14 +75,12 @@ def calc_age(category, col_index, table, question_list, results, question_data):
                 (question_data['question_text'] == 'Option')
             ]
             sub_questions = sub_questions_df['question_title'].tolist()
-            print(sub_questions)
             options_df = question_data[
                 (question_data['question_id'] == int(question['qid'])) &
                 (question_data['question_text'] == 'sub_option')
             ]
             options_list = options_df['question_title'].tolist()
             options = list(dict.fromkeys(options_list))
-            print(options)
             for sub_question in sub_questions:
                 table_filtered_df = filtered_df[cb.columns_with_substring_answers(results, sub_question, question['qid'])]
                 i = 1

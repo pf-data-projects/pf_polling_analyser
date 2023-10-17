@@ -18,7 +18,8 @@ def table_calculation(results, question_data):
     A function that controls the flow of logic for the
     creation of the table.
     """
-    # print(question_data.head(10))
+    # make sure all results are in string format.
+    results = results.astype(str)
 
     table = create_blank_table(question_data)
     questions = table['Answers'].tolist()
@@ -107,14 +108,12 @@ def table_calculation(results, question_data):
                 (question_data['question_text'] == 'Option')
             ]
             sub_questions = sub_questions_df['question_title'].tolist()
-            print(sub_questions)
             options_df = question_data[
                 (question_data['question_id'] == int(question['qid'])) &
                 (question_data['question_text'] == 'sub_option')
             ]
             options_list = options_df['question_title'].tolist()
             options = list(dict.fromkeys(options_list))
-            print(options)
             for sub_question in sub_questions:
                 table_filtered_df = results[columns_with_substring_answers(results, sub_question, question['qid'])]
                 i = 1
@@ -136,6 +135,10 @@ def table_calculation(results, question_data):
         else:
             # finds column that contains question id
             filtered_df = results[columns_with_substring(results, question['qid'])]
+            if question['qid'] == "39":
+                print(question['question'])
+                print(filtered_df)
+                # filtered_df = filtered_df.astype(str)
             # checks that question exists in responses.
             if not filtered_df.empty:
                 all_options = question_data.loc[
