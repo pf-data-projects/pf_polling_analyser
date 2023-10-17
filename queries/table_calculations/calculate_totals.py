@@ -172,19 +172,19 @@ def table_calculation(results, question_data):
             else:
                 continue
     # print(table)
-    # print("---- PROCESSING GENDER CROSSBREAKS ----")
-    # table = calc_gender("Male", 6, table, question_list, results, question_data)
-    # table = calc_gender("Female", 7, table, question_list, results, question_data)
-    # print("---- PROCESSING AGE CROSSBREAKS ----")
-    # table = iterate_age_brackets(table, question_list, results, question_data)
-    # print("---- PROCESSING REGION CROSSBREAKS ----")
-    # table = iterate_regions(table, question_list, results, question_data)
+    print("---- PROCESSING GENDER CROSSBREAKS ----")
+    table = calc_gender("Male", 6, table, question_list, results, question_data)
+    table = calc_gender("Female", 7, table, question_list, results, question_data)
+    print("---- PROCESSING AGE CROSSBREAKS ----")
+    table = iterate_age_brackets(table, question_list, results, question_data)
+    print("---- PROCESSING REGION CROSSBREAKS ----")
+    table = iterate_regions(table, question_list, results, question_data)
 
     # create a csv for manual QA
     # table.to_csv('totals_calculated.csv', encoding="utf-8-sig", index=False)
     # print("table created")
 
     # Display all values as a percentage of the total for each crossbreak.
-    # first_row_values = table.iloc[0, 5:]
-    # table.iloc[1:, 5:] = table.iloc[1:, 5:].div(first_row_values) * 100
+    first_row_values = table.iloc[0, 5:]
+    table.iloc[1:, 5:] = table.iloc[1:, 5:].div(first_row_values) * 100
     return table

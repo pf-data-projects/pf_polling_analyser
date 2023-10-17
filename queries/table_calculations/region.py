@@ -65,6 +65,38 @@ def calc_region(category, col_index, table, question_list, results, question_dat
         elif question['Base Type'] == 'Option' and question['type'] == 'TABLE':
             continue
 
+        elif question['Base Type'] == 'Question' and question['type'] == 'RANK':
+            sub_questions_df = question_data[
+                (question_data['question_id'] == int(question['qid'])) &
+                (question_data['question_text'] == 'Option')
+            ]
+            sub_questions = sub_questions_df['question_title'].tolist()
+            print(sub_questions)
+            options_df = question_data[
+                (question_data['question_id'] == int(question['qid'])) &
+                (question_data['question_text'] == 'sub_option')
+            ]
+            options_list = options_df['question_title'].tolist()
+            options = list(dict.fromkeys(options_list))
+            print(options)
+            for sub_question in sub_questions:
+                table_filtered_df = filtered_df[cb.columns_with_substring_answers(results, sub_question, question['qid'])]
+                i = 1
+                for option in options:
+                    responses_df = (table_filtered_df == option).sum()
+                    responses = int(responses_df.iloc[0])
+                    sub_question_position = table[(
+                        table['Answers'] == sub_question
+                    ) & (
+                        table['IDs'] == question['qid']
+                    )].index
+                    sq_position_int = int(sub_question_position[0]) + i
+                    table.iat[sq_position_int, col_index] = responses
+                    i += 1
+
+        elif question['Base Type'] == 'Option' and question['type'] == 'Rank':
+            continue
+
         else:
             filtered_df = filtered_df[cb.columns_with_substring(results, question['qid'])]
             # checks that question exists in responses.
