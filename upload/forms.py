@@ -1,5 +1,11 @@
 from django import forms
 
+CB_OPTIONS = (
+        ('gender', 'Gender'),
+        ('age', 'Age'),
+        ('region', 'Region'),
+    )
+
 class CSVUploadForm(forms.Form):
     """
     A class to handle the upload of:
@@ -7,6 +13,7 @@ class CSVUploadForm(forms.Form):
     2. the alchemer id of the survey
     3. any future inputs, such as crossbreaks, other data etc.
     """
+
     data_file = forms.FileField(
         label='SURVEY RESPONSE DATA ONLY',
         help_text='Only .xlsx files are accepted.',
@@ -17,3 +24,8 @@ class CSVUploadForm(forms.Form):
         help_text='This can be found on the first page of the survey legend',
         required=True
         )
+    standard_cb = forms.MultipleChoiceField(
+        choices=CB_OPTIONS,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )

@@ -40,6 +40,7 @@ def upload_csv(request):
         if form.is_valid():
             data_file = request.FILES['data_file']
             survey_id = form.cleaned_data['survey_id']
+            standard_cb = form.cleaned_data['options']
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Worksheet")
             # data = pd.read_csv(data_file, encoding="utf-8-sig")
