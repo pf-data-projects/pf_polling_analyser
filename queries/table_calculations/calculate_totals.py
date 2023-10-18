@@ -1,10 +1,9 @@
 import os
 import pandas as pd
 from .create_blank_table import create_blank_table
-from .define_standard_crossbreaks import (
-    columns_with_substring, 
-    columns_with_substring_question,
-    columns_with_substring_answers
+from .helpers import (
+    col_with_substr,
+    col_with_substr_a
     )
 from .gender import calc_gender
 from .age import iterate_age_brackets
@@ -54,7 +53,7 @@ def table_calculation(results, question_data, standard_cb):
             ]
             options = options_df['question_title'].tolist()
             for option in options:
-                checkbox_filtered_df = results[columns_with_substring_answers(results, option, question['qid'])]
+                checkbox_filtered_df = results[col_with_substr_a(results, option, question['qid'])]
                 if checkbox_filtered_df.empty:
                     continue
                 responses_df = (checkbox_filtered_df == option).sum()
@@ -87,7 +86,7 @@ def table_calculation(results, question_data, standard_cb):
             options_list = options_df['question_title'].tolist()
             options = list(dict.fromkeys(options_list))
             for sub_question in sub_questions:
-                table_filtered_df = results[columns_with_substring_answers(results, sub_question, question['qid'])]
+                table_filtered_df = results[col_with_substr_a(results, sub_question, question['qid'])]
                 i = 1
                 for option in options:
                     responses_df = (table_filtered_df == option).sum()
@@ -119,7 +118,7 @@ def table_calculation(results, question_data, standard_cb):
             options_list = options_df['question_title'].tolist()
             options = list(dict.fromkeys(options_list))
             for sub_question in sub_questions:
-                table_filtered_df = results[columns_with_substring_answers(results, sub_question, question['qid'])]
+                table_filtered_df = results[col_with_substr_a(results, sub_question, question['qid'])]
                 i = 1
                 for option in options:
                     responses_df = (table_filtered_df == option).sum()
@@ -140,7 +139,7 @@ def table_calculation(results, question_data, standard_cb):
 
         else:
             # finds column that contains question id
-            filtered_df = results[columns_with_substring(results, question['qid'])]
+            filtered_df = results[col_with_substr(results, question['qid'])]
             # checks that question exists in responses.
             if not filtered_df.empty:
                 all_options = question_data.loc[

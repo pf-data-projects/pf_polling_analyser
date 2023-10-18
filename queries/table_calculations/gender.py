@@ -1,6 +1,7 @@
 import pandas as pd
 
 from . import define_standard_crossbreaks as cb
+from . import helpers as helpers
 
 def calc_gender(category, col_index, table, question_list, results, question_data):
     """
@@ -9,7 +10,7 @@ def calc_gender(category, col_index, table, question_list, results, question_dat
     """
     gender_q = 'Which of the following best describes how you think of yourself?'
     for question in question_list:
-        get_gender = results[cb.columns_with_substring_question(results, gender_q)]
+        get_gender = results[helpers.col_with_substr_q(results, gender_q)]
         filtered_df = results.loc[(results[get_gender.columns[0]] == category)]
         table.iat[0, col_index] = len(filtered_df.index)
 
@@ -22,7 +23,7 @@ def calc_gender(category, col_index, table, question_list, results, question_dat
             ]
             options = options_df['question_title'].tolist()
             for option in options:
-                checkbox_filtered_df = filtered_df[cb.columns_with_substring_answers(results, option, question['qid'])]
+                checkbox_filtered_df = filtered_df[helpers.col_with_substr_a(results, option, question['qid'])]
                 if checkbox_filtered_df.empty:
                     continue
                 responses_df = (checkbox_filtered_df == option).sum()
@@ -54,7 +55,7 @@ def calc_gender(category, col_index, table, question_list, results, question_dat
             options_list = options_df['question_title'].tolist()
             options = list(dict.fromkeys(options_list))
             for sub_question in sub_questions:
-                table_filtered_df = filtered_df[cb.columns_with_substring_answers(results, sub_question, question['qid'])]
+                table_filtered_df = filtered_df[helpers.col_with_substr_a(results, sub_question, question['qid'])]
                 i = 1
                 for option in options:
                     responses_df = (table_filtered_df == option).sum()
@@ -86,7 +87,7 @@ def calc_gender(category, col_index, table, question_list, results, question_dat
             options_list = options_df['question_title'].tolist()
             options = list(dict.fromkeys(options_list))
             for sub_question in sub_questions:
-                table_filtered_df = filtered_df[cb.columns_with_substring_answers(results, sub_question, question['qid'])]
+                table_filtered_df = filtered_df[helpers.col_with_substr_a(results, sub_question, question['qid'])]
                 i = 1
                 for option in options:
                     responses_df = (table_filtered_df == option).sum()
@@ -106,7 +107,7 @@ def calc_gender(category, col_index, table, question_list, results, question_dat
         # ~~~~~~~ Calculates responses for Single-select radio button questions
 
         else:
-            filtered_df = filtered_df[cb.columns_with_substring(results, question['qid'])]
+            filtered_df = filtered_df[helpers.col_with_substr(results, question['qid'])]
             # checks that question exists in responses.
             if not filtered_df.empty:
                 all_options = question_data.loc[(question_data['question_text'] == 'Option')]
