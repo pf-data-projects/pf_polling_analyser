@@ -29,6 +29,21 @@ class CSVUploadForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         required=False,
     )
+    non_standard_cb_name = forms.CharField(
+        label="Name of Crossbreak",
+        help_text="Name you want to give this column in the table, i.e voted leave EU",
+        required=False
+    )
+    non_standard_cb_question = forms.CharField(
+        label="Question text",
+        help_text="Please put the exact text of the question that determines this crossbreak here.",
+        required=False
+    )
+    non_standard_cb_answer = forms.CharField(
+        label="Answer",
+        help_text="Please put the exact answer for this question which you would like to check.",
+        required=False
+    )
 
     def __init__(self, *args, **kwargs):
         super(CSVUploadForm, self).__init__(*args, **kwargs)
