@@ -152,8 +152,8 @@ def iterate_regions(table, question_list, results, question_data):
     contain the necessary arguments for a call
     of the calc_region function.
     """
-    regions = cb.REGION
-    table_col = 14
+    regions = cb.CROSSBREAKS['region']
+    table_col = table.columns.get_loc('London')
     regions_iterator = []
     for region in regions:
         iteration = {

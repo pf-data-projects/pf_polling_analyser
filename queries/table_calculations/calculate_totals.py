@@ -10,7 +10,7 @@ from .gender import calc_gender
 from .age import iterate_age_brackets
 from .region import iterate_regions
 
-def table_calculation(results, question_data):
+def table_calculation(results, question_data, standard_cb):
     """
     A function that controls the flow of logic for the
     creation of the table.
@@ -19,7 +19,7 @@ def table_calculation(results, question_data):
     results = results.astype(str)
 
     # Builds a dictionary used to iterate over all questions/answers
-    table = create_blank_table(question_data)
+    table = create_blank_table(question_data, standard_cb)
     questions = table['Answers'].tolist()
     question_ids = table['IDs'].tolist()
     question_types = table['Types'].tolist()
@@ -176,14 +176,31 @@ def table_calculation(results, question_data):
                     continue
             else:
                 continue
-    # print(table)
-    # print("---- PROCESSING GENDER CROSSBREAKS ----")
-    # table = calc_gender("Male", 6, table, question_list, results, question_data)
-    # table = calc_gender("Female", 7, table, question_list, results, question_data)
-    # print("---- PROCESSING AGE CROSSBREAKS ----")
-    # table = iterate_age_brackets(table, question_list, results, question_data)
-    # print("---- PROCESSING REGION CROSSBREAKS ----")
-    # table = iterate_regions(table, question_list, results, question_data)
+    # Run calculations for standard crossbreaks
+    if 'gender' in standard_cb:
+        print("---- PROCESSING GENDER CROSSBREAKS ----")
+        table = calc_gender(
+            "Male", 
+            table.columns.get_loc('Male'),
+            table,
+            question_list,
+            results,
+            question_data
+        )
+        table = calc_gender(
+            "Female", 
+            table.columns.get_loc('Female'),
+            table,
+            question_list,
+            results,
+            question_data
+        )
+    if 'age' in standard_cb:
+        print("---- PROCESSING AGE CROSSBREAKS ----")
+        table = iterate_age_brackets(table, question_list, results, question_data)
+    if 'region' in standard_cb:
+        print("---- PROCESSING REGION CROSSBREAKS ----")
+        table = iterate_regions(table, question_list, results, question_data)
 
     # Display all values as a percentage of the total for each crossbreak.
     first_row_values = table.iloc[0, 5:]

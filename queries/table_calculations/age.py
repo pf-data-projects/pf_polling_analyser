@@ -29,11 +29,6 @@ def calc_age(category, col_index, table, question_list, results, question_data):
                 if checkbox_filtered_df.empty:
                     continue
                 responses_df = (checkbox_filtered_df == option).sum()
-                print(option)
-                print("____________________")
-                print(checkbox_filtered_df.head(10))
-                print("____________________")
-                print(responses_df)
                 responses = int(responses_df.iloc[0])
                 position = table[(
                     table['Answers'] == option
@@ -158,8 +153,8 @@ def iterate_age_brackets(table, question_list, results, question_data):
     and calls the calc_age func based on the data
     in the list of age bracket objects.
     """
-    ages = cb.AGE
-    table_col = 8
+    ages = cb.CROSSBREAKS["age"]
+    table_col = table.columns.get_loc("18-24")
     age_brackets = []
     for age in ages:
         if "-" in age:

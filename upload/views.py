@@ -40,10 +40,10 @@ def upload_csv(request):
         if form.is_valid():
             data_file = request.FILES['data_file']
             survey_id = form.cleaned_data['survey_id']
-            standard_cb = form.cleaned_data['options']
+            standard_cb = form.cleaned_data['standard_cb']
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Worksheet")
-            
+
             # get question data from API
             survey_questions = get_questions_json(survey_id)
             questions = extract_questions_from_pages(survey_questions)
@@ -54,7 +54,7 @@ def upload_csv(request):
                 "question_data.csv", index=False, encoding="utf-8-sig")
 
             # Run calculations
-            table = table_calculation(data, question_data)
+            table = table_calculation(data, question_data, standard_cb)
 
             # Store results in cache
             csv_buffer = BytesIO()
