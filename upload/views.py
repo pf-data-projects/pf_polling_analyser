@@ -43,7 +43,8 @@ def upload_csv(request):
             standard_cb = form.cleaned_data['options']
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Worksheet")
-            # data = pd.read_csv(data_file, encoding="utf-8-sig")
+            
+            # get question data from API
             survey_questions = get_questions_json(survey_id)
             questions = extract_questions_from_pages(survey_questions)
             with open("questions_list.json", "w") as outfile:

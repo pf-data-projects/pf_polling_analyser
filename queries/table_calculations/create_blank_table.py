@@ -25,8 +25,6 @@ def create_blank_table(question_data):
         questions['question_text'].str.contains('Question|Option|sub_option|sub_question', na=False)
     ]
 
-    print(questions)
-
     table = {
         'IDs':["Total", "Weighted",],
         'Types': ["Total", "Weighted",],
