@@ -43,7 +43,7 @@ def table_calculation(results, question_data, standard_cb):
     for question in question_list:
         # adds the total respondents to table
         table.iat[0, 5] = len(results.index)
-
+        
         # ~~~~~~~~~~~~~ Calculates responses for checkbox/multiselect questions
 
         if question['Base Type'] == 'Question' and question['type'] == 'CHECKBOX':

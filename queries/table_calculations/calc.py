@@ -3,6 +3,8 @@ This is a helper module that enables any
 crossbreak to be calculated in the table.
 """
 
+from . import helpers
+
 def calc(filtered_df, col_index, table, question, results, question_data):
     """
     This function checks the question type and calulates
@@ -17,7 +19,7 @@ def calc(filtered_df, col_index, table, question, results, question_data):
         ]
         options = options_df['question_title'].tolist()
         for option in options:
-            checkbox_filtered_df = filtered_df[cb.columns_with_substring_answers(results, option, question['qid'])]
+            checkbox_filtered_df = filtered_df[helpers.col_with_substr_a(results, option, question['qid'])]
             if checkbox_filtered_df.empty:
                 continue
             responses_df = (checkbox_filtered_df == option).sum()
@@ -30,9 +32,10 @@ def calc(filtered_df, col_index, table, question, results, question_data):
             # Checks that this exists in the table.
             position_int = int(position[0])
             table.iat[position_int, col_index] = responses
+        return table
 
     elif question['Base Type'] == 'Option' and question['type'] == 'CHECKBOX':
-        pass
+        return table
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Calculates responses for table questions
 
@@ -49,7 +52,7 @@ def calc(filtered_df, col_index, table, question, results, question_data):
         options_list = options_df['question_title'].tolist()
         options = list(dict.fromkeys(options_list))
         for sub_question in sub_questions:
-            table_filtered_df = filtered_df[cb.columns_with_substring_answers(results, sub_question, question['qid'])]
+            table_filtered_df = filtered_df[helpers.col_with_substr_a(results, sub_question, question['qid'])]
             i = 1
             for option in options:
                 responses_df = (table_filtered_df == option).sum()
@@ -62,9 +65,10 @@ def calc(filtered_df, col_index, table, question, results, question_data):
                 sq_position_int = int(sub_question_position[0]) + i
                 table.iat[sq_position_int, col_index] = responses
                 i += 1
+        return table
 
     elif question['Base Type'] == 'Option' and question['type'] == 'TABLE':
-        pass
+        return table
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Calculates responses for rank questions
 
@@ -81,7 +85,7 @@ def calc(filtered_df, col_index, table, question, results, question_data):
         options_list = options_df['question_title'].tolist()
         options = list(dict.fromkeys(options_list))
         for sub_question in sub_questions:
-            table_filtered_df = filtered_df[cb.columns_with_substring_answers(results, sub_question, question['qid'])]
+            table_filtered_df = filtered_df[helpers.col_with_substr_a(results, sub_question, question['qid'])]
             i = 1
             for option in options:
                 responses_df = (table_filtered_df == option).sum()
@@ -94,14 +98,15 @@ def calc(filtered_df, col_index, table, question, results, question_data):
                 sq_position_int = int(sub_question_position[0]) + i
                 table.iat[sq_position_int, col_index] = responses
                 i += 1
+        return table
 
     elif question['Base Type'] == 'Option' and question['type'] == 'Rank':
-        pass
+        return table
 
     # ~~~~~~~ Calculates responses for Single-select radio button questions
 
     else:
-        filtered_df = filtered_df[cb.columns_with_substring(results, question['qid'])]
+        filtered_df = filtered_df[helpers.col_with_substr(results, question['qid'])]
         # checks that question exists in responses.
         if not filtered_df.empty:
             all_options = question_data.loc[(question_data['question_text'] == 'Option')]
@@ -133,7 +138,8 @@ def calc(filtered_df, col_index, table, question, results, question_data):
                         table.iat[position_int, col_index] = len(second_filtered_df.index)
                     else:
                         pass
+                return table
             else:
-                pass
+                return table
         else:
-            pass
+            return table
