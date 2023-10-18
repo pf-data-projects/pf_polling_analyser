@@ -29,3 +29,7 @@ class CSVUploadForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         required=False,
     )
+
+    def __init__(self, *args, **kwargs):
+        super(CSVUploadForm, self).__init__(*args, **kwargs)
+        self.fields['standard_cb'].initial = [choice[0] for choice in CB_OPTIONS]
