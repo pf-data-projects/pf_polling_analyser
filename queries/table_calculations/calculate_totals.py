@@ -8,6 +8,7 @@ from .helpers import (
 from .gender import calc_gender
 from .age import iterate_age_brackets
 from .region import iterate_regions
+from .define_non_standard_cb import calc_crossbreak
 
 def table_calculation(results, question_data, standard_cb, cb_data):
     """
@@ -200,6 +201,10 @@ def table_calculation(results, question_data, standard_cb, cb_data):
     if 'region' in standard_cb:
         print("---- PROCESSING REGION CROSSBREAKS ----")
         table = iterate_regions(table, question_list, results, question_data)
+
+    non_standard_cb = [cb_data]
+    for crossbreak in non_standard_cb:
+        calc_crossbreak(table, question_list, results, question_data, crossbreak)
 
     # Display all values as a percentage of the total for each crossbreak.
     first_row_values = table.iloc[0, 5:]
