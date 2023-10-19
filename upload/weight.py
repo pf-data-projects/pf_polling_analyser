@@ -18,6 +18,9 @@ survey_subset["Age Group"] = pd.cut(survey_subset["Age"], bins=bins, labels=labe
 survey_subset["genderage"] = survey_subset["Gender"] + " " + survey_subset["Age Group"].astype(str)
 
 def ipf(survey_data, weight_proportions, max_iterations=100, convergence_threshold=0.001):
+    """
+    Written by chatGPT. Iterates over groups and adjusts weight for each respondent.
+    """
     survey_data['weight'] = 1.0
     for iteration in range(max_iterations):
         previous_weights = survey_data['weight'].copy()

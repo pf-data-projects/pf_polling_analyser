@@ -41,6 +41,11 @@ def upload_csv(request):
             data_file = request.FILES['data_file']
             survey_id = form.cleaned_data['survey_id']
             standard_cb = form.cleaned_data['standard_cb']
+            cb_name = form.cleaned_data['non_standard_cb_name']
+            cb_question = form.cleaned_data['non_standard_cb_question']
+            cb_answer = form.cleaned_data['non_standard_cb_answer']
+            cb_data = [cb_name, cb_question, cb_answer]
+
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Worksheet")
 
@@ -54,7 +59,7 @@ def upload_csv(request):
                 "question_data.csv", index=False, encoding="utf-8-sig")
 
             # Run calculations
-            table = table_calculation(data, question_data, standard_cb)
+            table = table_calculation(data, question_data, standard_cb, cb_data)
 
             # Store results in cache
             csv_buffer = BytesIO()

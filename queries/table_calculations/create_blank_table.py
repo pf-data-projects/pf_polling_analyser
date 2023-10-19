@@ -9,8 +9,9 @@ certain way.
 
 import pandas as pd
 from . import define_standard_crossbreaks as cb
+from . import define_non_standard_cb as ns_cb
 
-def create_blank_table(question_data, standard_cb):
+def create_blank_table(question_data, standard_cb, cb_data):
     """
     Creates a table filled with zeros.
 
@@ -19,6 +20,7 @@ def create_blank_table(question_data, standard_cb):
     and a column for each crossbreak.
     """
     questions = question_data
+    non_standard_cb = [cb_data]
 
     # filters out entries that aren't 'Questions' or 'Options'.
     questions = questions[
@@ -38,6 +40,9 @@ def create_blank_table(question_data, standard_cb):
         if crossbreak in cb.CROSSBREAKS:
             for i in cb.CROSSBREAKS[crossbreak]:
                 table[i] = [0, 0,]
+
+    for crossbreak in non_standard_cb:
+        table[f'{crossbreak[0]}: {crossbreak[2]}'] = [0, 0,]
 
     for i in range(len(questions.index)):
         table['Answers'].append(
@@ -66,12 +71,13 @@ def create_blank_table(question_data, standard_cb):
 
     list_zeros = [0] * len(table['Answers'])
     protected_keys = [
-        'Answers', 'IDs', 'Types', 'Rebase comment needed', 'Base Type']
+        'Answers', 'IDs', 'Types', 'Rebase comment needed', 'Base Type'
+    ]
     for key, value in table.items():
         if key not in protected_keys:
             table[key] = list_zeros
 
     dataframe = pd.DataFrame(table)
     dataframe.to_csv('blank_table.csv')
-    # print(dataframe.head(5))
+    print(dataframe.head(5))
     return dataframe

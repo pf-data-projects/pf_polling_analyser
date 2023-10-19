@@ -9,7 +9,7 @@ from .gender import calc_gender
 from .age import iterate_age_brackets
 from .region import iterate_regions
 
-def table_calculation(results, question_data, standard_cb):
+def table_calculation(results, question_data, standard_cb, cb_data):
     """
     A function that controls the flow of logic for the
     creation of the table.
@@ -18,7 +18,7 @@ def table_calculation(results, question_data, standard_cb):
     results = results.astype(str)
 
     # Builds a dictionary used to iterate over all questions/answers
-    table = create_blank_table(question_data, standard_cb)
+    table = create_blank_table(question_data, standard_cb, cb_data)
     questions = table['Answers'].tolist()
     question_ids = table['IDs'].tolist()
     question_types = table['Types'].tolist()
@@ -43,7 +43,7 @@ def table_calculation(results, question_data, standard_cb):
     for question in question_list:
         # adds the total respondents to table
         table.iat[0, 5] = len(results.index)
-        
+
         # ~~~~~~~~~~~~~ Calculates responses for checkbox/multiselect questions
 
         if question['Base Type'] == 'Question' and question['type'] == 'CHECKBOX':

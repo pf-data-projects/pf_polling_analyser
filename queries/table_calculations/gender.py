@@ -14,7 +14,6 @@ def calc_gender(category, col_index, table, question_list, results, question_dat
         get_gender = results[helpers.col_with_substr_q(results, gender_q)]
         filtered_df = results.loc[(results[get_gender.columns[0]] == category)]
         table.iat[0, col_index] = len(filtered_df.index)
-        print(table.head(10))
 
         table = calc.calc(filtered_df, col_index, table, question, results, question_data)
 
