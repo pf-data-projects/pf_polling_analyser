@@ -18,6 +18,7 @@ from queries.api_request.get_processed_questions import (
     extract_questions_from_pages,
     extract_data_from_question_objects
 )
+from . import weight as wgt
 
 def read_word_file(file):
     """ 
@@ -28,6 +29,15 @@ def read_word_file(file):
     for paragraph in doc.paragraphs:
         result.append(paragraph.text)
     return '\n'.join(result)
+
+def weight_data(request):
+    """
+    A view that:
+    1. calls the run_weighting function in the weight file.
+    """
+    print("Running IPF on dataset")
+    wgt.run_weighting()
+    return redirect(reverse('home'))
 
 def upload_csv(request):
     """
