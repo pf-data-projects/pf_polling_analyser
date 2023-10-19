@@ -48,3 +48,21 @@ class CSVUploadForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(CSVUploadForm, self).__init__(*args, **kwargs)
         self.fields['standard_cb'].initial = [choice[0] for choice in CB_OPTIONS]
+
+
+class WeightForm(forms.Form):
+    """
+    A form to handle the uploading of:
+    1. polling data
+    2. weight proportions
+    """
+    results = forms.FileField(
+        label='SURVEY RESPONSE DATA ONLY',
+        help_text='Only .xlsx files are accepted.',
+        validators=[]
+    )
+    weights = forms.FileField(
+        label='SURVEY RESPONSE DATA ONLY',
+        help_text='Only .xlsx files are accepted.',
+        validators=[]
+    )

@@ -5,7 +5,7 @@ import pandas as pd
 from docx import Document
 
 from django.shortcuts import render, redirect, reverse
-from .forms import CSVUploadForm
+from .forms import CSVUploadForm, WeightForm
 from django.core.cache import cache
 from django.http import HttpResponse
 
@@ -35,9 +35,22 @@ def weight_data(request):
     A view that:
     1. calls the run_weighting function in the weight file.
     """
-    print("Running IPF on dataset")
-    wgt.run_weighting()
-    return redirect(reverse('home'))
+    if request.method == 'POST':
+        form = WeightForm(request.POST, request.FILES)
+        if form.is_valid():
+            print("Running IPF on dataset")
+            survey_data = request.FILES['results']
+            survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
+            weight_proportions = request.FILES['weights']
+            weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
+            wgt.run_weighting(survey_data, weight_proportions)
+            return redirect(reverse('home'))
+    else:
+        form = WeightForm()
+
+    return render(request, 'weight_form.html', {
+        'form': form,
+    })
 
 def upload_csv(request):
     """

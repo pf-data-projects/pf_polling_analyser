@@ -1,13 +1,13 @@
 import pandas as pd
 
 
-def run_weighting():
+def run_weighting(survey_data, weight_proportions):
     """
     Runs IPF for datasets to add the weighting column.
     """
     # Load the weight proportions and survey data
-    weight_proportions = pd.read_excel("Weight_Proportions.xlsx")
-    survey_data = pd.read_excel("data3.xlsx")
+    # weight_proportions = pd.read_excel("Weight_Proportions.xlsx")
+    # survey_data = pd.read_excel("data2.xlsx", sheet_name="Worksheet")
 
     # Extract column names after the colon
     def extract_column_name(col_name):
@@ -47,7 +47,7 @@ def run_weighting():
     survey_subset["Age Group"] = pd.cut(survey_subset["Age"], bins=bins, labels=labels, right=True, include_lowest=True)
     survey_subset["genderage"] = survey_subset["Gender"] + " " + survey_subset["Age Group"].astype(str)
 
-    def ipf(survey_data, weight_proportions, max_iterations=100, convergence_threshold=0.001):
+    def ipf(survey_data, weight_proportions, max_iterations=500, convergence_threshold=0.001):
         survey_data['weight'] = 1.0
         for iteration in range(max_iterations):
             previous_weights = survey_data['weight'].copy()
@@ -70,4 +70,10 @@ def run_weighting():
     # Apply IPF with region to the survey data
     ipf_result = ipf(survey_subset, weight_proportions)
     print(ipf_result[['Age', 'Gender', 'genderage', 'region', 'seg', 'weight']].head())
+
+    # Join the weight column from ipf_result to the original survey_data
+    survey_data['weight'] = ipf_result['weight']
+
+    # Save the dataset with appended weights to an output file
+    survey_data.to_csv("merged_weighted_data.csv", encoding="utf-8-sig")
     ipf_result.to_csv("test_weight.csv", encoding="utf-8-sig")

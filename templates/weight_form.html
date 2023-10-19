@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Upload Results</h1>
+    <h1>Upload Data and Proportions for Weighting</h1>
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Upload</button>
+        <button type="submit">Run weighting</button>
     </form>
     <p><a href="{% url 'home' %}">Back to query list</a></p>
     <p><a href="{% url 'create' %}">Make survey database query</a></p>
