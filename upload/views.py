@@ -61,37 +61,40 @@ def upload_csv(request):
     if request.method == 'POST':
         form = CSVUploadForm(request.POST, request.FILES)
         formset = CrossbreakFormSet(request.POST, prefix="crossbreaks")
-        if form.is_valid():
+        if form.is_valid() and formset.is_valid():
             data_file = request.FILES['data_file']
             survey_id = form.cleaned_data['survey_id']
             standard_cb = form.cleaned_data['standard_cb']
-            cb_name = form.cleaned_data['non_standard_cb_name']
-            cb_question = form.cleaned_data['non_standard_cb_question']
-            cb_answer = form.cleaned_data['non_standard_cb_answer']
-            cb_data = [cb_name, cb_question, cb_answer]
-
+            non_standard_cb = []
+            for sub_form in formset:
+                cb_name = sub_form.cleaned_data['non_standard_cb_name']
+                cb_question = sub_form.cleaned_data['non_standard_cb_question']
+                cb_answer = sub_form.cleaned_data['non_standard_cb_answer']
+                cb_data = [cb_name, cb_question, cb_answer]
+                non_standard_cb.append(cb_data)
+            print(non_standard_cb)
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Worksheet")
 
             # get question data from API
-            # survey_questions = get_questions_json(survey_id)
-            # questions = extract_questions_from_pages(survey_questions)
-            # with open("questions_list.json", "w") as outfile:
-            #     json.dump(survey_questions, outfile, indent=2)
-            # question_data = extract_data_from_question_objects(questions)
-            # question_data.to_csv(
-            #     "question_data.csv", index=False, encoding="utf-8-sig")
+            survey_questions = get_questions_json(survey_id)
+            questions = extract_questions_from_pages(survey_questions)
+            with open("questions_list.json", "w") as outfile:
+                json.dump(survey_questions, outfile, indent=2)
+            question_data = extract_data_from_question_objects(questions)
+            question_data.to_csv(
+                "question_data.csv", index=False, encoding="utf-8-sig")
 
-            # # Run calculations
-            # table = table_calculation(data, question_data, standard_cb, cb_data)
+            # Run calculations
+            table = table_calculation(data, question_data, standard_cb, non_standard_cb)
 
-            # # Store results in cache
-            # csv_buffer = BytesIO()
-            # table.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
-            # csv_buffer.seek(0)
-            # unique_id = "csv_for_user_" + str(request.user.id)
-            # cache.set(unique_id, csv_buffer.getvalue(), 300)
-            # print("SUCCESS!!")
+            # Store results in cache
+            csv_buffer = BytesIO()
+            table.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
+            csv_buffer.seek(0)
+            unique_id = "csv_for_user_" + str(request.user.id)
+            cache.set(unique_id, csv_buffer.getvalue(), 300)
+            print("SUCCESS!!")
 
             # Redirect user to homepage.
             return redirect(reverse('home'))

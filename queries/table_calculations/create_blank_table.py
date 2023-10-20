@@ -11,7 +11,7 @@ import pandas as pd
 from . import define_standard_crossbreaks as cb
 from . import define_non_standard_cb as ns_cb
 
-def create_blank_table(question_data, standard_cb, cb_data):
+def create_blank_table(question_data, standard_cb, non_standard_cb):
     """
     Creates a table filled with zeros.
 
@@ -20,7 +20,6 @@ def create_blank_table(question_data, standard_cb, cb_data):
     and a column for each crossbreak.
     """
     questions = question_data
-    non_standard_cb = [cb_data]
 
     # filters out entries that aren't 'Questions' or 'Options'.
     questions = questions[
