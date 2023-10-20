@@ -6,9 +6,94 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
+
+        <div id="formset-wrapper">
+            {{ formset.management_form }}
+            {% for sub_form in formset %}
+                <div class="formset-form">
+                    <hr/>
+                    <h4>Non-standard crossbreak</h4>
+                    {{ sub_form.as_p }}
+                    <button type="button" class="remove-form">Remove</button>
+                </div>
+            {% endfor %}
+        </div>
         <button type="submit">Upload</button>
     </form>
+
+    <div> </div>
+    <div> </div>
+    <div> </div>
+
+    <button id="add_more">Add more crossbreaks</button>
+
+
+
     <p><a href="{% url 'home' %}">Back to query list</a></p>
     <p><a href="{% url 'create' %}">Make survey database query</a></p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('add_more').addEventListener('click', function() {
+                // Get the formset wrapper
+                const wrapper = document.getElementById('formset-wrapper');
+                // Clone the last form in the formset
+                const newForm = wrapper.querySelector('.formset-form:last-child').cloneNode(true);
+                
+                // Get the current total forms count from the management form
+                const totalForms = document.querySelector('input[name="crossbreaks-TOTAL_FORMS"]');
+                const formNum = parseInt(totalForms.value);
+
+                // Update the new form's input names to increment the index
+                newForm.querySelectorAll('input, select, textarea').forEach(input => {
+                    input.name = input.name.replace('-' + (formNum - 1) + '-', '-' + formNum + '-');
+                    input.id = input.id.replace('_' + (formNum - 1) + '_', '_' + formNum + '_');
+                    
+                    // Clear the values of the cloned inputs
+                    if (input.tagName === 'INPUT') {
+                        input.value = '';
+                    }
+                });
+
+                // Append the new form to the formset
+                wrapper.appendChild(newForm);
+
+                // Update the TOTAL_FORMS count
+                totalForms.value = formNum + 1;
+
+                // Add a listener for the remove button of the newly added form
+                newForm.querySelector('.remove-form').addEventListener('click', removeForm);
+            });
+
+            function removeForm(event) {
+                // Prevent default behavior
+                event.preventDefault();
+
+                // Get the form to be removed
+                const formToRemove = event.target.closest('.formset-form');
+
+                // Update the TOTAL_FORMS count
+                const totalForms = document.querySelector('input[name="crossbreaks-TOTAL_FORMS"]');
+                totalForms.value = parseInt(totalForms.value) - 1;
+
+                // Remove the form
+                formToRemove.remove();
+
+                // Re-index all forms after the removed form to ensure the form prefix is continuous
+                const forms = document.querySelectorAll('.formset-form');
+                forms.forEach((form, index) => {
+                    form.querySelectorAll('input, select, textarea').forEach(input => {
+                        input.name = input.name.replace(/-\d+-/, '-' + index + '-');
+                        input.id = input.id.replace(/_\d+_/, '_' + index + '_');
+                    });
+                });
+            }
+
+            // Attach remove event to all existing remove buttons
+            document.querySelectorAll('.remove-form').forEach(btn => {
+                btn.addEventListener('click', removeForm);
+            });
+        });
+    </script>
 
 {% endblock %}

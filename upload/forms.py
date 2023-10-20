@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import formset_factory
 
 CB_OPTIONS = (
         ('gender', 'Gender'),
@@ -25,10 +26,22 @@ class CSVUploadForm(forms.Form):
         required=True
         )
     standard_cb = forms.MultipleChoiceField(
+        label="Select which standard crossbreaks to include",
         choices=CB_OPTIONS,
         widget=forms.CheckboxSelectMultiple,
         required=False,
     )
+
+    def __init__(self, *args, **kwargs):
+        super(CSVUploadForm, self).__init__(*args, **kwargs)
+        self.fields['standard_cb'].initial = [choice[0] for choice in CB_OPTIONS]
+
+
+class CrossbreakForm(forms.Form):
+    """
+    Constitutes the main element of formset to
+    handle multiple new crossbreak entries.
+    """
     non_standard_cb_name = forms.CharField(
         label="Name of Crossbreak",
         help_text="Name you want to give this column in the table, i.e voted leave EU",
@@ -45,10 +58,7 @@ class CSVUploadForm(forms.Form):
         required=False
     )
 
-    def __init__(self, *args, **kwargs):
-        super(CSVUploadForm, self).__init__(*args, **kwargs)
-        self.fields['standard_cb'].initial = [choice[0] for choice in CB_OPTIONS]
-
+CrossbreakFormSet = formset_factory(CrossbreakForm, extra=1)
 
 class WeightForm(forms.Form):
     """
