@@ -66,15 +66,20 @@ def upload_csv(request):
             survey_id = form.cleaned_data['survey_id']
             standard_cb = form.cleaned_data['standard_cb']
             non_standard_cb = []
-            for sub_form in formset:
-                cb_name = sub_form.cleaned_data['non_standard_cb_name']
-                cb_question = sub_form.cleaned_data['non_standard_cb_question']
-                cb_answer = sub_form.cleaned_data['non_standard_cb_answer']
-                cb_data = [cb_name, cb_question, cb_answer]
-                non_standard_cb.append(cb_data)
-            print(non_standard_cb)
+            num_submitted_forms = 0
+            for form in formset:
+                if form.has_changed():
+                    num_submitted_forms += 1
+            if num_submitted_forms > 0:
+                for sub_form in formset:
+                    cb_name = sub_form.cleaned_data['non_standard_cb_name']
+                    cb_question = sub_form.cleaned_data['non_standard_cb_question']
+                    cb_answer = sub_form.cleaned_data['non_standard_cb_answer']
+                    cb_data = [cb_name, cb_question, cb_answer]
+                    non_standard_cb.append(cb_data)
+                print(non_standard_cb)
             # convert the data to python-readable formats
-            data = pd.read_excel(data_file, header=0, sheet_name="Worksheet")
+            data = pd.read_excel(data_file, header=0, sheet_name="Sheet1")
 
             # get question data from API
             survey_questions = get_questions_json(survey_id)

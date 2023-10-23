@@ -11,6 +11,10 @@ def calc(filtered_df, col_index, table, question, results, question_data):
     the number of respondents who answered a particular way
     """
     # ~~~~~~~~~~~~~ Calculates responses for checkbox/multiselect questions
+    if question['qid'] == "Total":
+        return table
+    if question['qid'] == "Weighted":
+        return table
 
     if question['Base Type'] == 'Question' and question['type'] == 'CHECKBOX':
         options_df = question_data[
@@ -106,7 +110,7 @@ def calc(filtered_df, col_index, table, question, results, question_data):
     # ~~~~~~~ Calculates responses for Single-select radio button questions
 
     else:
-        filtered_df = filtered_df[helpers.col_with_substr(results, question['qid'])]
+        filtered_df = filtered_df[helpers.col_with_substr(results, question['qid']) + ['weighted_respondents']]
         # checks that question exists in responses.
         if not filtered_df.empty:
             all_options = question_data.loc[(question_data['question_text'] == 'Option')]
@@ -136,6 +140,7 @@ def calc(filtered_df, col_index, table, question, results, question_data):
                     if len(position) > 0:
                         position_int = int(position[0])
                         table.iat[position_int, col_index] = len(second_filtered_df.index)
+                        table.iat[position_int, col_index] = second_filtered_df['weighted_respondents'].astype(float).sum()
                     else:
                         pass
                 return table

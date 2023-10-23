@@ -42,8 +42,13 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
     # loops through all question options to find
     # number of respondents who answered each question a certain way
     for question in question_list:
+        if question['qid'] == "Total":
+            continue
+        if question['qid'] == "Weighted":
+            continue
         # adds the total respondents to table
         table.iat[0, 5] = len(results.index)
+        table.iat[1, 5] = results['weighted_respondents'].astype(float).sum()
 
         # ~~~~~~~~~~~~~ Calculates responses for checkbox/multiselect questions
 
@@ -140,7 +145,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
 
         else:
             # finds column that contains question id
-            filtered_df = results[col_with_substr(results, question['qid'])]
+            filtered_df = results[col_with_substr(results, question['qid']) + ['weighted_respondents']]
             # checks that question exists in responses.
             if not filtered_df.empty:
                 all_options = question_data.loc[
@@ -202,8 +207,9 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
         print("---- PROCESSING REGION CROSSBREAKS ----")
         table = iterate_regions(table, question_list, results, question_data)
 
-    for crossbreak in non_standard_cb:
-        calc_crossbreak(table, question_list, results, question_data, crossbreak)
+    if len(non_standard_cb) > 0:
+        for crossbreak in non_standard_cb:
+            calc_crossbreak(table, question_list, results, question_data, crossbreak)
 
     # Display all values as a percentage of the total for each crossbreak.
     first_row_values = table.iloc[0, 5:]

@@ -47,7 +47,7 @@ def run_weighting(survey_data, weight_proportions):
     survey_subset["Age Group"] = pd.cut(survey_subset["Age"], bins=bins, labels=labels, right=True, include_lowest=True)
     survey_subset["genderage"] = survey_subset["Gender"] + " " + survey_subset["Age Group"].astype(str)
 
-    def ipf(survey_data, weight_proportions, max_iterations=500, convergence_threshold=0.001):
+    def ipf(survey_data, weight_proportions, max_iterations=100, convergence_threshold=0.001):
         survey_data['weight'] = 1.0
         for iteration in range(max_iterations):
             previous_weights = survey_data['weight'].copy()
@@ -72,8 +72,8 @@ def run_weighting(survey_data, weight_proportions):
     print(ipf_result[['Age', 'Gender', 'genderage', 'region', 'seg', 'weight']].head())
 
     # Join the weight column from ipf_result to the original survey_data
-    survey_data['weight'] = ipf_result['weight']
+    survey_data['weighted_respondents'] = ipf_result['weight']
 
     # Save the dataset with appended weights to an output file
-    survey_data.to_csv("merged_weighted_data.csv", encoding="utf-8-sig")
+    survey_data.to_excel("merged_weighted_data.xlsx")
     ipf_result.to_csv("test_weight.csv", encoding="utf-8-sig")
