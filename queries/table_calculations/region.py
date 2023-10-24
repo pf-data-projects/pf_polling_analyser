@@ -14,6 +14,7 @@ def calc_region(category, col_index, table, question_list, results, question_dat
         get_region = results[helpers.col_with_substr_q(results, region_q)]
         filtered_df = results.loc[(results[get_region.columns[0]] == category)]
         table.iat[0, col_index] = len(filtered_df.index)
+        table.iat[1, col_index] = filtered_df['weighted_respondents'].astype(float).sum()
 
         table = calc.calc(filtered_df, col_index, table, question, results, question_data)
 

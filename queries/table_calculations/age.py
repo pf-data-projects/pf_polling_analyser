@@ -17,6 +17,7 @@ def calc_age(category, col_index, table, question_list, results, question_data):
             ]
         filtered_df = filtered_df.loc[(filtered_df[get_age.columns[0]].astype(int) <= category[1])]
         table.iat[0, col_index] = len(filtered_df.index)
+        table.iat[1, col_index] = filtered_df['weighted_respondents'].astype(float).sum()
 
         table = calc.calc(filtered_df, col_index, table, question, results, question_data)
 

@@ -2,6 +2,10 @@
 
 {% block content %}
     <h1>Upload Results</h1>
+    <h2>
+        Please make sure you have run the results through the weighting process first.
+        You can do this <a href="{% url 'weight_data' %}">here</a>
+    </h2>
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}

@@ -211,7 +211,17 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
         for crossbreak in non_standard_cb:
             calc_crossbreak(table, question_list, results, question_data, crossbreak)
 
+    # adjust weighted totals so that they are a proportion of actual total
+    adjustment_ratio = table.loc[0, 'Total'] / table.loc[1, 'Total']
+
+    # Determine numeric columns starting from the fifth column onward
+    is_numeric = table.iloc[1, 4:].apply(lambda x: isinstance(x, (int, float)))
+    numeric_cols = table.columns[4:][is_numeric]
+
+    # Adjust only the numeric columns in the "Weighted" row
+    table.loc[1, numeric_cols] = table.loc[1, numeric_cols] * adjustment_ratio
+
     # Display all values as a percentage of the total for each crossbreak.
-    first_row_values = table.iloc[0, 5:]
-    table.iloc[1:, 5:] = table.iloc[1:, 5:].div(first_row_values) * 100
+    weighted_totals = table.iloc[1, 5:]
+    table.iloc[2:, 5:] = table.iloc[2:, 5:].div(weighted_totals) * 100
     return table
