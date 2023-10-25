@@ -19,6 +19,8 @@ def run_weighting(survey_data, weight_proportions):
     survey_data_renamed = survey_data.rename(columns=column_mapping)
 
     # Map answers to social grade codes
+    # Pls forgive the awfully long lines of strings here.
+    # I can't find a way to multi-line without breaking it :(
     SEG_Lookup = pd.DataFrame({
         "Answers": [
             "Casual worker - not in permanent employment",
