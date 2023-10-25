@@ -38,12 +38,22 @@ def weight_data(request):
     if request.method == 'POST':
         form = WeightForm(request.POST, request.FILES)
         if form.is_valid():
-            print("Running IPF on dataset")
+            # Fetches data from form & converts them to df
             survey_data = request.FILES['results']
             survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
             weight_proportions = request.FILES['weights']
             weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
-            wgt.run_weighting(survey_data, weight_proportions)
+
+            # Run ipf module
+            weighted_data = wgt.run_weighting(survey_data, weight_proportions)
+
+            # Cache the weighted data to be downloaded by user later
+            excel_buffer = BytesIO()
+            weighted_data.to_excel(excel_buffer, index=False)
+            excel_buffer.seek(0)
+            unique_id = "weights_for_user_" + str(request.user.id)
+            cache.set(unique_id, excel_buffer.getvalue(), 300)
+            print("SUCCESS!!")
             return redirect(reverse('home'))
     else:
         form = WeightForm()
@@ -111,3 +121,29 @@ def upload_csv(request):
         'form': form,
         'formset': formset
     })
+
+def download_csv(request):
+    """
+    Handles retrieval of cached output table.
+    """
+    unique_id = "csv_for_user_" + str(request.user.id)
+    csv_data = cache.get(unique_id)
+    if csv_data:
+        response = HttpResponse(csv_data, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="table.csv"'
+        return response
+    else:
+        return HttpResponse("CSV NOT FOUND")
+
+def download_weights(request):
+    """
+    Handles retrieval of cached weighted data.
+    """
+    unique_id = "weights_for_user_" + str(request.user.id)
+    excel_data = cache.get(unique_id)
+    if excel_data:
+        response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
+        return response
+    else:
+        return HttpResponse("WEIGHTS NOT FOUND")

@@ -26,3 +26,4 @@ Weight_Proportions.xlsx
 test_weight.csv
 merged_weighted_data.csv
 merged_weighted_data.xlsx
+db.sqlite3

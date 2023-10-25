@@ -69,11 +69,12 @@ def run_weighting(survey_data, weight_proportions):
 
     # Apply IPF with region to the survey data
     ipf_result = ipf(survey_subset, weight_proportions)
-    print(ipf_result[['Age', 'Gender', 'genderage', 'region', 'seg', 'weight']].head())
 
     # Join the weight column from ipf_result to the original survey_data
     survey_data['weighted_respondents'] = ipf_result['weight']
 
-    # Save the dataset with appended weights to an output file
-    survey_data.to_excel("merged_weighted_data.xlsx")
-    ipf_result.to_csv("test_weight.csv", encoding="utf-8-sig")
+    # # Save the dataset with appended weights to an output file
+    # survey_data.to_excel("merged_weighted_data.xlsx")
+    # ipf_result.to_csv("test_weight.csv", encoding="utf-8-sig")
+
+    return survey_data

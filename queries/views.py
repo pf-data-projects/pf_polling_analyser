@@ -112,12 +112,4 @@ def make_request(request, pk):
 
     return redirect(reverse('home'))
 
-def download_csv(request):
-    unique_id = "csv_for_user_" + str(request.user.id)
-    csv_data = cache.get(unique_id)
-    if csv_data:
-        response = HttpResponse(csv_data, content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="table.csv"'
-        return response
-    else:
-        return HttpResponse("CSV NOT FOUND")
+
