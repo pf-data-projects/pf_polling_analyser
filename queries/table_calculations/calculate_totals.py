@@ -223,9 +223,9 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
     table.loc[1, numeric_cols] = table.loc[1, numeric_cols] * adjustment_ratio
 
     # Display all values as a percentage of the total for each crossbreak.
-    # weighted_totals = table.iloc[1, 5:]
-    # table.iloc[2:, 5:] = table.iloc[2:, 5:].div(weighted_totals) * 100
+    weighted_totals = table.iloc[1, 5:]
+    table.iloc[2:, 5:] = table.iloc[2:, 5:].div(weighted_totals) * 100
 
-    # rebase(results, question_list, table)
+    rebase(question_data, results, question_list, table, 5)
     # Call rebase module to get values as a total of actual respondents for crossbreak
     return table

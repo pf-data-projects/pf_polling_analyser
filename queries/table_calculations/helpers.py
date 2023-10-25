@@ -35,3 +35,12 @@ def col_with_substr_a(df, substring, qid):
         col for col in df.columns
         if qid in col and substring in col
     ]
+
+def col_with_qid(df, qid):
+    """
+    Returns a dataframe with all the columns
+    that contain a question ID
+    """
+    return [
+        col for col in df.columns if f"{qid}:" in col
+    ]
