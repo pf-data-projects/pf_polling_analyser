@@ -13,39 +13,28 @@ def rebase(question_data, results, question_list, table, col_index):
     for question in question_list:
         column = results[helpers.col_with_substr_a(results, question['question'], question['qid'])]
         contains_nan = (column == 'nan').any().any()
-        # if column.empty:
-        #     continue
-        if question['Base Type'] == 'Question' and question['type'] == 'CHECKBOX':
+
+        if question['Base Type'] == 'Question' and (question['type'] == 'CHECKBOX' or question['type'] == 'TABLE' or  question['type'] == 'RANK'):
             checkbox_cols = results[helpers.col_with_qid(results, question['qid'])]
             has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
             if has_nan_rows:
                 non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
-                print(question['qid'])
-                print(non_nan_count)
                 matching_indices = table[table['IDs'] == question['qid']].index
                 for idx in matching_indices:
                     percentage_value = table.iloc[idx, col_index]
                     table.iloc[idx, col_index] = (percentage_value / 100) * weighted_totals
-                    print(table.iloc[idx, col_index])
                     # Then, update the values in these rows to be their percentage of non_nan_count
                     value = table.iloc[idx, col_index]
                     table.iloc[idx, col_index] = (value / non_nan_count) * 100
-                    print(table.iloc[idx, col_index])
+            checked.append(question['qid'])
                 
         elif question['Base Type'] == 'Option' and question['type'] == 'CHECKBOX':
-            print("checkbox option")
             continue
-
-        elif question['Base Type'] == 'Question' and question['type'] == 'TABLE':
-            print("table")
+            
         elif question['Base Type'] == 'Option' and question['type'] == 'TABLE':
-            print("table option")
             continue
 
-        elif question['Base Type'] == 'Question' and question['type'] == 'RANK':
-            print("rank")
         elif question['Base Type'] == 'Option' and question['type'] == 'RANK':
-            print("rank option")
             continue
 
         elif contains_nan and question['type'] == 'RADIO':
@@ -57,11 +46,14 @@ def rebase(question_data, results, question_list, table, col_index):
                 for idx in matching_indices:
                     percentage_value = table.iloc[idx, col_index]
                     table.iloc[idx, col_index] = (percentage_value / 100) * weighted_totals
-                    
+
                     # Then, update the values in these rows to be their percentage of non_nan_count
                     value = table.iloc[idx, col_index]
                     table.iloc[idx, col_index] = (value / non_nan_count) * 100
-            checked.append(question['qid'])
+                checked.append(question['qid'])
         else:
+            checked.append(question['qid'])
             continue
-    # return table
+        # checked.append(question['qid'])
+        # print(checked)
+    return table
