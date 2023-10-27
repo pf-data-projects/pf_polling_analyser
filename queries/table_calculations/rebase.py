@@ -11,7 +11,7 @@ def rebase(question_data, results, question_list, table, col_index):
     weighted_totals = table.iloc[1, col_index]
     checked = []
     for question in question_list:
-        column = results[helpers.col_with_substr_a(results, question['question'], question['qid'])]
+        column = results[helpers.col_with_substr(results, question['qid'])]
         contains_nan = (column == 'nan').any().any()
 
         if question['Base Type'] == 'Question' and (question['type'] == 'CHECKBOX' or question['type'] == 'TABLE' or  question['type'] == 'RANK'):
@@ -42,6 +42,9 @@ def rebase(question_data, results, question_list, table, col_index):
             # Get indices of rows in 'table' that match question['qid']
             matching_indices = table[table['IDs'] == question['qid']].index
             if question['qid'] not in checked:
+                # print("------------------------")
+                # print(question['qid'])
+                # print("Non-nan count", non_nan_count)
                 # Reverse the percentage calculation for these rows
                 for idx in matching_indices:
                     percentage_value = table.iloc[idx, col_index]

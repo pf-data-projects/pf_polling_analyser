@@ -113,6 +113,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Calculates responses for rank questions
 
         elif question['Base Type'] == 'Question' and question['type'] == 'RANK':
+            print(question['qid'])
             sub_questions_df = question_data[
                 (question_data['question_id'] == int(question['qid'])) &
                 (question_data['question_text'] == 'Option')
@@ -120,15 +121,20 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
             sub_questions = sub_questions_df['question_title'].tolist()
             options_df = question_data[
                 (question_data['question_id'] == int(question['qid'])) &
+                (question_data['question_type'] == 'RANK') &
                 (question_data['question_text'] == 'sub_option')
             ]
             options_list = options_df['question_title'].tolist()
             options = list(dict.fromkeys(options_list))
             for sub_question in sub_questions:
                 table_filtered_df = results[col_with_substr_a(results, sub_question, question['qid'])]
+                table_filtered_df = table_filtered_df.astype(float)
+                print(table_filtered_df)
                 i = 1
                 for option in options:
+                    print(type(option))
                     responses_df = (table_filtered_df == option).sum()
+                    print(responses_df)
                     responses = int(responses_df.iloc[0])
                     sub_question_position = table[(
                         table['Answers'] == sub_question
