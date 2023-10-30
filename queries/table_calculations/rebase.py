@@ -17,16 +17,20 @@ def rebase(question_data, results, question_list, table, col_index):
         if question['Base Type'] == 'Question' and (question['type'] == 'CHECKBOX' or question['type'] == 'TABLE' or  question['type'] == 'RANK'):
             checkbox_cols = results[helpers.col_with_qid(results, question['qid'])]
             has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
-            if has_nan_rows:
-                non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
-                matching_indices = table[table['IDs'] == question['qid']].index
-                for idx in matching_indices:
-                    percentage_value = table.iloc[idx, col_index]
-                    table.iloc[idx, col_index] = (percentage_value / 100) * weighted_totals
-                    # Then, update the values in these rows to be their percentage of non_nan_count
-                    value = table.iloc[idx, col_index]
-                    table.iloc[idx, col_index] = (value / non_nan_count) * 100
-            checked.append(question['qid'])
+            if question['qid'] not in checked:
+                if has_nan_rows:
+                    non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
+                    matching_indices = table[table['IDs'] == question['qid']].index
+                    for idx in matching_indices:
+                        percentage_value = table.iloc[idx, col_index]
+                        table.iloc[idx, col_index] = (percentage_value / 100) * weighted_totals
+                        # Then, update the values in these rows to be their percentage of non_nan_count
+                        value = table.iloc[idx, col_index]
+                        table.iloc[idx, col_index] = (value / non_nan_count) * 100
+                checked.append(question['qid'])
+            else:
+                checked.append(question['qid'])
+                continue
                 
         elif question['Base Type'] == 'Option' and question['type'] == 'CHECKBOX':
             continue

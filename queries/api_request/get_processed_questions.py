@@ -26,6 +26,10 @@ def extract_data_from_question_objects(question_list):
     question_titles = []
     question_rebase = []
 
+    # makes previous question data available to
+    # question in a loop.
+    prev_question = {}
+
     for question in question_list:
 
         # checks if the question is shown to all respondents
@@ -59,7 +63,6 @@ def extract_data_from_question_objects(question_list):
                         question_types.append(question['type'])
                         question_titles.append(i + 1)
                         question_rebase.append(not question['properties']['required'])
-
                 else:
                     question_ids.append(question['id'])
                     question_texts.append('Option')
@@ -89,6 +92,26 @@ def extract_data_from_question_objects(question_list):
                         question_types.append(f"{question['type']} | {sub_question['type']}")
                         question_titles.append(option['title']['English'])
                         question_rebase.append(not sub_question['properties']['required'])
+
+        # Code to handle edge case where a table question relies on options
+        # of a question immediately before it.
+        if question['type'] == 'TABLE' and 'sub_questions' not in question:
+            for sub_question in prev_question['options']:
+                if 'Don’t know' in sub_question['title']['English'] or 'None of the above' in sub_question['title']['English']:
+                    continue
+                question_ids.append(question['id'])
+                question_texts.append('sub_Question')
+                question_titles.append(sub_question['title']['English'])
+                question_types.append(f"{question['type']} | RADIO")
+                question_rebase.append(False)
+                for option in question['options']:
+                    question_ids.append(question['id'])
+                    question_texts.append('sub_option')
+                    question_types.append(f"{question['type']} | RADIO")
+                    question_titles.append(option['title']['English'])
+                    question_rebase.append(False)
+
+        prev_question = question
 
     # creates a dataframe from the lists and outputs to csv
     # with correct encoding for windows: "utf-8-sig"
