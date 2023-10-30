@@ -54,7 +54,7 @@ def weight_data(request):
             excel_buffer.seek(0)
             unique_id = "weights_for_user_" + str(request.user.id)
             cache.set(unique_id, excel_buffer.getvalue(), 300)
-            print("SUCCESS!!")
+            print("Weighting SUCCESS!!")
             return redirect(reverse('home'))
     else:
         print(os.environ.get("SECRET_KEY"))
@@ -96,11 +96,11 @@ def upload_csv(request):
             # get question data from API
             survey_questions = get_questions_json(survey_id)
             questions = extract_questions_from_pages(survey_questions)
-            with open("questions_list.json", "w") as outfile:
-                json.dump(survey_questions, outfile, indent=2)
+            # with open("questions_list.json", "w") as outfile:
+            #     json.dump(survey_questions, outfile, indent=2)
             question_data = extract_data_from_question_objects(questions)
-            question_data.to_csv(
-                "question_data.csv", index=False, encoding="utf-8-sig")
+            # question_data.to_csv(
+            #     "question_data.csv", index=False, encoding="utf-8-sig")
 
             # Run calculations
             table = table_calculation(data, question_data, standard_cb, non_standard_cb)
