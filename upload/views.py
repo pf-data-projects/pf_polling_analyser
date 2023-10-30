@@ -57,7 +57,7 @@ def weight_data(request):
             print("Weighting SUCCESS!!")
             return redirect(reverse('home'))
     else:
-        print(os.environ.get("SECRET_KEY"))
+        print(os.environ.get("API_TOKEN"))
         form = WeightForm()
 
     return render(request, 'weight_form.html', {
@@ -71,6 +71,10 @@ def upload_csv(request):
     2. reads submitted csvs as a pandas dataframe
     """
     if request.method == 'POST':
+        if not request.user.is_authenticated:
+            print('You are not logged in to the PF polling analyser.')
+            print('You cannot make this request until you log in.')
+            return redirect(reverse('home'))
         form = CSVUploadForm(request.POST, request.FILES)
         formset = CrossbreakFormSet(request.POST, prefix="crossbreaks")
         if form.is_valid() and formset.is_valid():

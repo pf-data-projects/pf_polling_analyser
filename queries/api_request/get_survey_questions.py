@@ -30,8 +30,8 @@ def get_questions_json(survey_id):
     """
     print("getting data for this survey's questions...")
     survey_questions = get_survey_questions(
-        api_token=os.environ["API_TOKEN"],
-        api_token_secret=os.environ["API_SECRET"],
+        api_token=os.environ.get("API_TOKEN"),
+        api_token_secret=os.environ.get("API_SECRET"),
         id=survey_id
     )
     return survey_questions
