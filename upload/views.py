@@ -57,7 +57,10 @@ def weight_data(request):
             print("Weighting SUCCESS!!")
             return redirect(reverse('home'))
     else:
-        print(os.environ.get("API_TOKEN"))
+        print("API TOKEN", os.environ.get("API_TOKEN"))
+        print("API SECRET", os.environ.get("API_SECRET"))
+        print("Django", os.environ.get("SECRET_KEY"))
+
         form = WeightForm()
 
     return render(request, 'weight_form.html', {
