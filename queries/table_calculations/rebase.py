@@ -31,10 +31,10 @@ def rebase(question_data, results, question_list, table, col_index):
             else:
                 checked.append(question['qid'])
                 continue
-                
+
         elif question['Base Type'] == 'Option' and question['type'] == 'CHECKBOX':
             continue
-            
+
         elif question['Base Type'] == 'Option' and question['type'] == 'TABLE':
             continue
 

@@ -1,5 +1,6 @@
 from io import BytesIO
 import json
+import os
 
 import pandas as pd
 from docx import Document
@@ -56,6 +57,7 @@ def weight_data(request):
             print("SUCCESS!!")
             return redirect(reverse('home'))
     else:
+        print(os.environ.get("SECRET_KEY"))
         form = WeightForm()
 
     return render(request, 'weight_form.html', {
