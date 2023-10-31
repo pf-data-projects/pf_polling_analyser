@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Upload the calculations here to generate polling tables</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Run table maker</button>
+    </form>
+    <p><a href="{% url 'home' %}">Back to query list</a></p>
+
+{% endblock %}

@@ -1,16 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Query List</h2>
-{% for query in query_list %}
-    <p><a href="{% url 'detail' query.pk %}">{{ query.survey_name }}</a></p>
-{% endfor %}
-<hr/>
-<p><a href="{% url 'create' %}">Click here to create a query</a></p>
-<p><a href="{% url 'upload_data' %}">Click here to upload results instead</a></p>
-<p><a href="{% url 'weight_data' %}">Click here to test the weighting code</a></p>
+
+<h2>Instructions</h2>
+<p>If you are not yet logged in, please log in <a href="{% url 'admin:index' %}">here.</a></p>
+<p>Once you are logged in, follow the following steps:</p>
+<ol>
+    <li>Click on the link to weight the survey results.</li><br/>
+    <li>A loading icon will appear on this page's tab while the data is weighted.</li><br/>
+    <li>Once the data is weighted you will be redirected here. You can then click on the link to download the data.</li><br/>
+    <li>Click on the link to calculate response data.</li><br/>
+    <li>A loading icon will appear on this page's tab while the responses for each question is calculated.</li><br/>
+    <li>Once that is completed you will be redirected here. You can then click on the link to download the data.</li><br/>
+    <li>Click on the link to run the table-maker.</li><br/>
+    <li>A loading icon will appear on this page's tab while the tables are generated.</li><br/>
+    <li>Once that is completed you will be redirected here. You can then click on the link to download the data.</li><br/>
+</ol>
 
 <hr/>
-<p><a href="{% url 'download_csv' %}">DOWNLOAD CSV</a></p>
+<p><a href="{% url 'weight_data' %}">Click here to weight survey responses</a></p>
+<p><a href="{% url 'upload_data' %}">Click here to calculate response data</a></p>
+<p><a href="{% url 'upload_data' %}">Click here to run the table-maker</a></p>
+
+<hr/>
 <p><a href="{% url 'download_weights' %}">DOWNLOAD WEIGHTED DATA</a></p>
+<p><a href="{% url 'download_csv' %}">DOWNLOAD CSV</a></p>
+<p><a href="">DOWNLOAD POLLING TABLES</a></p>
 
 {% endblock %}
