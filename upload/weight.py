@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 def run_weighting(survey_data, weight_proportions):
     """
     Runs IPF for datasets to add the weighting column.

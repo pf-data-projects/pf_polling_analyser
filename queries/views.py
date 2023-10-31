@@ -112,5 +112,3 @@ def make_request(request, pk):
     cache.set(unique_id, csv_buffer.getvalue(), 300)
 
     return redirect(reverse('home'))
-
-
