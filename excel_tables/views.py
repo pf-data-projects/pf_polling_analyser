@@ -1,11 +1,12 @@
-import BytesIO
+from io import BytesIO
 
 import pandas as pd
 
 from django.shortcuts import render, reverse, redirect
-from .forms import TableUploadForm
 from django.core.cache import cache
 from django.http import HttpResponse
+
+from .forms import TableUploadForm
 
 def table_maker_form(request):
     """

@@ -14,8 +14,7 @@ class TableUploadForm(forms.Form):
     )
     title = forms.CharField(
         label="Title you want to give to the survey",
-        placeholder = "Public First Poll For",
-        required=True
+        required=True,
     )
     start = forms.IntegerField(
         label="Select which question you would like the table to start at",
