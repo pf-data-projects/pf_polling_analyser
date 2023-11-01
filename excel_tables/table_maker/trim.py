@@ -21,4 +21,17 @@ def trim_table(data, start, end):
     # Trim the DataFrame to only include rows between the found indices
     trimmed_data = data.loc[start_index:end_index]
 
+    # remove textbox/essay/maxdiff questions
+    trimmed_data = trimmed_data[trimmed_data['Types'] != 'TEXTBOX']
+    trimmed_data = trimmed_data[trimmed_data['Types'] != 'ESSAY']
+    trimmed_data = trimmed_data[trimmed_data['Types'] != 'MAXDIFF']
+
+    # remove superfluous table options
+    condition = (trimmed_data['Types'] == 'TABLE') & (trimmed_data['Base Type'] == 'Option')
+    trimmed_data = trimmed_data[~condition]
+
+    trimmed_data.reset_index(drop=True, inplace=True)
+
+    trimmed_data.to_csv("test_output.csv", encoding="utf-8-sig", index=False)
+
     return trimmed_data
