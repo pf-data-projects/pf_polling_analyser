@@ -8,6 +8,7 @@ from django.http import HttpResponse
 
 from .forms import TableUploadForm
 from .table_maker.trim import trim_table
+from .table_maker.workbook import create_workbook
 
 def table_maker_form(request):
     """
@@ -28,6 +29,7 @@ def table_maker_form(request):
             trimmed = trim_table(table_data, start, end)
             print(trimmed.head(10))
             print(trimmed.tail(10))
+            create_workbook(trimmed, title)
 
             # Cache the tables to be downloaded by user later
             # excel_buffer = BytesIO()
