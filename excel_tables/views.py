@@ -7,6 +7,7 @@ from django.core.cache import cache
 from django.http import HttpResponse
 
 from .forms import TableUploadForm
+from .table_maker.trim import trim_table
 
 def table_maker_form(request):
     """
@@ -17,12 +18,16 @@ def table_maker_form(request):
         form = TableUploadForm(request.POST, request.FILES)
         if form.is_valid():
             # Fetches data from form & converts them to df
-            # survey_data = request.FILES['results']
-            # survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
-            # weight_proportions = request.FILES['weights']
-            # weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
+            table_data = request.FILES['data_file']
+            table_data = pd.read_csv(table_data)
+            title = form.cleaned_data['title']
+            start = form.cleaned_data['start']
+            end = form.cleaned_data['end']
 
-            # Run table maker module
+            # Run table maker modules
+            trimmed = trim_table(table_data, start, end)
+            print(trimmed.head(10))
+            print(trimmed.tail(10))
 
             # Cache the tables to be downloaded by user later
             # excel_buffer = BytesIO()
