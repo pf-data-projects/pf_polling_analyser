@@ -48,7 +48,7 @@ def download_tables(request):
     excel_data = cache.get(unique_id)
     if excel_data:
         response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
+        response['Content-Disposition'] = 'attachment; filename="download.xlsx"'
         return response
     else:
         return HttpResponse("TABLES NOT FOUND")

@@ -11,7 +11,7 @@ def create_workbook(request, data, title):
     """
     cache_key = "tables_for_user_" + str(request.user.id)
     output = io.BytesIO()
-    with pd.ExcelWriter(f'{title}.xlsx', engine='xlsxwriter') as writer:
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
 
         # create main results polling table
         data.to_excel(writer, index=False, sheet_name='results')
@@ -27,8 +27,6 @@ def create_workbook(request, data, title):
         percent_format = workbook.add_format({'num_format': '0%'})
         # Apply a general format to the entire column without the percentage format
         results_sheet.set_column(5, len(data.columns) - 1, 15)
-
-        print(len(data.iloc[3:]))
 
         # Loop through rows, starting from the fourth row, and apply the percentage format
         for row_num in range(3, len(data)):  # start from the fourth row (index 3)
