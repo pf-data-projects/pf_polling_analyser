@@ -27,16 +27,10 @@ def table_maker_form(request):
 
             # Run table maker modules
             trimmed = trim_table(table_data, start, end)
-            print(trimmed.head(10))
-            print(trimmed.tail(10))
-            create_workbook(trimmed, title)
 
-            # Cache the tables to be downloaded by user later
-            # excel_buffer = BytesIO()
-            # weighted_data.to_excel(excel_buffer, index=False)
-            # excel_buffer.seek(0)
-            # unique_id = "tables_for_user_" + str(request.user.id)
-            # cache.set(unique_id, excel_buffer.getvalue(), 300)
+            # create and cache excel tables.
+            create_workbook(request, trimmed, title)
+
             print("table making SUCCESS!!")
             return redirect(reverse('home'))
     else:
@@ -45,3 +39,16 @@ def table_maker_form(request):
     return render(request, 'table_maker_form.html', {
         'form': form,
     })
+
+def download_tables(request):
+    """
+    Handles retrieval of cached weighted data.
+    """
+    unique_id = "tables_for_user_" + str(request.user.id)
+    excel_data = cache.get(unique_id)
+    if excel_data:
+        response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
+        return response
+    else:
+        return HttpResponse("TABLES NOT FOUND")

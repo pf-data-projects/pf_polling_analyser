@@ -18,6 +18,9 @@ def trim_table(data, start, end):
     if pd.isna(start_index) or pd.isna(end_index):
         raise ValueError("The specified IDs were not found in the CSV file.")
 
+    # Save the totals/weighted totals
+    headers = data.loc[0:1]
+
     # Trim the DataFrame to only include rows between the found indices
     trimmed_data = data.loc[start_index:end_index]
 
@@ -26,12 +29,24 @@ def trim_table(data, start, end):
     trimmed_data = trimmed_data[trimmed_data['Types'] != 'ESSAY']
     trimmed_data = trimmed_data[trimmed_data['Types'] != 'MAXDIFF']
 
+    # divide all values by 100
+    trimmed_data.iloc[:, 5:] = trimmed_data.iloc[:, 5:].applymap(
+        lambda x: x / 100 if x != 0 else x
+    )
+
     # remove superfluous table options
     condition = (trimmed_data['Types'] == 'TABLE') & (trimmed_data['Base Type'] == 'Option')
     trimmed_data = trimmed_data[~condition]
 
+    # replace zeros from question and subquestion rows with empty strings
+    question_rows = ['Question', 'sub_Question']
+    condition = trimmed_data['Base Type'].isin(question_rows)
+    trimmed_data.loc[condition] = trimmed_data.loc[condition].replace(0, '')
+
     trimmed_data.reset_index(drop=True, inplace=True)
 
-    trimmed_data.to_csv("test_output.csv", encoding="utf-8-sig", index=False)
+    concatenated_data = pd.concat([headers, trimmed_data], ignore_index=True)
 
-    return trimmed_data
+    concatenated_data.to_csv("test_output.csv", encoding="utf-8-sig", index=False)
+
+    return concatenated_data
