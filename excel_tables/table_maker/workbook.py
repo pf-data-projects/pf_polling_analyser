@@ -4,6 +4,9 @@ import pandas as pd
 import xlsxwriter
 from django.core.cache import cache
 
+from .contents import create_contents_page
+from .cover import create_cover_page
+
 def create_workbook(request, data, title):
     """
     The function that controls the creation and formatting of
@@ -12,6 +15,9 @@ def create_workbook(request, data, title):
     # create a further trimmed dataframe for excel output
     trimmed_data = data.drop(['IDs', 'Types', 'Base Type', 'Rebase comment needed'], axis=1)
 
+    cover_df = create_cover_page(data)
+    contents_df = create_contents_page(data)
+
     # define variables for caching
     cache_key = "tables_for_user_" + str(request.user.id)
     output = io.BytesIO()
@@ -19,9 +25,11 @@ def create_workbook(request, data, title):
     # Format the tables with xlsxwriter and pandas
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create main results polling table
-        trimmed_data.to_excel(writer, index=False, sheet_name='results')
+        cover_df.to_excel(writer, index=False, sheet_name="Cover Page")
+        contents_df.to_excel(writer, index=False, sheet_name="Contents")
+        trimmed_data.to_excel(writer, index=False, sheet_name='Full Results')
         workbook = writer.book
-        results_sheet = writer.sheets['results']
+        results_sheet = writer.sheets['Full Results']
 
         results_sheet.set_zoom(90)
         header_format = workbook.add_format({
