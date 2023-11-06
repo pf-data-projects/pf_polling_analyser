@@ -121,7 +121,6 @@ def create_workbook(request, data, title):
                 for col_num, value in enumerate(concat_sub_table.columns.values):
                     question_sheet.write(0, col_num, value, header_format)
             checked.append(qid)
-        writer.close()
 
     output.seek(0)
     cache.set(cache_key, output.getvalue(), timeout=300)

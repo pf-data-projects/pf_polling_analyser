@@ -44,9 +44,29 @@ def trim_table(data, start, end):
     trimmed_data.loc[condition] = trimmed_data.loc[condition].replace(0, '')
 
     trimmed_data.reset_index(drop=True, inplace=True)
-
     concatenated_data = pd.concat([headers, trimmed_data], ignore_index=True)
+    concatenated_data.reset_index(drop=True, inplace=True)
 
-    concatenated_data.to_csv("test_output.csv", encoding="utf-8-sig", index=False)
+    # Create a list to store the rows
+    rows_list = []
 
-    return concatenated_data
+    # Iterate through the DataFrame and insert rows with empty strings before 'Question' or 'sub_Question'
+    for index, row in concatenated_data.iterrows():
+        # Check if the 'Base Type' is 'Question' or 'sub_Question' and add a row with empty strings if it is
+        if row['Base Type'] in ['Question', 'sub_Question']:
+            # Create a Series with empty strings for each column
+            empty_row = pd.Series([''] * len(data.columns), index=data.columns)
+            rows_list.append(empty_row)
+            
+        # Add the original row to the list
+        rows_list.append(row)
+
+    # Concatenate the list into a new DataFrame
+    new_data = pd.concat([pd.DataFrame([row]) for row in rows_list], ignore_index=True)
+
+    # Reset the index of the new DataFrame
+    new_data.reset_index(drop=True, inplace=True)
+
+    new_data.to_csv("test_output.csv", encoding="utf-8-sig", index=False)
+
+    return new_data
