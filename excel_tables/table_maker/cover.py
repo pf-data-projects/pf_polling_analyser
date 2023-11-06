@@ -20,5 +20,4 @@ def create_cover_page(data):
     cover = {"Public First Poll for: ": cover_list}
     cover_df = pd.DataFrame(cover)
 
-    print(cover_df)
     return cover_df

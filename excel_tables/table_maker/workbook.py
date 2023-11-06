@@ -2,10 +2,12 @@ import io
 
 import pandas as pd
 import xlsxwriter
+from xlsxwriter.utility import xl_rowcol_to_cell
 from django.core.cache import cache
 
 from .contents import create_contents_page
 from .cover import create_cover_page
+from .helper import get_column_letter
 
 def create_workbook(request, data, title):
     """
@@ -13,8 +15,13 @@ def create_workbook(request, data, title):
     polling tables.
     """
     # create a further trimmed dataframe for excel output
-    trimmed_data = data.drop(['IDs', 'Types', 'Base Type', 'Rebase comment needed'], axis=1)
+    trimmed_data = data.drop(
+        ['IDs', 'Types', 'Base Type', 'Rebase comment needed'], 
+        axis=1
+    )
 
+    # create cover page and contents page
+    # blank = {'Table of contents'}
     cover_df = create_cover_page(data)
     contents_df = create_contents_page(data)
 
@@ -30,6 +37,27 @@ def create_workbook(request, data, title):
         trimmed_data.to_excel(writer, index=False, sheet_name='Full Results')
         workbook = writer.book
         results_sheet = writer.sheets['Full Results']
+        contents_sheet = writer.sheets['Contents']
+
+        # add link to the full results page in the contents page
+        position = contents_df.isin(['Full Results']).stack()
+        if not position.empty:
+            # Get the first match's index
+            first_match_index = position[position].index[0]
+
+            # Get row and column for the DataFrame
+            df_row = first_match_index[0]
+            df_col = first_match_index[1]
+
+            # Convert the DataFrame column label to an Excel column letter
+            excel_col = get_column_letter(contents_df.columns.get_loc(df_col) + 1)
+            excel_row = df_row + 2  # Adding 1 because Excel starts at 1
+            excel_cell = f"{excel_col}{excel_row}"
+            contents_sheet.write_url(excel_cell, "internal:'Full Results'!A1", string="Full Results Table")
+
+            print(f"'Full Results' found at DataFrame position {first_match_index}, which corresponds to Excel cell {excel_cell}")
+        else:
+            print("Value 'Full Results' not found in DataFrame.")
 
         results_sheet.set_zoom(90)
         header_format = workbook.add_format({
@@ -39,7 +67,7 @@ def create_workbook(request, data, title):
         })
         percent_format = workbook.add_format({'num_format': '0%'})
         question_format = workbook.add_format({"bold": True})
-        # Apply a general format to the entire column 
+        # Apply a general format to the entire column
         # without the percentage format
         results_sheet.set_column(5, len(data.columns) - 1, 15)
 

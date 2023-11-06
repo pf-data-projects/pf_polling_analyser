@@ -16,6 +16,5 @@ def create_contents_page(data):
             contents_list.append(item)
     contents = {"Table of Contents": contents_list}
     contents_df = pd.DataFrame(contents)
-    print(contents_df)
 
     return contents_df
