@@ -16,7 +16,7 @@ def create_workbook(request, data, title):
     """
     # create a further trimmed dataframe for excel output
     trimmed_data = data.drop(
-        ['IDs', 'Types', 'Base Type', 'Rebase comment needed'], 
+        ['IDs', 'Types', 'Base Type', 'Rebase comment needed'],
         axis=1
     )
 
@@ -76,6 +76,7 @@ def create_workbook(request, data, title):
             question_value = data.iloc[i, 3]
             if data.at[i, 'Base Type'] == 'Question' or data.at[i, 'Base Type'] == 'sub_Question':
                 results_sheet.write(i + 1, 0, question_value, question_format)
+                results_sheet.merge_range(i + 1, 0, i + 1, 26, question_value, question_format)
 
         # apply percentage format to data.
         format_percentages(trimmed_data, results_sheet, percent_format)

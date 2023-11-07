@@ -50,14 +50,14 @@ def trim_table(data, start, end):
     # Create a list to store the rows
     rows_list = []
 
-    # Iterate through the DataFrame and insert rows with empty strings before 'Question' or 'sub_Question'
+    # Iterate through the DataFrame and insert rows 
+    # with empty strings before 'Question' or 'sub_Question'
     for index, row in concatenated_data.iterrows():
-        # Check if the 'Base Type' is 'Question' or 'sub_Question' and add a row with empty strings if it is
         if row['Base Type'] in ['Question', 'sub_Question']:
             # Create a Series with empty strings for each column
             empty_row = pd.Series([''] * len(data.columns), index=data.columns)
             rows_list.append(empty_row)
-            
+
         # Add the original row to the list
         rows_list.append(row)
 

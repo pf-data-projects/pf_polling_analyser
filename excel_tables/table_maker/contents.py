@@ -5,7 +5,9 @@ def create_contents_page(data):
     Build a dataframe to house the contents page
     of PF polling tables.
     """
+    data = data[(data['Base Type'] == "Question")]
     question_list = data['Answers'].tolist()
+    print(question_list)
     question_list = list(dict.fromkeys(question_list))
 
     # create the df that will show individual tables/sheets
