@@ -53,9 +53,11 @@ def create_workbook(request, data, title):
             excel_col = get_column_letter(contents_df.columns.get_loc(df_col) + 1)
             excel_row = df_row + 2  # Adding 1 because Excel starts at 1
             excel_cell = f"{excel_col}{excel_row}"
-            contents_sheet.write_url(excel_cell, "internal:'Full Results'!A1", string="Full Results Table")
-
-            print(f"'Full Results' found at DataFrame position {first_match_index}, which corresponds to Excel cell {excel_cell}")
+            contents_sheet.write_url(
+                excel_cell,
+                "internal:'Full Results'!A1",
+                string="Full Results Table"
+            )
         else:
             print("Value 'Full Results' not found in DataFrame.")
 
@@ -119,6 +121,7 @@ def create_workbook(request, data, title):
                             question_value,
                             question_format
                         )
+                        question_sheet.merge_range(i + 3, 0, i + 3, 25, question_value, question_format)
                 for col_num, value in enumerate(concat_sub_table.columns.values):
                     question_sheet.write(0, col_num, value, header_format)
             checked.append(qid)

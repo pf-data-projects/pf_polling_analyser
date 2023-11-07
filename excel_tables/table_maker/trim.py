@@ -47,13 +47,20 @@ def trim_table(data, start, end):
     concatenated_data = pd.concat([headers, trimmed_data], ignore_index=True)
     concatenated_data.reset_index(drop=True, inplace=True)
 
+    # remove any html tags from questions
+    concatenated_data["Answers"] = concatenated_data['Answers'].str.replace(
+        r'<[^>]+>',
+        '',
+        regex=True
+    )
+
     # Create a list to store the rows
     rows_list = []
 
-    # Iterate through the DataFrame and insert rows 
+    # Iterate through the DataFrame and insert rows
     # with empty strings before 'Question' or 'sub_Question'
     for index, row in concatenated_data.iterrows():
-        if row['Base Type'] in ['Question', 'sub_Question']:
+        if row['Base Type'] in ['Question']:
             # Create a Series with empty strings for each column
             empty_row = pd.Series([''] * len(data.columns), index=data.columns)
             rows_list.append(empty_row)
