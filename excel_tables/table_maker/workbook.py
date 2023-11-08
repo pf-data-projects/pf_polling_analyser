@@ -94,6 +94,14 @@ def create_workbook(request, data, title):
         for qid in ids:
             if qid not in checked:
                 sub_table = data[(data['IDs'] == qid)]
+                rows_list = []
+                for index, row in sub_table.iterrows():
+                    if row['Base Type'] in ['Question']:
+                        empty_row = pd.Series([''] * len(data.columns), index=data.columns)
+                        rows_list.append(empty_row)
+                    rows_list.append(row)
+                sub_table = pd.concat([pd.DataFrame([row]) for row in rows_list], ignore_index=True)
+                sub_table.reset_index(drop=True, inplace=True)
                 concat_sub_table = pd.concat(
                     [header, sub_table],
                     ignore_index=True
