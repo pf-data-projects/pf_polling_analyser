@@ -78,7 +78,14 @@ def create_workbook(request, data, title):
             question_value = data.iloc[i, 3]
             if data.at[i, 'Base Type'] == 'Question' or data.at[i, 'Base Type'] == 'sub_Question':
                 results_sheet.write(i + 1, 0, question_value, question_format)
-                results_sheet.merge_range(i + 1, 0, i + 1, 26, question_value, question_format)
+                results_sheet.merge_range(
+                    i + 1,
+                    0,
+                    i + 1,
+                    26,
+                    question_value,
+                    question_format
+                )
 
         # apply percentage format to data.
         format_percentages(trimmed_data, results_sheet, percent_format)
@@ -86,14 +93,17 @@ def create_workbook(request, data, title):
         for col_num, value in enumerate(trimmed_data.columns.values):
             results_sheet.write(0, col_num, value, header_format)
 
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create individual tables
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create individual tables.
+        # ~~~~~~ Apologies for how fiddly this bit of code is atm.
         non_header_data = data.iloc[2:]
         header = data.loc[0:1]
         ids = non_header_data['IDs'].tolist()
         checked = []
         for qid in ids:
             if qid not in checked:
+                # create table containing just 1 question
                 sub_table = data[(data['IDs'] == qid)]
+                # add a space beneath where header goes
                 rows_list = []
                 for index, row in sub_table.iterrows():
                     if row['Base Type'] in ['Question']:
@@ -101,25 +111,29 @@ def create_workbook(request, data, title):
                         rows_list.append(empty_row)
                     rows_list.append(row)
                 sub_table = pd.concat([pd.DataFrame([row]) for row in rows_list], ignore_index=True)
-                sub_table.reset_index(drop=True, inplace=True)
+                # concatinate the headers back to the top of the sub table
                 concat_sub_table = pd.concat(
                     [header, sub_table],
                     ignore_index=True
                 )
                 sub_table.reset_index(drop=True, inplace=True)
+                # drop columns that we don't want to see in excel
                 concat_sub_table = concat_sub_table.drop(
                     ['IDs', 'Types', 'Base Type', 'Rebase comment needed'],
                     axis=1
                 )
+                # add a new row for link back to contents page
                 new_row = {concat_sub_table.columns[0]: 'Back to contents'}
                 for col in concat_sub_table.columns[1:]:
                     new_row[col] = ''
                 concat_sub_table.loc[len(concat_sub_table)] = new_row
+                # Add the table to excel with sheetname based on QID
                 concat_sub_table.to_excel(
                     writer,
                     index=False,
                     sheet_name=f'question ID - {qid}'
                 )
+                # define sheet for formatting
                 question_sheet = writer.sheets[f'question ID - {qid}']
                 # format numbers to nice percentages
                 format_percentages(
@@ -139,7 +153,7 @@ def create_workbook(request, data, title):
                 # format headers
                 for col_num, value in enumerate(concat_sub_table.columns.values):
                     question_sheet.write(0, col_num, value, header_format)
-                # add link back to contents
+                # add hyperlink back to contents
                 position = concat_sub_table.isin(['Back to contents']).stack()
                 if not position.empty:
                     first_match_index = position[position].index[0]
