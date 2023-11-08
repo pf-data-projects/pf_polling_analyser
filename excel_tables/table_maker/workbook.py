@@ -103,15 +103,21 @@ def create_workbook(request, data, title):
                     ['IDs', 'Types', 'Base Type', 'Rebase comment needed'],
                     axis=1
                 )
+                new_row = {concat_sub_table.columns[0]: 'Back to contents'}
+                for col in concat_sub_table.columns[1:]:
+                    new_row[col] = ''
+                concat_sub_table.loc[len(concat_sub_table)] = new_row
                 concat_sub_table.to_excel(
                     writer,
                     index=False,
                     sheet_name=f'question ID - {qid}'
                 )
                 question_sheet = writer.sheets[f'question ID - {qid}']
+                # format numbers to nice percentages
                 format_percentages(
                     concat_sub_table, question_sheet, percent_format
                 )
+                # format questions
                 for i in range(len(sub_table)):
                     question_value = concat_sub_table.iloc[i + 2, 0]
                     if sub_table.loc[i, 'Base Type'] == 'Question' or sub_table.loc[i, 'Base Type'] == 'sub_Question':
@@ -122,8 +128,25 @@ def create_workbook(request, data, title):
                             question_format
                         )
                         question_sheet.merge_range(i + 3, 0, i + 3, 25, question_value, question_format)
+                # format headers
                 for col_num, value in enumerate(concat_sub_table.columns.values):
                     question_sheet.write(0, col_num, value, header_format)
+                # add link back to contents
+                position = concat_sub_table.isin(['Back to contents']).stack()
+                if not position.empty:
+                    first_match_index = position[position].index[0]
+
+                    df_row = first_match_index[0]
+                    df_col = first_match_index[1]
+
+                    excel_col = get_column_letter(concat_sub_table.columns.get_loc(df_col) + 1)
+                    excel_row = df_row + 2
+                    excel_cell = f"{excel_col}{excel_row}"
+                    question_sheet.write_url(
+                        excel_cell,
+                        "internal:'Contents'!A1",
+                        string="Back to Contents"
+                    )
             checked.append(qid)
 
         # Once tables are made, create links to each from contents page.
@@ -156,7 +179,7 @@ def format_percentages(data, sheet, cell_format):
     """
     for row_num in range(3, len(data)):  # start from the fourth row (index 3)
         row_data = data.iloc[row_num]
-        for col_num in range(1, len(data.columns)):  # start from the sixth column (index 5)
+        for col_num in range(1, len(data.columns)):
             cell_value = data.iloc[row_num, col_num]
             # Check if the cell contains a number (int or float)
             if isinstance(cell_value, (int, float)):
