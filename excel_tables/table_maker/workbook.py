@@ -36,6 +36,7 @@ def create_workbook(request, data, title):
         contents_df[0].to_excel(writer, index=False, sheet_name="Contents")
         trimmed_data.to_excel(writer, index=False, sheet_name='Full Results')
         workbook = writer.book
+        totals_format = workbook.add_format({'num_format': '0'})
 
         # define results sheet and add basic styles
         results_sheet = writer.sheets['Full Results']
@@ -62,7 +63,8 @@ def create_workbook(request, data, title):
             df_col = first_match_index[1]
 
             # Convert the DataFrame column label to an Excel column letter
-            excel_col = get_column_letter(contents_df[0].columns.get_loc(df_col) + 1)
+            excel_col = get_column_letter(
+                contents_df[0].columns.get_loc(df_col) + 1)
             excel_row = df_row + 2  # Adding 1 because Excel starts at 1
             excel_cell = f"{excel_col}{excel_row}"
             contents_sheet.write_url(
@@ -77,7 +79,8 @@ def create_workbook(request, data, title):
         header_format = workbook.add_format({
             "bg_color": "#FFA500",
             "bold": True,
-            "font_color": "#FFFFFF"
+            "font_color": "#FFFFFF",
+            "align": "center"
         })
         percent_format = workbook.add_format({'num_format': '0%'})
         question_format = workbook.add_format({"bold": True})
@@ -85,6 +88,14 @@ def create_workbook(request, data, title):
         # without the percentage format
         results_sheet.set_column(1, len(data.columns) - 1, 15)
         results_sheet.set_column(0, 0, 80)
+
+        # round weighted totals to nearest integer
+        row_as_list = trimmed_data.iloc[1].values.tolist()
+        for col, number in enumerate(row_as_list, start=0):
+            if isinstance(number, str):
+                results_sheet.write(2, col, number)
+            else:
+                results_sheet.write_number(2, col, number, totals_format)
 
         # create question style and loop to apply them
         for i in range(2, len(data)):
@@ -106,7 +117,7 @@ def create_workbook(request, data, title):
         for col_num, value in enumerate(trimmed_data.columns.values):
             results_sheet.write(0, col_num, value, header_format)
 
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create individual tables.
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create individual tables.
         # ~~~~~~ Apologies for how fiddly this bit of code is atm.
         non_header_data = data.iloc[2:]
         header = data.loc[0:1]
@@ -120,10 +131,14 @@ def create_workbook(request, data, title):
                 rows_list = []
                 for index, row in sub_table.iterrows():
                     if row['Base Type'] in ['Question']:
-                        empty_row = pd.Series([''] * len(data.columns), index=data.columns)
+                        empty_row = pd.Series(
+                            [''] * len(data.columns), index=data.columns)
                         rows_list.append(empty_row)
                     rows_list.append(row)
-                sub_table = pd.concat([pd.DataFrame([row]) for row in rows_list], ignore_index=True)
+                sub_table = pd.concat(
+                    [pd.DataFrame([row]) for row in rows_list], 
+                    ignore_index=True
+                )
                 # concatinate the headers back to the top of the sub table
                 concat_sub_table = pd.concat(
                     [header, sub_table],
@@ -165,10 +180,16 @@ def create_workbook(request, data, title):
                             question_value,
                             question_format
                         )
-                        question_sheet.merge_range(i + 3, 0, i + 3, 25, question_value, question_format)
+                        question_sheet.merge_range(
+                            i + 3,
+                            0,
+                            i + 3,
+                            25,
+                            question_value, question_format
+                        )
                 # format headers
-                for col_num, value in enumerate(concat_sub_table.columns.values):
-                    question_sheet.write(0, col_num, value, header_format)
+                for col, value in enumerate(concat_sub_table.columns.values):
+                    question_sheet.write(0, col, value, header_format)
                 # add hyperlink back to contents
                 position = concat_sub_table.isin(['Back to contents']).stack()
                 if not position.empty:
@@ -177,7 +198,8 @@ def create_workbook(request, data, title):
                     df_row = first_match_index[0]
                     df_col = first_match_index[1]
 
-                    excel_col = get_column_letter(concat_sub_table.columns.get_loc(df_col) + 1)
+                    excel_col = get_column_letter(
+                        concat_sub_table.columns.get_loc(df_col) + 1)
                     excel_row = df_row + 2
                     excel_cell = f"{excel_col}{excel_row}"
                     question_sheet.write_url(
@@ -185,7 +207,12 @@ def create_workbook(request, data, title):
                         "internal:'Contents'!A1",
                         string="Back to Contents"
                     )
-            checked.append(qid)
+                for col, number in enumerate(row_as_list, start=0):
+                    if isinstance(number, str):
+                        question_sheet.write(2, col, number)
+                    else:
+                        question_sheet.write_number(2, col, number, totals_format)
+                    checked.append(qid)
 
         # Once tables are made, create links to each from contents page.
         question_id_list = contents_df[1]
@@ -222,10 +249,11 @@ def format_percentages(data, sheet, cell_format):
             # Check if the cell contains a number (int or float)
             if isinstance(cell_value, (int, float)):
                 # Apply percent format to the cell because it contains a number
-                sheet.write_number(row_num + 1, col_num, cell_value, cell_format)
+                sheet.write_number(
+                    row_num + 1, col_num, cell_value, cell_format)
             elif pd.isna(cell_value) or cell_value == '':
                 # If the cell is NaN or an empty string, write an empty string
                 sheet.write_string(row_num + 1, col_num, '')
             else:
-                # Otherwise, write the value as it is (this covers non-empty strings)
+                # Otherwise, write the value as it is
                 sheet.write(row_num + 1, col_num, cell_value)
