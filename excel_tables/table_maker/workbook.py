@@ -33,14 +33,14 @@ def create_workbook(request, data, title):
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create main results polling table
         cover_df.to_excel(writer, index=False, sheet_name="Cover Page")
-        contents_df.to_excel(writer, index=False, sheet_name="Contents")
+        contents_df[0].to_excel(writer, index=False, sheet_name="Contents")
         trimmed_data.to_excel(writer, index=False, sheet_name='Full Results')
         workbook = writer.book
         results_sheet = writer.sheets['Full Results']
         contents_sheet = writer.sheets['Contents']
 
         # add link to the full results page in the contents page
-        position = contents_df.isin(['Full Results']).stack()
+        position = contents_df[0].isin(['Full Results']).stack()
         if not position.empty:
             # Get the first match's index
             first_match_index = position[position].index[0]
@@ -50,7 +50,7 @@ def create_workbook(request, data, title):
             df_col = first_match_index[1]
 
             # Convert the DataFrame column label to an Excel column letter
-            excel_col = get_column_letter(contents_df.columns.get_loc(df_col) + 1)
+            excel_col = get_column_letter(contents_df[0].columns.get_loc(df_col) + 1)
             excel_row = df_row + 2  # Adding 1 because Excel starts at 1
             excel_cell = f"{excel_col}{excel_row}"
             contents_sheet.write_url(
@@ -125,6 +125,24 @@ def create_workbook(request, data, title):
                 for col_num, value in enumerate(concat_sub_table.columns.values):
                     question_sheet.write(0, col_num, value, header_format)
             checked.append(qid)
+
+        # Once tables are made, create links to each from contents page.
+        question_id_list = contents_df[1]
+        i = 0
+        for question in question_id_list:
+            df_row = i + 1
+            df_col = 0
+            if i < len(contents_df[0]):
+                cell_data = contents_df[0].iat[i + 1, 0]
+                excel_col = "A"
+                excel_row = df_row + 2
+                excel_cell = f"{excel_col}{excel_row}"
+                contents_sheet.write_url(
+                    excel_cell,
+                    f"internal:'question ID - {question}'!A1",
+                    string=f'{cell_data}'
+                )
+            i += 1
 
     output.seek(0)
     cache.set(cache_key, output.getvalue(), timeout=300)
