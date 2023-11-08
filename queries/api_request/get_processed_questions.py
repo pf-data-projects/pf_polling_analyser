@@ -37,7 +37,7 @@ def extract_data_from_question_objects(question_list):
             if question['properties']['required'] is True:
                 question_rebase.append(False)
             elif question['properties']['required'] is False:
-                question_rebase.append(True)
+                question_rebase.append(False)
         else:
             question_rebase.append('N/A')
 
@@ -77,7 +77,7 @@ def extract_data_from_question_objects(question_list):
                 if sub_question['properties']['required'] is True:
                     question_rebase.append(False)
                 elif sub_question['properties']['required'] is False:
-                    question_rebase.append(True)
+                    question_rebase.append(False)
                 question_ids.append(question['id'])
                 question_texts.append(f"sub_{sub_question['base_type']}")
                 question_types.append(f"{question['type']} | {sub_question['type']}")

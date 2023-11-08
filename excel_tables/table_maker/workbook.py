@@ -20,6 +20,8 @@ def create_workbook(request, data, title):
         axis=1
     )
 
+    trimmed_data.iat[0, 0] = "Unweighted"
+
     # create cover page and contents page
     # blank = {'Table of contents'}
     cover_df = create_cover_page(data)
@@ -49,10 +51,14 @@ def create_workbook(request, data, title):
             "align": "left"
         })
         questions_border.set_right(1)
+        weight_label_format = workbook.add_format({
+            "align": "right"
+        })
 
         # define results sheet and add basic styles
         results_sheet = writer.sheets['Full Results']
         results_sheet.hide_gridlines(2)
+        results_sheet.freeze_panes(3, 1)
 
         # define contents sheet and add basic styles
         contents_sheet = writer.sheets['Contents']
@@ -103,6 +109,7 @@ def create_workbook(request, data, title):
         # without the percentage format
         results_sheet.set_column(1, len(data.columns) - 1, 15)
         results_sheet.set_column(0, 0, 80, cell_format=questions_border)
+        
 
         # round weighted totals to nearest integer
         row_as_list = trimmed_data.iloc[1].values.tolist()
@@ -188,6 +195,7 @@ def create_workbook(request, data, title):
                 question_sheet.set_column(1, len(data.columns) - 1, 15)
                 question_sheet.set_column(0, 0, 80, cell_format=questions_border)
                 question_sheet.hide_gridlines(2)
+                question_sheet.freeze_panes(3, 1)
                 # format numbers to nice percentages
                 format_percentages(
                     concat_sub_table, question_sheet, percent_format
