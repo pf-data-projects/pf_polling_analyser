@@ -36,7 +36,19 @@ def create_workbook(request, data, title):
         contents_df[0].to_excel(writer, index=False, sheet_name="Contents")
         trimmed_data.to_excel(writer, index=False, sheet_name='Full Results')
         workbook = writer.book
-        totals_format = workbook.add_format({'num_format': '0'})
+        totals_format = workbook.add_format({
+            'num_format': '0',
+            'align': 'center',
+        })
+        weighted_totals_format = workbook.add_format({
+            'num_format': '0',
+            'align': 'center',
+        })
+        weighted_totals_format.set_bottom(1)
+        questions_border = workbook.add_format({
+            "align": "left"
+        })
+        questions_border.set_right(1)
 
         # define results sheet and add basic styles
         results_sheet = writer.sheets['Full Results']
@@ -82,12 +94,15 @@ def create_workbook(request, data, title):
             "font_color": "#FFFFFF",
             "align": "center"
         })
-        percent_format = workbook.add_format({'num_format': '0%'})
+        percent_format = workbook.add_format({
+            'num_format': '0%',
+            'align': 'center'
+        })
         question_format = workbook.add_format({"bold": True})
         # Apply a general format to the entire column
         # without the percentage format
         results_sheet.set_column(1, len(data.columns) - 1, 15)
-        results_sheet.set_column(0, 0, 80)
+        results_sheet.set_column(0, 0, 80, cell_format=questions_border)
 
         # round weighted totals to nearest integer
         row_as_list = trimmed_data.iloc[1].values.tolist()
@@ -95,7 +110,14 @@ def create_workbook(request, data, title):
             if isinstance(number, str):
                 results_sheet.write(2, col, number)
             else:
-                results_sheet.write_number(2, col, number, totals_format)
+                results_sheet.write_number(2, col, number, weighted_totals_format)
+
+        row_as_list_totals = trimmed_data.iloc[0].values.tolist()
+        for col, number in enumerate(row_as_list_totals, start=0):
+            if isinstance(number, str):
+                results_sheet.write(1, col, number)
+            else:
+                results_sheet.write_number(1, col, number, totals_format)
 
         # create question style and loop to apply them
         for i in range(2, len(data)):
@@ -164,7 +186,7 @@ def create_workbook(request, data, title):
                 # define sheet for formatting
                 question_sheet = writer.sheets[f'question ID - {qid}']
                 question_sheet.set_column(1, len(data.columns) - 1, 15)
-                question_sheet.set_column(0, 0, 80)
+                question_sheet.set_column(0, 0, 80, cell_format=questions_border)
                 question_sheet.hide_gridlines(2)
                 # format numbers to nice percentages
                 format_percentages(
@@ -211,8 +233,13 @@ def create_workbook(request, data, title):
                     if isinstance(number, str):
                         question_sheet.write(2, col, number)
                     else:
-                        question_sheet.write_number(2, col, number, totals_format)
-                    checked.append(qid)
+                        question_sheet.write_number(2, col, number, weighted_totals_format)
+                for col, number in enumerate(row_as_list_totals, start=0):
+                    if isinstance(number, str):
+                        question_sheet.write(1, col, number)
+                    else:
+                        question_sheet.write_number(1, col, number, totals_format)
+                checked.append(qid)
 
         # Once tables are made, create links to each from contents page.
         question_id_list = contents_df[1]
