@@ -36,8 +36,20 @@ def create_workbook(request, data, title):
         contents_df[0].to_excel(writer, index=False, sheet_name="Contents")
         trimmed_data.to_excel(writer, index=False, sheet_name='Full Results')
         workbook = writer.book
+
+        # define results sheet and add basic styles
         results_sheet = writer.sheets['Full Results']
+        results_sheet.hide_gridlines(2)
+
+        # define contents sheet and add basic styles
         contents_sheet = writer.sheets['Contents']
+        contents_sheet.hide_gridlines(2)
+        contents_sheet.set_column(0, 0, 40)
+
+        # define cover sheet and add basic styles
+        cover_sheet = writer.sheets['Cover Page']
+        cover_sheet.hide_gridlines(2)
+        cover_sheet.set_column(0, 0, 40)
 
         # add link to the full results page in the contents page
         position = contents_df[0].isin(['Full Results']).stack()
@@ -61,7 +73,7 @@ def create_workbook(request, data, title):
         else:
             print("Value 'Full Results' not found in DataFrame.")
 
-        results_sheet.set_zoom(90)
+        results_sheet.set_zoom(85)
         header_format = workbook.add_format({
             "bg_color": "#FFA500",
             "bold": True,
@@ -71,7 +83,8 @@ def create_workbook(request, data, title):
         question_format = workbook.add_format({"bold": True})
         # Apply a general format to the entire column
         # without the percentage format
-        results_sheet.set_column(5, len(data.columns) - 1, 15)
+        results_sheet.set_column(1, len(data.columns) - 1, 15)
+        results_sheet.set_column(0, 0, 80)
 
         # create question style and loop to apply them
         for i in range(2, len(data)):
@@ -135,6 +148,9 @@ def create_workbook(request, data, title):
                 )
                 # define sheet for formatting
                 question_sheet = writer.sheets[f'question ID - {qid}']
+                question_sheet.set_column(1, len(data.columns) - 1, 15)
+                question_sheet.set_column(0, 0, 80)
+                question_sheet.hide_gridlines(2)
                 # format numbers to nice percentages
                 format_percentages(
                     concat_sub_table, question_sheet, percent_format
