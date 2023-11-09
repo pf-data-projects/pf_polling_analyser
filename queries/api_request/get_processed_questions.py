@@ -56,19 +56,19 @@ def extract_data_from_question_objects(question_list):
                     question_texts.append('Option')
                     question_types.append(question['type'])
                     question_titles.append(option['title']['English'])
-                    question_rebase.append(not question['properties']['required'])
+                    question_rebase.append(False)
                     for i in range(len(question['options'])):
                         question_ids.append(question['id'])
                         question_texts.append('sub_option')
                         question_types.append(question['type'])
                         question_titles.append(i + 1)
-                        question_rebase.append(not question['properties']['required'])
+                        question_rebase.append(False)
                 else:
                     question_ids.append(question['id'])
                     question_texts.append('Option')
                     question_types.append(question['type'])
                     question_titles.append(option['title']['English'])
-                    question_rebase.append(not question['properties']['required'])
+                    question_rebase.append(False)
 
         # checks if the question has subquestions
         # and adds their data to the lists.
@@ -91,7 +91,7 @@ def extract_data_from_question_objects(question_list):
                         question_texts.append('sub_option')
                         question_types.append(f"{question['type']} | {sub_question['type']}")
                         question_titles.append(option['title']['English'])
-                        question_rebase.append(not sub_question['properties']['required'])
+                        question_rebase.append(False)
 
         # Code to handle edge case where a table question relies on options
         # of a question immediately before it.

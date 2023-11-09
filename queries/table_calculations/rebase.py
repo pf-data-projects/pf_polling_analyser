@@ -19,8 +19,10 @@ def rebase(question_data, results, question_list, table, col_index):
             has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
             if question['qid'] not in checked:
                 if has_nan_rows:
+                    print(question['qid'])
                     non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
                     matching_indices = table[table['IDs'] == question['qid']].index
+                    table.loc[table['IDs'] == question['qid'], 'Rebase comment needed'] = True
                     for idx in matching_indices:
                         percentage_value = table.iloc[idx, col_index]
                         table.iloc[idx, col_index] = (percentage_value / 100) * weighted_totals
@@ -46,9 +48,8 @@ def rebase(question_data, results, question_list, table, col_index):
             # Get indices of rows in 'table' that match question['qid']
             matching_indices = table[table['IDs'] == question['qid']].index
             if question['qid'] not in checked:
-                # print("------------------------")
-                # print(question['qid'])
-                # print("Non-nan count", non_nan_count)
+                print(question['qid'])
+                table.loc[table['IDs'] == question['qid'], 'Rebase comment needed'] = True
                 # Reverse the percentage calculation for these rows
                 for idx in matching_indices:
                     percentage_value = table.iloc[idx, col_index]
