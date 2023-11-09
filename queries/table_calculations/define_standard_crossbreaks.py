@@ -18,4 +18,5 @@ CROSSBREAKS = {
         "West Midlands", "East Midlands", "Yorkshire and the Humber",
         "North West", "North East", "Scotland", "Wales", "Northern Ireland"
     ],
+    "seg": ['AB', 'C1', 'C2', 'DE']
 }

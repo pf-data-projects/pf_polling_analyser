@@ -5,6 +5,7 @@ CB_OPTIONS = (
         ('gender', 'Gender'),
         ('age', 'Age'),
         ('region', 'Region'),
+        ('seg', 'Socio-economic Group'),
     )
 
 class CSVUploadForm(forms.Form):
