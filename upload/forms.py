@@ -72,7 +72,7 @@ class WeightForm(forms.Form):
         validators=[]
     )
     weights = forms.FileField(
-        label='SURVEY RESPONSE DATA ONLY',
+        label='WEIGHT PROPORTIONS DATA ONLY',
         help_text='Only .xlsx files are accepted.',
         validators=[]
     )
