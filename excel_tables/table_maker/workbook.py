@@ -84,6 +84,10 @@ def create_workbook(request, data, title):
         cover_sheet.hide_gridlines(2)
         cover_sheet.set_column(0, 0, 40)
 
+        image_file = 'static/assets/pf.jpg'
+        cover_sheet.insert_image('A3', image_file, {'x_scale': 0.5, 'y_scale': 0.5})
+        cover_sheet.set_row(2, 60)
+
         # add link to the full results page in the contents page
         position = contents_df[0].isin(['Full Results']).stack()
         if not position.empty:

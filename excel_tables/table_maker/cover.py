@@ -7,6 +7,8 @@ def create_cover_page(data):
     """
     cover_list = []
     cover_list.append("")
+    cover_list.append("") # logo will go here
+    cover_list.append("")
     cover_list.append("Interview method: Online Survey")
     cover_list.append("Population represented: UK Adults")
     cover_list.append(f"Sample size: {data.at[1, 'Total']}")
