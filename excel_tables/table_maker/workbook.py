@@ -1,3 +1,17 @@
+""" 
+This file handles the logic for building and styling the excel table
+outputs for the whole program. It takes trimmed table data as an
+input. The logic broadly follows these steps.
+
+1. call external functions to generate a cover page and contents page.
+2. create a writer object using pandas/xlsxwriter to create the main results.
+3. Add contents and cover pages to excel sheet.
+4. Create individual sheets for all questions in the table.
+5. Create links to each table and from each table back to contents in
+each sheet.
+6. cache the excel file for download later after the function has returned.
+"""
+
 import io
 
 import pandas as pd
