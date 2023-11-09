@@ -44,3 +44,11 @@ def col_with_qid(df, qid):
     return [
         col for col in df.columns if f"{qid}:" in col
     ]
+
+def col_substr_partial(df, substring):
+    """
+    Helper function that returns the column
+    of a dataframe which contains a part of
+    a question.
+    """
+    return [col for col in df.columns if substring in col]

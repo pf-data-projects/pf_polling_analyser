@@ -18,5 +18,13 @@ CROSSBREAKS = {
         "West Midlands", "East Midlands", "Yorkshire and the Humber",
         "North West", "North East", "Scotland", "Wales", "Northern Ireland"
     ],
-    "seg": ['AB', 'C1', 'C2', 'DE']
+    "seg": ['AB', 'C1', 'C2', 'DE'],
+    "children": ["yes, no"],
+    "education": [
+        "GCSE or equivalent (Scottish National/O Level)", 
+        "A Level or equivalent (GCE/Higher/Advanced Higher)", 
+        "University Undergraduate Degree (BA/BSc)", 
+        "University Postgraduate Degree (MA/MSc/MPhil)",
+        "Doctorate (PhD/DPHil)"
+    ]
 }

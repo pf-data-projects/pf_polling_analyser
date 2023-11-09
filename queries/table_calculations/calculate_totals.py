@@ -8,6 +8,7 @@ from .helpers import (
 from .gender import calc_gender, gender_rebase
 from .age import iterate_age_brackets, iterate_age_rebase
 from .region import iterate_regions, iterate_regions_rebase
+from .seg import iterate_seg, iterate_seg_rebase
 from .define_non_standard_cb import calc_crossbreak, rebase_crossbreak
 from .rebase import rebase
 
@@ -210,6 +211,9 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
     if 'region' in standard_cb:
         print("---- PROCESSING REGION CROSSBREAKS ----")
         table = iterate_regions(table, question_list, results, question_data)
+    if 'seg' in standard_cb:
+        print("---- PROCESSING SEG CROSSBREAKS ----")
+        table = iterate_seg(table, question_list, results, question_data)
 
     # Run calc for any non standard crossbreaks.
     if len(non_standard_cb) > 0:
@@ -255,6 +259,8 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
         table = iterate_age_rebase(table, question_list, results, question_data)
     if 'region' in standard_cb:
         table = iterate_regions_rebase(table, question_list, results, question_data)
+    if 'seg' in standard_cb:
+        table = iterate_seg_rebase(table, question_list, results, question_data)
     if len(non_standard_cb) > 0:
         for crossbreak in non_standard_cb:
             rebase_crossbreak(table, question_list, results, question_data, crossbreak)
