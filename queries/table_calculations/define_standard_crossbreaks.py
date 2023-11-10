@@ -21,9 +21,10 @@ CROSSBREAKS = {
     "seg": ['AB', 'C1', 'C2', 'DE'],
     "children": ["Yes", "No"],
     "education": [
-        "GCSE or equivalent (Scottish National/O Level)", 
-        "A Level or equivalent (GCE/Higher/Advanced Higher)", 
-        "University Undergraduate Degree (BA/BSc)", 
+        "GCSE or equivalent (Scottish National/O Level)",
+        "A Level or equivalent (GCE/Higher/Advanced Higher)",
+        "Level 4 / 5 or equivalent (HND/HNC/Higher Apprenticeship)",
+        "University Undergraduate Degree (BA/BSc)",
         "University Postgraduate Degree (MA/MSc/MPhil)",
         "Doctorate (PhD/DPHil)"
     ]

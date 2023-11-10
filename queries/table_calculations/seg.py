@@ -69,12 +69,10 @@ def iterate_seg(table, question_list, results, question_data):
     of the calc_region function.
     """
     segs = cb.CROSSBREAKS['seg']
-    print(segs)
     table_col = table.columns.get_loc('AB')
     
     regions_iterator = []
     for seg in segs:
-        print("hello2")
         iteration = {
             'seg': SEG_MAPPING[seg],
             'col': table_col
@@ -82,7 +80,6 @@ def iterate_seg(table, question_list, results, question_data):
         regions_iterator.append(iteration)
         table_col += 1
     for iteration in regions_iterator:
-        print("hello3")
         table = calc_seg(
             iteration['seg'],
             iteration['col'], table, question_list, results, question_data

@@ -10,6 +10,7 @@ from .age import iterate_age_brackets, iterate_age_rebase
 from .region import iterate_regions, iterate_regions_rebase
 from .seg import iterate_seg, iterate_seg_rebase
 from .children import calc_children, children_rebase
+from .education import iterate_ed, iterate_ed_rebase
 from .define_non_standard_cb import calc_crossbreak, rebase_crossbreak
 from .rebase import rebase
 
@@ -216,6 +217,9 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
     if 'seg' in standard_cb:
         print("---- PROCESSING SEG CROSSBREAKS ----")
         table = iterate_seg(table, question_list, results, question_data)
+    if 'education' in standard_cb:
+        print("--- PROCESSING EDUCATION CROSSBREAKS ---")
+        table = iterate_ed(table, question_list, results, question_data)
     if 'children' in standard_cb:
         print("---- PROCESSING CHILDREN CROSSBREAKS ----")
         table = calc_children(
@@ -283,9 +287,12 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
     if 'seg' in standard_cb:
         table = iterate_seg_rebase(
             table, question_list, results, question_data)
+    if 'education' in standard_cb:
+        table = iterate_ed_rebase(
+            table, question_list, results, question_data)
     if 'children' in standard_cb:
         table = children_rebase(
-            "Yes", 
+            "Yes",
             table.columns.get_loc('Yes'),
             table,
             question_list,
