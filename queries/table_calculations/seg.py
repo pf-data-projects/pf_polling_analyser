@@ -70,16 +70,15 @@ def iterate_seg(table, question_list, results, question_data):
     """
     segs = cb.CROSSBREAKS['seg']
     table_col = table.columns.get_loc('AB')
-    
-    regions_iterator = []
+    seg_iterator = []
     for seg in segs:
         iteration = {
             'seg': SEG_MAPPING[seg],
             'col': table_col
         }
-        regions_iterator.append(iteration)
+        seg_iterator.append(iteration)
         table_col += 1
-    for iteration in regions_iterator:
+    for iteration in seg_iterator:
         table = calc_seg(
             iteration['seg'],
             iteration['col'], table, question_list, results, question_data
@@ -95,15 +94,15 @@ def iterate_seg_rebase(table, question_list, results, question_data):
     """
     segs = cb.CROSSBREAKS['seg']
     table_col = table.columns.get_loc('AB')
-    regions_iterator = []
+    seg_iterator = []
     for seg in segs:
         iteration = {
             'seg': SEG_MAPPING[seg],
             'col': table_col
         }
-        regions_iterator.append(iteration)
+        seg_iterator.append(iteration)
         table_col += 1
-    for iteration in regions_iterator:
+    for iteration in seg_iterator:
         table = seg_rebase(
             iteration['seg'],
             iteration['col'], table, question_list, results, question_data
