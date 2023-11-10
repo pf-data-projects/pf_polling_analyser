@@ -19,7 +19,7 @@ CROSSBREAKS = {
         "North West", "North East", "Scotland", "Wales", "Northern Ireland"
     ],
     "seg": ['AB', 'C1', 'C2', 'DE'],
-    "children": ["yes, no"],
+    "children": ["Yes", "No"],
     "education": [
         "GCSE or equivalent (Scottish National/O Level)", 
         "A Level or equivalent (GCE/Higher/Advanced Higher)", 

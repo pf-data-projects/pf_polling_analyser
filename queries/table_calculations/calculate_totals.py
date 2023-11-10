@@ -9,6 +9,7 @@ from .gender import calc_gender, gender_rebase
 from .age import iterate_age_brackets, iterate_age_rebase
 from .region import iterate_regions, iterate_regions_rebase
 from .seg import iterate_seg, iterate_seg_rebase
+from .children import calc_children, children_rebase
 from .define_non_standard_cb import calc_crossbreak, rebase_crossbreak
 from .rebase import rebase
 
@@ -207,14 +208,32 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
         )
     if 'age' in standard_cb:
         print("---- PROCESSING AGE CROSSBREAKS ----")
-        table = iterate_age_brackets(table, question_list, results, question_data)
+        table = iterate_age_brackets(
+            table, question_list, results, question_data)
     if 'region' in standard_cb:
         print("---- PROCESSING REGION CROSSBREAKS ----")
         table = iterate_regions(table, question_list, results, question_data)
     if 'seg' in standard_cb:
         print("---- PROCESSING SEG CROSSBREAKS ----")
         table = iterate_seg(table, question_list, results, question_data)
-
+    if 'children' in standard_cb:
+        print("---- PROCESSING CHILDREN CROSSBREAKS ----")
+        table = calc_children(
+            "Yes", 
+            table.columns.get_loc('Yes'),
+            table,
+            question_list,
+            results,
+            question_data
+        )
+        table = calc_children(
+            "No", 
+            table.columns.get_loc('No'),
+            table,
+            question_list,
+            results,
+            question_data
+        )
     # Run calc for any non standard crossbreaks.
     if len(non_standard_cb) > 0:
         for crossbreak in non_standard_cb:
@@ -256,14 +275,34 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
             question_data
         )
     if 'age' in standard_cb:
-        table = iterate_age_rebase(table, question_list, results, question_data)
+        table = iterate_age_rebase(
+            table, question_list, results, question_data)
     if 'region' in standard_cb:
-        table = iterate_regions_rebase(table, question_list, results, question_data)
+        table = iterate_regions_rebase(
+            table, question_list, results, question_data)
     if 'seg' in standard_cb:
-        table = iterate_seg_rebase(table, question_list, results, question_data)
+        table = iterate_seg_rebase(
+            table, question_list, results, question_data)
+    if 'children' in standard_cb:
+        table = children_rebase(
+            "Yes", 
+            table.columns.get_loc('Yes'),
+            table,
+            question_list,
+            results,
+            question_data
+        )
+        table = children_rebase(
+            "No", 
+            table.columns.get_loc('No'),
+            table,
+            question_list,
+            results,
+            question_data
+        )
     if len(non_standard_cb) > 0:
         for crossbreak in non_standard_cb:
-            rebase_crossbreak(table, question_list, results, question_data, crossbreak)
+            rebase_crossbreak(
+                table, question_list, results, question_data, crossbreak)
 
-    # Call rebase module to get values as a total of actual respondents for crossbreak
     return table
