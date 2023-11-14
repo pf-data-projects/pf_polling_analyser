@@ -79,3 +79,13 @@ def run_weighting(survey_data, weight_proportions):
     # ipf_result.to_csv("test_weight.csv", encoding="utf-8-sig")
 
     return survey_data
+
+
+def apply_no_weight(survey_data):
+    """
+    Adds an extra column to the survey data,
+    assigning each respondent with the value 1
+    rather than a weight.
+    """
+    survey_data['weighted_respondents'] = 1
+    return survey_data

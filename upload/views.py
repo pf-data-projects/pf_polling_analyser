@@ -44,9 +44,14 @@ def weight_data(request):
             survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
             weight_proportions = request.FILES['weights']
             weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
+            apply = form.cleaned_data['apply_weights']
 
             # Run ipf module
-            weighted_data = wgt.run_weighting(survey_data, weight_proportions)
+            if apply:
+                weighted_data = wgt.run_weighting(survey_data, weight_proportions)
+
+            else:
+                weighted_data = wgt.apply_no_weight(survey_data)
 
             # Cache the weighted data to be downloaded by user later
             excel_buffer = BytesIO()

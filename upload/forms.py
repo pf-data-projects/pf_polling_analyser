@@ -79,3 +79,8 @@ class WeightForm(forms.Form):
         help_text='Only .xlsx files are accepted.',
         validators=[]
     )
+    apply_weights = forms.BooleanField(
+        label="Weight the data?",
+        help_text="Leave unchecked if you don't want to weight the data.",
+        required=False
+    )
