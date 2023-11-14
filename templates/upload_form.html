@@ -18,7 +18,7 @@
                     <hr/>
                     <h4>Non-standard crossbreak</h4>
                     {{ sub_form.as_p }}
-                    <button type="button" class="remove-form">Remove</button>
+                    <button type="button" class="remove-form">Remove crossbreak</button>
                 </div>
             {% endfor %}
         </div>
@@ -29,12 +29,12 @@
     <div> </div>
     <div> </div>
 
-    <button id="add_more">Add more crossbreaks</button>
+    <button id="add_more">Add another crossbreak</button>
 
 
 
     <p><a href="{% url 'home' %}">Back</a></p>
-    <p><a href="{% url 'create' %}">Make survey database query</a></p>
+    <!-- <p><a href="{% url 'create' %}">Make survey database query</a></p> -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

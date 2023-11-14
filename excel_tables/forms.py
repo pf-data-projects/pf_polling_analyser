@@ -17,11 +17,11 @@ class TableUploadForm(forms.Form):
         required=True,
     )
     start = forms.IntegerField(
-        label="Select which question you would like the table to start at",
-        help_text="For now this form cannot auto-read questions from data",
+        label="Select which question ID you would like the table to start at",
+        help_text="For now, you need to specify the question ID here. It's the number that the question has in the results sheet you download from Alchemer.",
         required=True
     )
     end = forms.IntegerField(
-        label="Select which question you would like the table to end at",
+        label="Select which question ID you would like the table to end at",
         required=True
     )
