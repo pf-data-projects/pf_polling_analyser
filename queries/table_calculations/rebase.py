@@ -20,14 +20,15 @@ def rebase(question_data, results, question_list, table, col_index):
             if question['qid'] not in checked:
                 if has_nan_rows:
                     non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
-                    matching_indices = table[table['IDs'] == question['qid']].index
-                    table.loc[table['IDs'] == question['qid'], 'Rebase comment needed'] = True
-                    for idx in matching_indices:
-                        percentage_value = table.iloc[idx, col_index]
-                        table.iloc[idx, col_index] = (percentage_value / 100) * weighted_totals
-                        # Then, update the values in these rows to be their percentage of non_nan_count
-                        value = table.iloc[idx, col_index]
-                        table.iloc[idx, col_index] = (value / non_nan_count) * 100
+                    if non_nan_count > 0:
+                        matching_indices = table[table['IDs'] == question['qid']].index
+                        table.loc[table['IDs'] == question['qid'], 'Rebase comment needed'] = True
+                        for idx in matching_indices:
+                            percentage_value = table.iloc[idx, col_index]
+                            table.iloc[idx, col_index] = (percentage_value / 100) * weighted_totals
+                            # Then, update the values in these rows to be their percentage of non_nan_count
+                            value = table.iloc[idx, col_index]
+                            table.iloc[idx, col_index] = (value / non_nan_count) * 100
                 checked.append(question['qid'])
             else:
                 checked.append(question['qid'])
