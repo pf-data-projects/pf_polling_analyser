@@ -132,7 +132,6 @@ def create_workbook(request, data, title):
         # without the percentage format
         results_sheet.set_column(1, len(data.columns) - 1, 15)
         results_sheet.set_column(0, 0, 80, cell_format=questions_border)
-        
 
         # round weighted totals to nearest integer
         row_as_list = trimmed_data.iloc[1].values.tolist()
@@ -176,7 +175,7 @@ def create_workbook(request, data, title):
         ids = non_header_data['IDs'].tolist()
         checked = []
         for qid in ids:
-            if qid not in checked:
+            if qid != "" and qid not in checked:
                 # create table containing just 1 question
                 sub_table = data[(data['IDs'] == qid)]
                 # add a space beneath where header goes
