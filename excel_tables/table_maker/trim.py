@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 
 def trim_table(data, start, end):
     """
@@ -8,6 +9,7 @@ def trim_table(data, start, end):
     are not needed.
     2. removes other unnecessary rows of the table.
     """
+
     # Find the index for the first row with the start_id
     start_index = data[data['IDs'] == str(start)].index.min()
 

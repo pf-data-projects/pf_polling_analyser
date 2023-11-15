@@ -13,6 +13,7 @@ each sheet.
 """
 
 import io
+import math
 
 import pandas as pd
 import xlsxwriter
@@ -37,6 +38,11 @@ def create_workbook(request, data, title):
     )
 
     trimmed_data.iat[0, 0] = "Unweighted"
+
+    # ensure blank cols remain blank
+    for col in trimmed_data.columns:
+        if trimmed_data[col].iloc[0] == 0:
+            trimmed_data = trimmed_data.rename(columns={col: ''})
 
     # create cover page and contents page
     # blank = {'Table of contents'}
@@ -182,7 +188,7 @@ def create_workbook(request, data, title):
                         rows_list.append(empty_row)
                     rows_list.append(row)
                 sub_table = pd.concat(
-                    [pd.DataFrame([row]) for row in rows_list], 
+                    [pd.DataFrame([row]) for row in rows_list],
                     ignore_index=True
                 )
                 # concatinate the headers back to the top of the sub table
@@ -201,6 +207,11 @@ def create_workbook(request, data, title):
                 for col in concat_sub_table.columns[1:]:
                     new_row[col] = ''
                 concat_sub_table.loc[len(concat_sub_table)] = new_row
+
+                # ensure blank cols remain blank
+                for col in concat_sub_table.columns:
+                    if concat_sub_table[col].iloc[0] == 0:
+                        concat_sub_table = concat_sub_table.rename(columns={col: ''})
                 # Add the table to excel with sheetname based on QID
                 concat_sub_table.to_excel(
                     writer,
@@ -318,21 +329,24 @@ def create_workbook(request, data, title):
 
 def format_percentages(data, sheet, cell_format):
     """
-    # Loop through rows, starting from the fourth row, 
-    # and apply the percentage format
+    Loop through rows, starting from the fourth row, 
+    and apply the percentage format.
     """
     for row_num in range(3, len(data)):  # start from the fourth row (index 3)
         row_data = data.iloc[row_num]
         for col_num in range(1, len(data.columns)):
-            cell_value = data.iloc[row_num, col_num]
-            # Check if the cell contains a number (int or float)
-            if isinstance(cell_value, (int, float)):
-                # Apply percent format to the cell because it contains a number
-                sheet.write_number(
-                    row_num + 1, col_num, cell_value, cell_format)
-            elif pd.isna(cell_value) or cell_value == '':
-                # If the cell is NaN or an empty string, write an empty string
-                sheet.write_string(row_num + 1, col_num, '')
-            else:
-                # Otherwise, write the value as it is
-                sheet.write(row_num + 1, col_num, cell_value)
+            col_name = data.columns[col_num]
+            if col_name != " ":
+                cell_value = data.iloc[row_num, col_num]
+                # Check if the cell contains a number (int or float)
+                if isinstance(cell_value, (int, float)):
+                    if not math.isnan(cell_value):
+                        # Apply percent format to the cell because it contains a number
+                        sheet.write_number(
+                            row_num + 1, col_num, cell_value, cell_format)
+                elif pd.isna(cell_value) or cell_value == '':
+                    # If the cell is NaN or an empty string, write an empty string
+                    sheet.write_string(row_num + 1, col_num, '')
+                else:
+                    # Otherwise, write the value as it is
+                    sheet.write(row_num + 1, col_num, cell_value)
