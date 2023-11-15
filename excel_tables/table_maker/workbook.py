@@ -42,6 +42,8 @@ def create_workbook(request, data, title):
     # ensure blank cols remain blank
     for col in trimmed_data.columns:
         if trimmed_data[col].iloc[0] == 0:
+            trimmed_data[col].iloc[0] = ""
+            trimmed_data[col].iloc[1] = ""
             trimmed_data = trimmed_data.rename(columns={col: ''})
 
     # create cover page and contents page
@@ -210,7 +212,10 @@ def create_workbook(request, data, title):
                 # ensure blank cols remain blank
                 for col in concat_sub_table.columns:
                     if concat_sub_table[col].iloc[0] == 0:
+                        concat_sub_table[col].iloc[0] = ""
+                        concat_sub_table[col].iloc[1] = ""
                         concat_sub_table = concat_sub_table.rename(columns={col: ''})
+
                 # Add the table to excel with sheetname based on QID
                 concat_sub_table.to_excel(
                     writer,
