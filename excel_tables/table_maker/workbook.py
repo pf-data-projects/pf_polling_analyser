@@ -17,6 +17,8 @@ import io
 import pandas as pd
 import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell
+from openpyxl import load_workbook
+from openpyxl.drawing.image import Image
 from django.core.cache import cache
 
 from .contents import create_contents_page
@@ -38,7 +40,7 @@ def create_workbook(request, data, title):
 
     # create cover page and contents page
     # blank = {'Table of contents'}
-    cover_df = create_cover_page(data)
+    cover_df = create_cover_page(data, title)
     contents_df = create_contents_page(data)
 
     # define variables for caching
@@ -72,21 +74,18 @@ def create_workbook(request, data, title):
         # define results sheet and add basic styles
         results_sheet = writer.sheets['Full Results']
         results_sheet.hide_gridlines(2)
-        results_sheet.freeze_panes(3, 1)
+        results_sheet.freeze_panes(4, 1)
 
         # define contents sheet and add basic styles
         contents_sheet = writer.sheets['Contents']
         contents_sheet.hide_gridlines(2)
-        contents_sheet.set_column(0, 0, 40)
+        contents_sheet.set_column(1, 1, 100)
+        contents_sheet.set_column(2, 2, 40)
 
         # define cover sheet and add basic styles
         cover_sheet = writer.sheets['Cover Page']
         cover_sheet.hide_gridlines(2)
         cover_sheet.set_column(0, 0, 40)
-
-        image_file = 'static/assets/pf.jpg'
-        cover_sheet.insert_image('A3', image_file, {'x_scale': 0.5, 'y_scale': 0.5})
-        cover_sheet.set_row(2, 60)
 
         # add link to the full results page in the contents page
         position = contents_df[0].isin(['Full Results']).stack()
@@ -213,7 +212,7 @@ def create_workbook(request, data, title):
                 question_sheet.set_column(1, len(data.columns) - 1, 15)
                 question_sheet.set_column(0, 0, 80, cell_format=questions_border)
                 question_sheet.hide_gridlines(2)
-                question_sheet.freeze_panes(3, 1)
+                question_sheet.freeze_panes(4, 1)
                 # format numbers to nice percentages
                 format_percentages(
                     concat_sub_table, question_sheet, percent_format
@@ -274,8 +273,8 @@ def create_workbook(request, data, title):
             df_row = i + 1
             df_col = 0
             if i < len(contents_df[0]):
-                cell_data = contents_df[0].iat[i + 1, 0]
-                excel_col = "A"
+                cell_data = contents_df[0].iat[i + 1, 1]
+                excel_col = "B"
                 excel_row = df_row + 2
                 excel_cell = f"{excel_col}{excel_row}"
                 contents_sheet.write_url(
@@ -286,6 +285,33 @@ def create_workbook(request, data, title):
             i += 1
 
     output.seek(0)
+    cache.set(cache_key, output.getvalue(), timeout=300)
+
+    cached_file_content = cache.get(cache_key)
+
+    # Create a BytesIO object from your cached content
+    file_obj = io.BytesIO(cached_file_content)
+
+    # Load the workbook from the file object and define image path
+    wb = load_workbook(file_obj)
+    img_path = 'static/assets/pf.jpg'
+
+    # Add pf logo to top of all sheets
+    for sheet in wb.sheetnames:
+        ws = wb[sheet]
+        ws.insert_rows(1)
+        ws.row_dimensions[1].height = 60
+
+        img = Image(img_path)
+        scale_x = 0.5
+        scale_y = 0.5
+        img.width = img.width * scale_x
+        img.height = img.height * scale_y
+        ws.add_image(img, 'A1')
+
+    output = io.BytesIO()
+    wb.save(output)
+
     cache.set(cache_key, output.getvalue(), timeout=300)
     return cache_key
 

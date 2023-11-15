@@ -20,7 +20,10 @@ def create_contents_page(data):
     for item in question_list:
         if item != 'Total' and item != 'Weighted':
             contents_list.append(item)
-    contents = {"Table of Contents": contents_list}
+    contents = {"Question": contents_list}
     contents_df = pd.DataFrame(contents)
-
+    contents_df["Number"] = range(1, len(contents_df) + 1)
+    column_order = ["Number"] + ["Question"]
+    contents_df = contents_df[column_order]
+    contents_df["Base"] = "All Respondents"
     return [contents_df, id_list]
