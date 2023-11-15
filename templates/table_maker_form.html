@@ -6,6 +6,16 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
+
+        <hr/>
+        <h3>Edit Rebase Comments</h3>
+        {{ formset.management_form }}
+        {% for form in formset %}
+            <fieldset>
+                <legend>{{ form.initial.item_number }}</legend>
+                {{ form }}
+            </fieldset>
+        {% endfor %}
         <button type="submit">Run table maker</button>
     </form>
     <p><a href="{% url 'home' %}">Back</a></p>

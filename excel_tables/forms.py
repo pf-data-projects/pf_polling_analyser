@@ -25,3 +25,36 @@ class TableUploadForm(forms.Form):
         label="Select which question ID you would like the table to end at",
         required=True
     )
+
+class RebaseForm(forms.Form):
+    """
+    A component for a single rebase comment in the form.
+    """
+    rebase = forms.CharField(
+        widget=forms.TextInput(
+            attrs={'placeholder': 'All respondents'}
+        )
+    )
+    def __init__(self, *args, **kwargs):
+        """
+        Override default init func
+        to create unique labels for each
+        rebase comment field.
+        """
+        item_number = kwargs.pop('item_number', None)
+        super(RebaseForm, self).__init__(*args, **kwargs)
+
+        if item_number is not None:
+            self.fields['name'].label = 'base'
+
+class TableScanForm(forms.Form):
+    """
+    A class that takes just the table and scans it to find
+    all the records that have a base type of 'question'
+    and a TRUE rebase comment value.
+    """
+    data_file = forms.FileField(
+        label='Upload the results',
+        help_text="You will then be prompted to enter rebase comments for the questions that need it.",
+        required=True
+    )
