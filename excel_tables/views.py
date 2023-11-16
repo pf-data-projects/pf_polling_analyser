@@ -21,7 +21,7 @@ def table_maker_form(request, arg1):
         form = TableUploadForm(request.POST, request.FILES)
         RebaseFormSet = formset_factory(RebaseForm)
         formset = RebaseFormSet(request.POST)
-        if form.is_valid():
+        if form.is_valid() and formset.is_valid():
             # Fetches data from form & converts them to df
             table_data = request.FILES['data_file']
             table_data = pd.read_csv(table_data)
@@ -40,11 +40,13 @@ def table_maker_form(request, arg1):
                     question = sub_form.cleaned_data['question_id']
                     comment = sub_form.cleaned_data['rebase']
                     comment_data = [question, comment]
-                    edited_comments.append(comment_data)
-            print(edited_comments)
+                    if question is None or comment == "":
+                        continue
+                    else:
+                        edited_comments.append(comment_data)
 
             # Run table maker modules
-            trimmed = trim_table(table_data, start, end)
+            trimmed = trim_table(table_data, start, end, edited_comments)
 
             # create and cache excel tables.
             create_workbook(request, trimmed, title)
@@ -74,18 +76,17 @@ def scan_table(request):
             # Fetches data from form & converts them to df
             table_data = request.FILES['data_file']
             table_data = pd.read_csv(table_data, encoding="utf-8-sig")
+            # Filters the df to get only questions that have true rebase value
             filtered_df = table_data[
                 (table_data['Base Type'] == 'Question')
             ]
             filtered_df = filtered_df[filtered_df['Rebase comment needed'].isin(['TRUE', 'True'])]
-            print(filtered_df.head(30))
-
             filtered_df.set_index('IDs', inplace=True)
+            # Add these questions to a dictionary
             id_answer_dict = filtered_df['Answers'].to_dict()
-
             forms_needed = len(id_answer_dict)
-            print(forms_needed)
-
+            # Add the questions to a list and save them
+            # to session storage for table maker view to use.
             rebase_questions = []
             for key, value in id_answer_dict.items():
                 pair = f"{key}: {value}"
