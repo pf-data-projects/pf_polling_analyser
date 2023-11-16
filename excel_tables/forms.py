@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import formset_factory
+
 
 class TableUploadForm(forms.Form):
     """
@@ -26,10 +26,14 @@ class TableUploadForm(forms.Form):
         required=True
     )
 
+
 class RebaseForm(forms.Form):
     """
     A component for a single rebase comment in the form.
     """
+    question_id = forms.IntegerField(
+        label="Type the question ID here."
+    )
     rebase = forms.CharField(
         widget=forms.TextInput(
             attrs={'placeholder': 'All respondents'}
@@ -46,6 +50,7 @@ class RebaseForm(forms.Form):
 
         if item_number is not None:
             self.fields['name'].label = 'base'
+
 
 class TableScanForm(forms.Form):
     """

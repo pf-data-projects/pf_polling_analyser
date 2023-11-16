@@ -97,7 +97,7 @@ def upload_csv(request):
                     cb_answer = sub_form.cleaned_data['non_standard_cb_answer']
                     cb_data = [cb_name, cb_question, cb_answer]
                     non_standard_cb.append(cb_data)
-                print(non_standard_cb)
+
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Sheet1")
 

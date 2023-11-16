@@ -29,6 +29,20 @@ def table_maker_form(request, arg1):
             start = form.cleaned_data['start']
             end = form.cleaned_data['end']
 
+            # Fetches data from formset and stores in 'edited_comments'
+            edited_comments = []
+            num_submitted_forms = 0
+            for sub_form in formset:
+                if sub_form.has_changed():
+                    num_submitted_forms += 1
+            if num_submitted_forms > 0:
+                for sub_form in formset:
+                    question = sub_form.cleaned_data['question_id']
+                    comment = sub_form.cleaned_data['rebase']
+                    comment_data = [question, comment]
+                    edited_comments.append(comment_data)
+            print(edited_comments)
+
             # Run table maker modules
             trimmed = trim_table(table_data, start, end)
 
@@ -41,8 +55,6 @@ def table_maker_form(request, arg1):
         form = TableUploadForm()
         print(len(rebase_questions))
         RebaseFormSet = formset_factory(RebaseForm, extra=0)
-        my_list = [1, 2, 3, 4, 5]
-
         formset = RebaseFormSet(initial=[{'item_number': number} for number in rebase_questions])
 
     return render(request, 'table_maker_form.html', {
@@ -61,15 +73,18 @@ def scan_table(request):
         if form.is_valid():
             # Fetches data from form & converts them to df
             table_data = request.FILES['data_file']
-            table_data = pd.read_csv(table_data)
+            table_data = pd.read_csv(table_data, encoding="utf-8-sig")
             filtered_df = table_data[
-                (table_data['Base Type'] == 'Question') & (table_data['Rebase comment needed'] == 'TRUE')
+                (table_data['Base Type'] == 'Question')
             ]
+            filtered_df = filtered_df[filtered_df['Rebase comment needed'].isin(['TRUE', 'True'])]
+            print(filtered_df.head(30))
 
             filtered_df.set_index('IDs', inplace=True)
             id_answer_dict = filtered_df['Answers'].to_dict()
 
             forms_needed = len(id_answer_dict)
+            print(forms_needed)
 
             rebase_questions = []
             for key, value in id_answer_dict.items():
