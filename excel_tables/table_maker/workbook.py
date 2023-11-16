@@ -26,7 +26,7 @@ from .contents import create_contents_page
 from .cover import create_cover_page
 from .helper import get_column_letter
 
-def create_workbook(request, data, title):
+def create_workbook(request, data, title, comments):
     """
     The function that controls the creation and formatting of
     polling tables.
@@ -49,7 +49,7 @@ def create_workbook(request, data, title):
     # create cover page and contents page
     # blank = {'Table of contents'}
     cover_df = create_cover_page(data, title)
-    contents_df = create_contents_page(data)
+    contents_df = create_contents_page(data, comments)
 
     # define variables for caching
     cache_key = "tables_for_user_" + str(request.user.id)
@@ -87,8 +87,12 @@ def create_workbook(request, data, title):
         # define contents sheet and add basic styles
         contents_sheet = writer.sheets['Contents']
         contents_sheet.hide_gridlines(2)
-        contents_sheet.set_column(1, 1, 100)
-        contents_sheet.set_column(2, 2, 40)
+        contents_sheet.set_column(2, 2, 100)
+        contents_sheet.set_column(3, 3, 40)
+        right_format = workbook.add_format({
+            'align': 'right',
+        })
+        contents_sheet.set_column("B:B", None, right_format)
 
         # define cover sheet and add basic styles
         cover_sheet = writer.sheets['Cover Page']
@@ -220,10 +224,10 @@ def create_workbook(request, data, title):
                 concat_sub_table.to_excel(
                     writer,
                     index=False,
-                    sheet_name=f'question ID - {qid}'
+                    sheet_name=f'Question ID - {qid}'
                 )
                 # define sheet for formatting
-                question_sheet = writer.sheets[f'question ID - {qid}']
+                question_sheet = writer.sheets[f'Question ID - {qid}']
                 question_sheet.set_column(1, len(data.columns) - 1, 15)
                 question_sheet.set_column(0, 0, 80, cell_format=questions_border)
                 question_sheet.hide_gridlines(2)
@@ -288,13 +292,13 @@ def create_workbook(request, data, title):
             df_row = i + 1
             df_col = 0
             if i < len(contents_df[0]):
-                cell_data = contents_df[0].iat[i + 1, 1]
-                excel_col = "B"
+                cell_data = contents_df[0].iat[i + 1, 2]
+                excel_col = "C"
                 excel_row = df_row + 2
                 excel_cell = f"{excel_col}{excel_row}"
                 contents_sheet.write_url(
                     excel_cell,
-                    f"internal:'question ID - {question}'!A1",
+                    f"internal:'Question ID - {question}'!A1",
                     string=f'{cell_data}'
                 )
             i += 1

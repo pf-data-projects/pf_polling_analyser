@@ -1,6 +1,6 @@
 import pandas as pd
 
-def create_contents_page(data):
+def create_contents_page(data, comments):
     """
     Build a dataframe to house the contents page
     of PF polling tables.
@@ -20,10 +20,21 @@ def create_contents_page(data):
     for item in question_list:
         if item != 'Total' and item != 'Weighted':
             contents_list.append(item)
-    contents = {"Question": contents_list}
+    id_column = []
+    id_column.append(' ')
+    for item in id_list:
+        if item != 'Total' and item != 'Weighted':
+            id_column.append(item)
+    contents = {"Question": contents_list, 'ID': id_column}
     contents_df = pd.DataFrame(contents)
     contents_df["Number"] = range(1, len(contents_df) + 1)
-    column_order = ["Number"] + ["Question"]
+    column_order = ["Number"] + ["ID"] + ["Question"]
     contents_df = contents_df[column_order]
     contents_df["Base"] = "All Respondents"
+
+    for comment in comments:
+        contents_df_index = contents_df[contents_df['ID'] == str(comment[0])].index
+        if not contents_df_index.empty:
+            contents_df.iat[contents_df_index[0], 3] = comment[1]
+
     return [contents_df, id_list]

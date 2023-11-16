@@ -1,5 +1,4 @@
 import pandas as pd
-import re
 
 def trim_table(data, start, end, comments):
     """
@@ -18,7 +17,6 @@ def trim_table(data, start, end, comments):
         data_row_index = data[(data['Base Type'] == "Question") & (data['IDs'] == str(comment[0]))].index
         if not data_row_index.empty:
             data.iat[data_row_index[0], 3] = updated_question.iat[0, 0]
-        
 
     # Add 'BASE: All respondents' to all other questions
     comment_ids = []
@@ -31,7 +29,6 @@ def trim_table(data, start, end, comments):
             updated = row['Answers'] + " BASE: All respondents"
             data.iat[index, 3] = updated
     data.to_csv("test_rebase.csv", index=False)
-
 
     # Find the index for the first row with the start_id
     start_index = data[data['IDs'] == str(start)].index.min()

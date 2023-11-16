@@ -49,13 +49,12 @@ def table_maker_form(request, arg1):
             trimmed = trim_table(table_data, start, end, edited_comments)
 
             # create and cache excel tables.
-            create_workbook(request, trimmed, title)
+            create_workbook(request, trimmed, title, edited_comments)
 
             print("table making SUCCESS!!")
             return redirect(reverse('home'))
     else:
         form = TableUploadForm()
-        print(len(rebase_questions))
         RebaseFormSet = formset_factory(RebaseForm, extra=0)
         formset = RebaseFormSet(initial=[{'item_number': number} for number in rebase_questions])
 
