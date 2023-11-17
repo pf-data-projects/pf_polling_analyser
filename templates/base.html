@@ -12,6 +12,11 @@
     <body>
         <header>
             <h1 style="margin: auto">Polling Analyser</h1>
+            {% if user.is_authenticated %}
+                <p><span><a href="{% url 'account_logout' %}">log out</a></span></p>
+            {% else %}
+                <p><span><a href="{% url 'account_login' %}">log in</a></span> | <span><a href="{% url 'account_signup' %}">sign up</a></span></p>
+            {% endif %}
         </header>
         <main>
             {% block content %}
