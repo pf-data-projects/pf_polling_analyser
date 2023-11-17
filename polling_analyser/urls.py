@@ -18,6 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
     path('', include('queries.urls'), name='queries_urls'),
     path('', include('upload.urls'), name='upload_urls'),
     path('', include('excel_tables.urls'), name="excel_table_urls"),
