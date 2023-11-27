@@ -19,7 +19,7 @@ class CSVUploadForm(forms.Form):
     """
 
     data_file = forms.FileField(
-        label='SURVEY RESPONSE DATA ONLY',
+        label='SURVEY RESPONSE DATA (same data file you would use normally)',
         help_text='Only .xlsx files are accepted.',
         validators=[]
     )
@@ -70,12 +70,12 @@ class WeightForm(forms.Form):
     2. weight proportions
     """
     results = forms.FileField(
-        label='SURVEY RESPONSE DATA ONLY',
+        label='SURVEY RESPONSE DATA (same data file you would use normally)',
         help_text='Only .xlsx files are accepted.',
         validators=[]
     )
     weights = forms.FileField(
-        label='WEIGHT PROPORTIONS DATA ONLY',
+        label='WEIGHT PROPORTIONS DATA (same as the standard weight proportions we already use)',
         help_text='Only .xlsx files are accepted.',
         validators=[]
     )
