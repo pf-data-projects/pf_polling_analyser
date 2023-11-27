@@ -159,14 +159,6 @@ def create_workbook(request, data, title, comments):
             question_value = data.iloc[i, 3]
             if data.at[i, 'Base Type'] == 'Question' or data.at[i, 'Base Type'] == 'sub_Question':
                 results_sheet.write(i + 1, 0, question_value, question_format)
-                results_sheet.merge_range(
-                    i + 1,
-                    0,
-                    i + 1,
-                    26,
-                    question_value,
-                    question_format
-                )
 
         # apply percentage format to data.
         format_percentages(trimmed_data, results_sheet, percent_format)
@@ -245,13 +237,6 @@ def create_workbook(request, data, title, comments):
                             0,
                             question_value,
                             question_format
-                        )
-                        question_sheet.merge_range(
-                            i + 3,
-                            0,
-                            i + 3,
-                            25,
-                            question_value, question_format
                         )
                 # format headers
                 for col, value in enumerate(concat_sub_table.columns.values):
