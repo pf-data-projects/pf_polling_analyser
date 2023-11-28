@@ -31,7 +31,6 @@ def rebase(question_data, results, question_list, table, col_index):
                             value = table.iloc[idx, col_index]
                             table.iloc[idx, col_index] = (value / non_nan_count) * 100
                             sum_percentages += (value / non_nan_count) * 100
-                        print(sum_percentages)
                         for idx in matching_indices:
                             value = table.iloc[idx, col_index]
                             table.iloc[idx, col_index] = (value / sum_percentages) * 100
@@ -66,7 +65,6 @@ def rebase(question_data, results, question_list, table, col_index):
                         value = table.iloc[idx, col_index]
                         table.iloc[idx, col_index] = (value / non_nan_count) * 100
                         sum_percentages += (value / non_nan_count) * 100
-                    print(sum_percentages)
                     for idx in matching_indices:
                         value = table.iloc[idx, col_index]
                         table.iloc[idx, col_index] = (value / sum_percentages) * 100

@@ -82,7 +82,7 @@ def create_workbook(request, data, title, comments):
         # define results sheet and add basic styles
         results_sheet = writer.sheets['Full Results']
         results_sheet.hide_gridlines(2)
-        results_sheet.freeze_panes(4, 1)
+        results_sheet.freeze_panes(5, 1)
 
         # define contents sheet and add basic styles
         contents_sheet = writer.sheets['Contents']
@@ -223,7 +223,7 @@ def create_workbook(request, data, title, comments):
                 question_sheet.set_column(1, len(data.columns) - 1, 15)
                 question_sheet.set_column(0, 0, 80, cell_format=questions_border)
                 question_sheet.hide_gridlines(2)
-                question_sheet.freeze_panes(4, 1)
+                question_sheet.freeze_panes(5, 1)
                 # format numbers to nice percentages
                 format_percentages(
                     concat_sub_table, question_sheet, percent_format
@@ -312,6 +312,49 @@ def create_workbook(request, data, title, comments):
         img.width = img.width * scale_x
         img.height = img.height * scale_y
         ws.add_image(img, 'A1')
+
+    # Add extra row and headers for the standard crossbreaks.
+    protected_sheets = [
+        'Cover Page',
+        'Contents',
+    ]
+
+    for sheet in wb.sheetnames:
+        if sheet not in protected_sheets:
+            ws = wb[sheet]
+            ws.insert_rows(2)
+            cols = trimmed_data.columns
+            if "Male" in cols:
+                col_index = trimmed_data.columns.get_loc("Male")
+                excel_col = get_column_letter(col_index + 1)
+                excel_coord = excel_col + '2'
+                ws[excel_coord] = "Gender"
+            if "18-24" in cols:
+                col_index = trimmed_data.columns.get_loc("18-24")
+                excel_col = get_column_letter(col_index + 1)
+                excel_coord = excel_col + '2'
+                ws[excel_coord] = "Age"
+            if "London" in cols:
+                col_index = trimmed_data.columns.get_loc("London")
+                excel_col = get_column_letter(col_index + 1)
+                excel_coord = excel_col + '2'
+                ws[excel_coord] = "Region"
+            if "AB" in cols:
+                col_index = trimmed_data.columns.get_loc("AB")
+                excel_col = get_column_letter(col_index + 1)
+                excel_coord = excel_col + '2'
+                ws[excel_coord] = "Socio-Economic Group"
+            if "Yes" in cols:
+                col_index = trimmed_data.columns.get_loc("Yes")
+                excel_col = get_column_letter(col_index + 1)
+                excel_coord = excel_col + '2'
+                ws[excel_coord] = "Has Children?"
+            if "GCSE or equivalent (Scottish National/O Level)" in cols:
+                col_index = trimmed_data.columns.get_loc("GCSE or equivalent (Scottish National/O Level)")
+                excel_col = get_column_letter(col_index + 1)
+                excel_coord = excel_col + '2'
+                ws[excel_coord] = "Highest Level of Education"
+
 
     output = io.BytesIO()
     wb.save(output)

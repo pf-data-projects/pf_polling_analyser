@@ -46,8 +46,6 @@ def create_blank_table(question_data, standard_cb, non_standard_cb):
             table[f'{crossbreak[0]}: {crossbreak[2]}'] = [0, 0,]
             table[f"blank_{crossbreak[1]}_{crossbreak[1]}"] = " "
 
-    
-
     for i in range(len(questions.index)):
         table['Answers'].append(
             f'{questions.iloc[i, 3]}'
