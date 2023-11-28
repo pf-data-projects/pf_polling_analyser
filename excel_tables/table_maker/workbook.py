@@ -20,6 +20,7 @@ import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell
 from openpyxl import load_workbook
 from openpyxl.drawing.image import Image
+from openpyxl.styles import PatternFill, Font, Alignment
 from django.core.cache import cache
 
 from .contents import create_contents_page
@@ -323,38 +324,53 @@ def create_workbook(request, data, title, comments):
         if sheet not in protected_sheets:
             ws = wb[sheet]
             ws.insert_rows(2)
+            ws.row_dimensions[2].height = 40
             cols = trimmed_data.columns
             if "Male" in cols:
-                col_index = trimmed_data.columns.get_loc("Male")
-                excel_col = get_column_letter(col_index + 1)
-                excel_coord = excel_col + '2'
+                excel_coord = get_header_coords("Male", trimmed_data)
+                excel_coord2 = get_header_coords("Female", trimmed_data)
                 ws[excel_coord] = "Gender"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
             if "18-24" in cols:
-                col_index = trimmed_data.columns.get_loc("18-24")
-                excel_col = get_column_letter(col_index + 1)
-                excel_coord = excel_col + '2'
+                excel_coord = get_header_coords("18-24", trimmed_data)
+                excel_coord2 = get_header_coords("65+", trimmed_data)
                 ws[excel_coord] = "Age"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
             if "London" in cols:
-                col_index = trimmed_data.columns.get_loc("London")
-                excel_col = get_column_letter(col_index + 1)
-                excel_coord = excel_col + '2'
+                excel_coord = get_header_coords("London", trimmed_data)
+                excel_coord2 = get_header_coords("Northern Ireland", trimmed_data)
                 ws[excel_coord] = "Region"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
             if "AB" in cols:
-                col_index = trimmed_data.columns.get_loc("AB")
-                excel_col = get_column_letter(col_index + 1)
-                excel_coord = excel_col + '2'
+                excel_coord = get_header_coords("AB", trimmed_data)
+                excel_coord2 = get_header_coords("DE", trimmed_data)
                 ws[excel_coord] = "Socio-Economic Group"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
             if "Yes" in cols:
-                col_index = trimmed_data.columns.get_loc("Yes")
-                excel_col = get_column_letter(col_index + 1)
-                excel_coord = excel_col + '2'
+                excel_coord = get_header_coords("Yes", trimmed_data)
+                excel_coord2 = get_header_coords("No", trimmed_data)
                 ws[excel_coord] = "Has Children?"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
             if "GCSE or equivalent (Scottish National/O Level)" in cols:
-                col_index = trimmed_data.columns.get_loc("GCSE or equivalent (Scottish National/O Level)")
-                excel_col = get_column_letter(col_index + 1)
-                excel_coord = excel_col + '2'
+                excel_coord = get_header_coords(
+                    "GCSE or equivalent (Scottish National/O Level)", 
+                    trimmed_data
+                )
+                excel_coord2 = get_header_coords("Doctorate (PhD/DPHil)", trimmed_data)
                 ws[excel_coord] = "Highest Level of Education"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
 
+    fill = PatternFill(start_color='FFA500', end_color='FFA500', fill_type='solid')
+    font = Font(bold=True, color='FFFFFF', size=14)
+    alignment = Alignment(horizontal='center', vertical='center')
+
+    for sheet in wb.sheetnames:
+        if sheet not in protected_sheets:
+            ws = wb[sheet]
+            for cell in ws['2']:
+                cell.fill = fill
+                cell.font = font
+                cell.alignment = alignment
 
     output = io.BytesIO()
     wb.save(output)
@@ -386,3 +402,13 @@ def format_percentages(data, sheet, cell_format):
                 else:
                     # Otherwise, write the value as it is
                     sheet.write(row_num + 1, col_num, cell_value)
+
+def get_header_coords(colname, data):
+    """
+    Gets the excel coordinates for any
+    given crossbreak headers
+    """
+    col_index = data.columns.get_loc(colname)
+    excel_col = get_column_letter(col_index + 1)
+    excel_coord = excel_col + '2'
+    return excel_coord
