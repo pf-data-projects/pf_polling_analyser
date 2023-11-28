@@ -78,7 +78,9 @@ def upload_csv(request):
         if not request.user.is_authenticated:
             print('You are not logged in to the PF polling analyser.')
             print('You cannot make this request until you log in.')
-            return redirect(reverse('home'))
+            return HttpResponse(
+                "You are not logged in. Please log in to use this feature"
+            )
         form = CSVUploadForm(request.POST, request.FILES)
         formset = CrossbreakFormSet(request.POST, prefix="crossbreaks")
         if form.is_valid() and formset.is_valid():
@@ -152,7 +154,10 @@ def download_weights(request):
     unique_id = "weights_for_user_" + str(request.user.id)
     excel_data = cache.get(unique_id)
     if excel_data:
-        response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response = HttpResponse(
+            excel_data,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
+        )
         response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
         return response
     else:
