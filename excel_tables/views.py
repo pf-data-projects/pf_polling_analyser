@@ -26,6 +26,7 @@ def table_maker_form(request, arg1):
             table_data = request.FILES['data_file']
             table_data = pd.read_csv(table_data)
             title = form.cleaned_data['title']
+            dates = form.cleaned_data['dates']
             start = form.cleaned_data['start']
             end = form.cleaned_data['end']
 

@@ -16,6 +16,11 @@ class TableUploadForm(forms.Form):
         label="Title you want to give to the survey",
         required=True,
     )
+    dates = forms.CharField(
+        label='Please specify the dates in which this survey was in the field.',
+        help_text='e.g. "1st - 7th January 2000"',
+        required=True
+    )
     start = forms.IntegerField(
         label="Select which question ID you would like the table to start at",
         help_text="For now, you need to specify the question ID here. It's the number that the question has in the results sheet you download from Alchemer.",
