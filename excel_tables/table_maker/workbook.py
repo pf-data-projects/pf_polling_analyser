@@ -377,7 +377,6 @@ def create_workbook(request, data, title, comments):
                 ws[header_coords] = header
                 ws[title_coords] = col_title
 
-
     # Add styles to the crossbreak heaeders.
 
     fill = PatternFill(start_color='FFA500', end_color='FFA500', fill_type='solid')
@@ -387,6 +386,7 @@ def create_workbook(request, data, title, comments):
     for sheet in wb.sheetnames:
         if sheet not in protected_sheets:
             ws = wb[sheet]
+            ws['A3'] = " "
             for cell in ws['2']:
                 cell.fill = fill
                 cell.font = font

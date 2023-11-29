@@ -44,7 +44,7 @@ def create_blank_table(question_data, standard_cb, non_standard_cb):
     if len(non_standard_cb) > 0:
         for crossbreak in non_standard_cb:
             table[f'{crossbreak[0]}: {crossbreak[2]}'] = [0, 0,]
-            table[f"blank_{crossbreak[1]}_{crossbreak[1]}"] = " "
+            table[f"blank_{crossbreak[1]}_{crossbreak[2]}"] = " "
 
     for i in range(len(questions.index)):
         table['Answers'].append(
