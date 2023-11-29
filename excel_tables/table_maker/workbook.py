@@ -362,6 +362,24 @@ def create_workbook(request, data, title, comments):
                 ws[excel_coord] = "Highest Level of Education"
                 ws.merge_cells(f"{excel_coord}:{excel_coord2}")
 
+    # Add headers for non-standard crossbreaks
+
+    non_standard = [col for col in trimmed_data.columns if ":" in col]
+
+    for sheet in wb.sheetnames:
+        if sheet not in protected_sheets:
+            ws = wb[sheet]
+            for col in non_standard:
+                header_coords = get_header_coords(col, trimmed_data)
+                title_coords = get_title_coords(col, trimmed_data)
+                header = col.split(":")[0]
+                col_title = col.split(":")[1]
+                ws[header_coords] = header
+                ws[title_coords] = col_title
+
+
+    # Add styles to the crossbreak heaeders.
+
     fill = PatternFill(start_color='FFA500', end_color='FFA500', fill_type='solid')
     font = Font(bold=True, color='FFFFFF', size=14)
     alignment = Alignment(horizontal='center', vertical='center')
@@ -380,6 +398,7 @@ def create_workbook(request, data, title, comments):
     cache.set(cache_key, output.getvalue(), timeout=300)
     return cache_key
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ EXTRA HELPER FUNCTIONS HERE FOR CONVENIENCE
 
 def format_percentages(data, sheet, cell_format):
     """
@@ -413,4 +432,14 @@ def get_header_coords(colname, data):
     col_index = data.columns.get_loc(colname)
     excel_col = get_column_letter(col_index + 1)
     excel_coord = excel_col + '2'
+    return excel_coord
+
+def get_title_coords(colname, data):
+    """
+    Gets the excel coordinates for any
+    given crossbreak headers
+    """
+    col_index = data.columns.get_loc(colname)
+    excel_col = get_column_letter(col_index + 1)
+    excel_coord = excel_col + '3'
     return excel_coord
