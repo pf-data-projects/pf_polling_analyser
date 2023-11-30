@@ -86,5 +86,5 @@ def create_blank_table(question_data, standard_cb, non_standard_cb):
             dataframe = dataframe.rename(columns={col: ' '})
 
     dataframe.to_csv('blank_table.csv')
-    print(dataframe.head(5))
+    # print(dataframe.head(5))
     return dataframe

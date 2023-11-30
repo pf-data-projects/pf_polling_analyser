@@ -41,10 +41,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
         }
         question_list.append(item)
 
-    print(len(question_list))
-
     question_list = [d for d in question_list if d['Base Type'] == 'Question']
-    print(len(question_list))
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Work out the totals for each question
 
