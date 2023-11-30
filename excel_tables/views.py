@@ -82,6 +82,13 @@ def scan_table(request):
             ]
             filtered_df = filtered_df[filtered_df['Rebase comment needed'].isin(['TRUE', 'True'])]
             filtered_df.set_index('IDs', inplace=True)
+
+            # remove html tags from questions for rebase form
+            filtered_df["Answers"] = filtered_df["Answers"].str.replace(
+                r'<[^>]+>',
+                '',
+                regex=True
+            )
             # Add these questions to a dictionary
             id_answer_dict = filtered_df['Answers'].to_dict()
             forms_needed = len(id_answer_dict)

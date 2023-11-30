@@ -70,7 +70,7 @@ def trim_table(data, start, end, comments):
     concatenated_data.reset_index(drop=True, inplace=True)
 
     # remove any html tags from questions
-    concatenated_data["Answers"] = concatenated_data['Answers'].str.replace(
+    concatenated_data["Answers"] = concatenated_data["Answers"].str.replace(
         r'<[^>]+>',
         '',
         regex=True
