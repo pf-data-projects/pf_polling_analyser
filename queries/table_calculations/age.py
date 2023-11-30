@@ -37,7 +37,6 @@ def age_rebase(category, col_index, table, question_list, results, question_data
     filtered_df = filtered_df.loc[(filtered_df[get_age.columns[0]].astype(int) <= category[1])]
 
     table = rebase(question_data, filtered_df, question_list, table, col_index)
-    print("age rebase done")
     return table
 
 def iterate_age_brackets(table, question_list, results, question_data):

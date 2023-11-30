@@ -41,6 +41,11 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
         }
         question_list.append(item)
 
+    print(len(question_list))
+
+    question_list = [d for d in question_list if d['Base Type'] == 'Question']
+    print(len(question_list))
+
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Work out the totals for each question
 
     # loops through all question options to find
@@ -278,18 +283,23 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
             results,
             question_data
         )
+        print("gender rebase done")
     if 'age' in standard_cb:
         table = iterate_age_rebase(
             table, question_list, results, question_data)
+        print("age rebase done")
     if 'region' in standard_cb:
         table = iterate_regions_rebase(
             table, question_list, results, question_data)
+        print("region rebase done")
     if 'seg' in standard_cb:
         table = iterate_seg_rebase(
             table, question_list, results, question_data)
+        print("seg rebase done")
     if 'education' in standard_cb:
         table = iterate_ed_rebase(
             table, question_list, results, question_data)
+        print("education rebase done")
     if 'children' in standard_cb:
         table = children_rebase(
             "Yes",
@@ -307,6 +317,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
             results,
             question_data
         )
+        print("children rebase done")
     if len(non_standard_cb) > 0:
         for crossbreak in non_standard_cb:
             rebase_crossbreak(

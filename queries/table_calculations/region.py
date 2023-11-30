@@ -32,7 +32,6 @@ def region_rebase(category, col_index, table, question_list, results, question_d
     filtered_df = results.loc[(results[get_region.columns[0]] == category)]
 
     table = rebase(question_data, filtered_df, question_list, table, col_index)
-    print("region rebase done")
     return table
 
 def iterate_regions(table, question_list, results, question_data):

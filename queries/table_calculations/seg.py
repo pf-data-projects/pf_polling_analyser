@@ -58,7 +58,6 @@ def seg_rebase(category, col_index, table, question_list, results, question_data
     filtered_df = results[contains]
 
     table = rebase(question_data, filtered_df, question_list, table, col_index)
-    print("seg rebase done")
     return table
 
 def iterate_seg(table, question_list, results, question_data):
