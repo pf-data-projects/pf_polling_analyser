@@ -1,12 +1,13 @@
 import pandas as pd
 
-def create_cover_page(data, title):
+def create_cover_page(data, title, dates):
     """
     Create a dataframe containing all info needed
     for polling table cover page.
     """
     cover_list = []
     cover_list.append("")
+    cover_list.append(f"Fieldwork: {dates}")
     cover_list.append("Interview method: Online Survey")
     cover_list.append("Population represented: UK Adults")
     cover_list.append(f"Sample size: {data.at[1, 'Total']}")

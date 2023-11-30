@@ -27,7 +27,7 @@ from .contents import create_contents_page
 from .cover import create_cover_page
 from .helper import get_column_letter
 
-def create_workbook(request, data, title, comments):
+def create_workbook(request, data, title, dates, comments):
     """
     The function that controls the creation and formatting of
     polling tables.
@@ -49,7 +49,7 @@ def create_workbook(request, data, title, comments):
 
     # create cover page and contents page
     # blank = {'Table of contents'}
-    cover_df = create_cover_page(data, title)
+    cover_df = create_cover_page(data, title, dates)
     contents_df = create_contents_page(data, comments)
 
     # define variables for caching
@@ -391,6 +391,26 @@ def create_workbook(request, data, title, comments):
                 cell.fill = fill
                 cell.font = font
                 cell.alignment = alignment
+
+    # Add the mini titles to the full results sheet, and then to all sheets.
+
+    title_font = Font(bold=True, size=25)
+    title_font_smaller = Font(bold=True, size=18)
+    title_align = Alignment(vertical='center')
+
+    full_results = wb['Full Results']
+    full_results['C1'] = 'Full Results'
+    full_results['C1'].font = title_font
+    full_results['C1'].alignment = title_align
+
+    protected_sheets.append('Full Results')
+
+    for sheet in wb.sheetnames:
+        if sheet not in protected_sheets:
+            ws = wb[sheet]
+            ws['B1'] = ws['A7'].value
+            ws['B1'].font = title_font_smaller
+            ws['B1'].alignment = title_align
 
     output = io.BytesIO()
     wb.save(output)

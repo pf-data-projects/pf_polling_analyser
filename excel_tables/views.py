@@ -50,7 +50,7 @@ def table_maker_form(request, arg1):
             trimmed = trim_table(table_data, start, end, edited_comments)
 
             # create and cache excel tables.
-            create_workbook(request, trimmed, title, edited_comments)
+            create_workbook(request, trimmed, title, dates, edited_comments)
 
             print("table making SUCCESS!!")
             return redirect(reverse('home'))
@@ -116,7 +116,10 @@ def download_tables(request):
     unique_id = "tables_for_user_" + str(request.user.id)
     excel_data = cache.get(unique_id)
     if excel_data:
-        response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response = HttpResponse(
+            excel_data,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
         response['Content-Disposition'] = 'attachment; filename="download.xlsx"'
         return response
     else:
