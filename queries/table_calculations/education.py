@@ -19,7 +19,7 @@ def calc_ed(category, col_index, table, question_list, results, question_data):
 
         table = calc.calc(filtered_df, col_index, table, question, results, question_data)
 
-    print(category, "done!")
+    # print(category, "done!")
     return table
 
 def ed_rebase(category, col_index, table, question_list, results, question_data):
@@ -32,7 +32,6 @@ def ed_rebase(category, col_index, table, question_list, results, question_data)
     filtered_df = results.loc[(results[get_ed.columns[0]] == category)]
 
     table = rebase(question_data, filtered_df, question_list, table, col_index)
-    print("education rebase done")
     return table
 
 def iterate_ed(table, question_list, results, question_data):

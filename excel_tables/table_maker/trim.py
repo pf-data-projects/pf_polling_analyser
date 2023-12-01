@@ -1,6 +1,6 @@
 import pandas as pd
 
-def trim_table(data, start, end):
+def trim_table(data, start, end, comments):
     """
     A function that:
     1. takes the start and end of the survey
@@ -8,6 +8,28 @@ def trim_table(data, start, end):
     are not needed.
     2. removes other unnecessary rows of the table.
     """
+    # Add the edited rebase comments to the table.
+    for comment in comments:
+        filtered_df = data[data['IDs'] == str(comment[0])]
+        filtered_df = filtered_df[filtered_df['Base Type'] == 'Question']
+        updated_question = filtered_df['Answers'] + f" BASE: {comment[1]}"
+        updated_question = pd.DataFrame(updated_question)
+        data_row_index = data[(data['Base Type'] == "Question") & (data['IDs'] == str(comment[0]))].index
+        if not data_row_index.empty:
+            data.iat[data_row_index[0], 3] = updated_question.iat[0, 0]
+
+    # Add 'BASE: All respondents' to all other questions
+    comment_ids = []
+    for comment in comments:
+        comment_ids.append(str(comment[0]))
+
+    filtered_df = data[~data['IDs'].isin(comment_ids)]
+    for index, row in filtered_df.iterrows():
+        if row['Base Type'] == 'Question':
+            updated = row['Answers'] + " BASE: All respondents"
+            data.iat[index, 3] = updated
+    data.to_csv("test_rebase.csv", index=False)
+
     # Find the index for the first row with the start_id
     start_index = data[data['IDs'] == str(start)].index.min()
 
@@ -48,7 +70,7 @@ def trim_table(data, start, end):
     concatenated_data.reset_index(drop=True, inplace=True)
 
     # remove any html tags from questions
-    concatenated_data["Answers"] = concatenated_data['Answers'].str.replace(
+    concatenated_data["Answers"] = concatenated_data["Answers"].str.replace(
         r'<[^>]+>',
         '',
         regex=True

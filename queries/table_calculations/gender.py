@@ -19,7 +19,7 @@ def calc_gender(category, col_index, table, question_list, results, question_dat
 
         table = calc.calc(filtered_df, col_index, table, question, results, question_data)
 
-    print(category, "done!")
+    # print(category, "done!")
     return table
 
 def gender_rebase(category, col_index, table, question_list, results, question_data):
@@ -32,5 +32,4 @@ def gender_rebase(category, col_index, table, question_list, results, question_d
     filtered_df = results.loc[(results[get_gender.columns[0]] == category)]
 
     table = rebase(question_data, filtered_df, question_list, table, col_index)
-    print("gender rebase done")
     return table

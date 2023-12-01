@@ -13,17 +13,21 @@ each sheet.
 """
 
 import io
+import math
 
 import pandas as pd
 import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell
+from openpyxl import load_workbook
+from openpyxl.drawing.image import Image
+from openpyxl.styles import PatternFill, Font, Alignment, Border
 from django.core.cache import cache
 
 from .contents import create_contents_page
 from .cover import create_cover_page
 from .helper import get_column_letter
 
-def create_workbook(request, data, title):
+def create_workbook(request, data, title, dates, comments):
     """
     The function that controls the creation and formatting of
     polling tables.
@@ -36,10 +40,17 @@ def create_workbook(request, data, title):
 
     trimmed_data.iat[0, 0] = "Unweighted"
 
+    # ensure blank cols remain blank
+    for col in trimmed_data.columns:
+        if trimmed_data[col].iloc[0] == 0:
+            trimmed_data[col].iloc[0] = ""
+            trimmed_data[col].iloc[1] = ""
+            trimmed_data = trimmed_data.rename(columns={col: ''})
+
     # create cover page and contents page
     # blank = {'Table of contents'}
-    cover_df = create_cover_page(data)
-    contents_df = create_contents_page(data)
+    cover_df = create_cover_page(data, title, dates)
+    contents_df = create_contents_page(data, comments)
 
     # define variables for caching
     cache_key = "tables_for_user_" + str(request.user.id)
@@ -72,21 +83,23 @@ def create_workbook(request, data, title):
         # define results sheet and add basic styles
         results_sheet = writer.sheets['Full Results']
         results_sheet.hide_gridlines(2)
-        results_sheet.freeze_panes(3, 1)
+        results_sheet.freeze_panes(5, 1)
 
         # define contents sheet and add basic styles
         contents_sheet = writer.sheets['Contents']
         contents_sheet.hide_gridlines(2)
-        contents_sheet.set_column(0, 0, 40)
+        contents_sheet.set_column(2, 2, 100)
+        contents_sheet.set_column(3, 3, 40)
+        right_format = workbook.add_format({
+            'align': 'right',
+        })
+        contents_sheet.set_column("B:B", None, right_format)
 
         # define cover sheet and add basic styles
         cover_sheet = writer.sheets['Cover Page']
         cover_sheet.hide_gridlines(2)
-        cover_sheet.set_column(0, 0, 40)
-
-        image_file = 'static/assets/pf.jpg'
-        cover_sheet.insert_image('A3', image_file, {'x_scale': 0.5, 'y_scale': 0.5})
-        cover_sheet.set_row(2, 60)
+        cover_sheet.set_column(3, 3, 60)
+        cover_sheet.set_zoom(115)
 
         # add link to the full results page in the contents page
         position = contents_df[0].isin(['Full Results']).stack()
@@ -127,7 +140,6 @@ def create_workbook(request, data, title):
         # without the percentage format
         results_sheet.set_column(1, len(data.columns) - 1, 15)
         results_sheet.set_column(0, 0, 80, cell_format=questions_border)
-        
 
         # round weighted totals to nearest integer
         row_as_list = trimmed_data.iloc[1].values.tolist()
@@ -149,14 +161,6 @@ def create_workbook(request, data, title):
             question_value = data.iloc[i, 3]
             if data.at[i, 'Base Type'] == 'Question' or data.at[i, 'Base Type'] == 'sub_Question':
                 results_sheet.write(i + 1, 0, question_value, question_format)
-                results_sheet.merge_range(
-                    i + 1,
-                    0,
-                    i + 1,
-                    26,
-                    question_value,
-                    question_format
-                )
 
         # apply percentage format to data.
         format_percentages(trimmed_data, results_sheet, percent_format)
@@ -171,7 +175,7 @@ def create_workbook(request, data, title):
         ids = non_header_data['IDs'].tolist()
         checked = []
         for qid in ids:
-            if qid not in checked:
+            if qid != "" and qid not in checked:
                 # create table containing just 1 question
                 sub_table = data[(data['IDs'] == qid)]
                 # add a space beneath where header goes
@@ -183,7 +187,7 @@ def create_workbook(request, data, title):
                         rows_list.append(empty_row)
                     rows_list.append(row)
                 sub_table = pd.concat(
-                    [pd.DataFrame([row]) for row in rows_list], 
+                    [pd.DataFrame([row]) for row in rows_list],
                     ignore_index=True
                 )
                 # concatinate the headers back to the top of the sub table
@@ -202,18 +206,26 @@ def create_workbook(request, data, title):
                 for col in concat_sub_table.columns[1:]:
                     new_row[col] = ''
                 concat_sub_table.loc[len(concat_sub_table)] = new_row
+
+                # ensure blank cols remain blank
+                for col in concat_sub_table.columns:
+                    if concat_sub_table[col].iloc[0] == 0:
+                        concat_sub_table[col].iloc[0] = ""
+                        concat_sub_table[col].iloc[1] = ""
+                        concat_sub_table = concat_sub_table.rename(columns={col: ''})
+
                 # Add the table to excel with sheetname based on QID
                 concat_sub_table.to_excel(
                     writer,
                     index=False,
-                    sheet_name=f'question ID - {qid}'
+                    sheet_name=f'Question ID - {qid}'
                 )
                 # define sheet for formatting
-                question_sheet = writer.sheets[f'question ID - {qid}']
+                question_sheet = writer.sheets[f'Question ID - {qid}']
                 question_sheet.set_column(1, len(data.columns) - 1, 15)
                 question_sheet.set_column(0, 0, 80, cell_format=questions_border)
                 question_sheet.hide_gridlines(2)
-                question_sheet.freeze_panes(3, 1)
+                question_sheet.freeze_panes(5, 1)
                 # format numbers to nice percentages
                 format_percentages(
                     concat_sub_table, question_sheet, percent_format
@@ -227,13 +239,6 @@ def create_workbook(request, data, title):
                             0,
                             question_value,
                             question_format
-                        )
-                        question_sheet.merge_range(
-                            i + 3,
-                            0,
-                            i + 3,
-                            25,
-                            question_value, question_format
                         )
                 # format headers
                 for col, value in enumerate(concat_sub_table.columns.values):
@@ -274,39 +279,200 @@ def create_workbook(request, data, title):
             df_row = i + 1
             df_col = 0
             if i < len(contents_df[0]):
-                cell_data = contents_df[0].iat[i + 1, 0]
-                excel_col = "A"
+                cell_data = contents_df[0].iat[i + 1, 2]
+                excel_col = "C"
                 excel_row = df_row + 2
                 excel_cell = f"{excel_col}{excel_row}"
                 contents_sheet.write_url(
                     excel_cell,
-                    f"internal:'question ID - {question}'!A1",
+                    f"internal:'Question ID - {question}'!A1",
                     string=f'{cell_data}'
                 )
             i += 1
 
     output.seek(0)
     cache.set(cache_key, output.getvalue(), timeout=300)
+
+
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ EDITS WITH OPENPYXL
+    cached_file_content = cache.get(cache_key)
+
+    # Create a BytesIO object from your cached content
+    file_obj = io.BytesIO(cached_file_content)
+
+    # Load the workbook from the file object and define image path
+    wb = load_workbook(file_obj)
+    img_path = 'static/assets/pf.jpg'
+
+    # Add pf logo to top of all sheets
+    for sheet in wb.sheetnames:
+        ws = wb[sheet]
+        ws.insert_rows(1)
+        ws.row_dimensions[1].height = 60
+
+        img = Image(img_path)
+        scale_x = 0.5
+        scale_y = 0.5
+        img.width = img.width * scale_x
+        img.height = img.height * scale_y
+        if sheet == 'Cover Page':
+            ws.add_image(img, 'D1')
+        else:
+            ws.add_image(img, 'A1')
+
+    # Add extra space in cover page.
+    cover_page = wb['Cover Page']
+    for i in range(1, 4):
+        cover_page.insert_cols(idx=1)
+    cover_page['D2'].border = Border(
+        left=None, right=None, top=None, bottom=None)
+    cover_page['D10'].alignment = Alignment(wrapText=True)
+    cover_page['D12'].alignment = Alignment(wrapText=True)
+
+    # Add extra row and headers for the standard crossbreaks.
+    protected_sheets = [
+        'Cover Page',
+        'Contents',
+    ]
+
+    for sheet in wb.sheetnames:
+        if sheet not in protected_sheets:
+            ws = wb[sheet]
+            ws.insert_rows(2)
+            ws.row_dimensions[2].height = 40
+            cols = trimmed_data.columns
+            if "Male" in cols:
+                excel_coord = get_header_coords("Male", trimmed_data)
+                excel_coord2 = get_header_coords("Female", trimmed_data)
+                ws[excel_coord] = "Gender"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+            if "18-24" in cols:
+                excel_coord = get_header_coords("18-24", trimmed_data)
+                excel_coord2 = get_header_coords("65+", trimmed_data)
+                ws[excel_coord] = "Age"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+            if "London" in cols:
+                excel_coord = get_header_coords("London", trimmed_data)
+                excel_coord2 = get_header_coords("Northern Ireland", trimmed_data)
+                ws[excel_coord] = "Region"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+            if "AB" in cols:
+                excel_coord = get_header_coords("AB", trimmed_data)
+                excel_coord2 = get_header_coords("DE", trimmed_data)
+                ws[excel_coord] = "Socio-Economic Group"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+            if "Yes" in cols:
+                excel_coord = get_header_coords("Yes", trimmed_data)
+                excel_coord2 = get_header_coords("No", trimmed_data)
+                ws[excel_coord] = "Has Children?"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+            if "GCSE or equivalent (Scottish National/O Level)" in cols:
+                excel_coord = get_header_coords(
+                    "GCSE or equivalent (Scottish National/O Level)", 
+                    trimmed_data
+                )
+                excel_coord2 = get_header_coords("Doctorate (PhD/DPHil)", trimmed_data)
+                ws[excel_coord] = "Highest Level of Education"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+
+    # Add headers for non-standard crossbreaks
+
+    non_standard = [col for col in trimmed_data.columns if ":" in col]
+
+    for sheet in wb.sheetnames:
+        if sheet not in protected_sheets:
+            ws = wb[sheet]
+            for col in non_standard:
+                header_coords = get_header_coords(col, trimmed_data)
+                title_coords = get_title_coords(col, trimmed_data)
+                header = col.split(":")[0]
+                col_title = col.split(":")[1]
+                ws[header_coords] = header
+                ws[title_coords] = col_title
+
+    # Add styles to the crossbreak heaeders.
+
+    fill = PatternFill(start_color='FFA500', end_color='FFA500', fill_type='solid')
+    font = Font(bold=True, color='FFFFFF', size=14)
+    alignment = Alignment(horizontal='center', vertical='center')
+
+    for sheet in wb.sheetnames:
+        if sheet not in protected_sheets:
+            ws = wb[sheet]
+            ws['A3'] = " "
+            for cell in ws['2']:
+                cell.fill = fill
+                cell.font = font
+                cell.alignment = alignment
+
+    # Add the mini titles to the full results sheet, and then to all sheets.
+
+    title_font = Font(bold=True, size=25)
+    title_font_smaller = Font(bold=True, size=18)
+    title_align = Alignment(vertical='center')
+
+    full_results = wb['Full Results']
+    full_results['C1'] = 'Full Results'
+    full_results['C1'].font = title_font
+    full_results['C1'].alignment = title_align
+
+    protected_sheets.append('Full Results')
+
+    for sheet in wb.sheetnames:
+        if sheet not in protected_sheets:
+            ws = wb[sheet]
+            ws['B1'] = ws['A7'].value
+            ws['B1'].font = title_font_smaller
+            ws['B1'].alignment = title_align
+
+    output = io.BytesIO()
+    wb.save(output)
+
+    cache.set(cache_key, output.getvalue(), timeout=300)
     return cache_key
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ EXTRA HELPER FUNCTIONS HERE FOR CONVENIENCE
 
 def format_percentages(data, sheet, cell_format):
     """
-    # Loop through rows, starting from the fourth row, 
-    # and apply the percentage format
+    Loop through rows, starting from the fourth row, 
+    and apply the percentage format.
     """
     for row_num in range(3, len(data)):  # start from the fourth row (index 3)
         row_data = data.iloc[row_num]
         for col_num in range(1, len(data.columns)):
-            cell_value = data.iloc[row_num, col_num]
-            # Check if the cell contains a number (int or float)
-            if isinstance(cell_value, (int, float)):
-                # Apply percent format to the cell because it contains a number
-                sheet.write_number(
-                    row_num + 1, col_num, cell_value, cell_format)
-            elif pd.isna(cell_value) or cell_value == '':
-                # If the cell is NaN or an empty string, write an empty string
-                sheet.write_string(row_num + 1, col_num, '')
-            else:
-                # Otherwise, write the value as it is
-                sheet.write(row_num + 1, col_num, cell_value)
+            col_name = data.columns[col_num]
+            if col_name != " ":
+                cell_value = data.iloc[row_num, col_num]
+                # Check if the cell contains a number (int or float)
+                if isinstance(cell_value, (int, float)):
+                    if not math.isnan(cell_value):
+                        # Apply percent format to the cell because it contains a number
+                        sheet.write_number(
+                            row_num + 1, col_num, cell_value, cell_format)
+                elif pd.isna(cell_value) or cell_value == '':
+                    # If the cell is NaN or an empty string, write an empty string
+                    sheet.write_string(row_num + 1, col_num, '')
+                else:
+                    # Otherwise, write the value as it is
+                    sheet.write(row_num + 1, col_num, cell_value)
+
+def get_header_coords(colname, data):
+    """
+    Gets the excel coordinates for any
+    given crossbreak headers
+    """
+    col_index = data.columns.get_loc(colname)
+    excel_col = get_column_letter(col_index + 1)
+    excel_coord = excel_col + '2'
+    return excel_coord
+
+def get_title_coords(colname, data):
+    """
+    Gets the excel coordinates for any
+    given crossbreak headers
+    """
+    col_index = data.columns.get_loc(colname)
+    excel_col = get_column_letter(col_index + 1)
+    excel_coord = excel_col + '3'
+    return excel_coord

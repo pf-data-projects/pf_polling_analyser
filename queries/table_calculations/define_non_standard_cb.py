@@ -26,7 +26,7 @@ def calc_crossbreak(table, question_list, results, question_data, crossbreak):
         table.iat[1, col_index] = filtered_df['weighted_respondents'].astype(float).sum()
         table = calc.calc(filtered_df, col_index, table, question, results, question_data)
 
-    print(category, "done!")
+    # print(category, "done!")
     return table
 
 def rebase_crossbreak(table, question_list, results, question_data, crossbreak):
@@ -41,5 +41,5 @@ def rebase_crossbreak(table, question_list, results, question_data, crossbreak):
     filtered_df = results.loc[(results[get_crossbreak.columns[0]] == category)]
 
     table = rebase(question_data, filtered_df, question_list, table, col_index)
-    print(category, "rebase done!")
+    # print(category, "rebase done!")
     return table

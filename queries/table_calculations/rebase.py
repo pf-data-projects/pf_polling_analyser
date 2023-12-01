@@ -23,12 +23,17 @@ def rebase(question_data, results, question_list, table, col_index):
                     if non_nan_count > 0:
                         matching_indices = table[table['IDs'] == question['qid']].index
                         table.loc[table['IDs'] == question['qid'], 'Rebase comment needed'] = True
+                        sum_percentages = 0
                         for idx in matching_indices:
                             percentage_value = table.iloc[idx, col_index]
                             table.iloc[idx, col_index] = (percentage_value / 100) * weighted_totals
                             # Then, update the values in these rows to be their percentage of non_nan_count
                             value = table.iloc[idx, col_index]
                             table.iloc[idx, col_index] = (value / non_nan_count) * 100
+                            sum_percentages += (value / non_nan_count) * 100
+                        for idx in matching_indices:
+                            value = table.iloc[idx, col_index]
+                            table.iloc[idx, col_index] = (value / sum_percentages) * 100
                 checked.append(question['qid'])
             else:
                 checked.append(question['qid'])
@@ -50,6 +55,7 @@ def rebase(question_data, results, question_list, table, col_index):
             if non_nan_count > 0:
                 if question['qid'] not in checked:
                     table.loc[table['IDs'] == question['qid'], 'Rebase comment needed'] = True
+                    sum_percentages = 0
                     # Reverse the percentage calculation for these rows
                     for idx in matching_indices:
                         percentage_value = table.iloc[idx, col_index]
@@ -58,6 +64,10 @@ def rebase(question_data, results, question_list, table, col_index):
                         # Then, update the values in these rows to be their percentage of non_nan_count
                         value = table.iloc[idx, col_index]
                         table.iloc[idx, col_index] = (value / non_nan_count) * 100
+                        sum_percentages += (value / non_nan_count) * 100
+                    for idx in matching_indices:
+                        value = table.iloc[idx, col_index]
+                        table.iloc[idx, col_index] = (value / sum_percentages) * 100
                     checked.append(question['qid'])
         else:
             checked.append(question['qid'])
