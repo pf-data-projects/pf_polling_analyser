@@ -52,6 +52,9 @@ def table_maker_form(request, arg1):
             # create and cache excel tables.
             create_workbook(request, trimmed, title, dates, edited_comments)
 
+            unique_id = "title_for_user_" + str(request.user.id)
+            cache.set(unique_id, title, 300)
+
             print("table making SUCCESS!!")
             return redirect(reverse('home'))
     else:
@@ -114,13 +117,15 @@ def download_tables(request):
     Handles retrieval of cached weighted data.
     """
     unique_id = "tables_for_user_" + str(request.user.id)
+    unique_title = "title_for_user_" + str(request.user.id)
     excel_data = cache.get(unique_id)
+    title = cache.get(unique_title)
     if excel_data:
         response = HttpResponse(
             excel_data,
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response['Content-Disposition'] = 'attachment; filename="download.xlsx"'
+        response['Content-Disposition'] = f'attachment; filename="Public First Poll For {title}.xlsx"'
         return response
     else:
         return HttpResponse("TABLES NOT FOUND")
