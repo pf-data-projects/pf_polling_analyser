@@ -19,7 +19,7 @@ def calc_children(category, col_index, table, question_list, results, question_d
 
         table = calc.calc(filtered_df, col_index, table, question, results, question_data)
 
-    print(category, "done!")
+    # print(category, "done!")
     return table
 
 def children_rebase(category, col_index, table, question_list, results, question_data):

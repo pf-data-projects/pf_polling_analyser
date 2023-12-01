@@ -98,7 +98,7 @@ def create_workbook(request, data, title, dates, comments):
         # define cover sheet and add basic styles
         cover_sheet = writer.sheets['Cover Page']
         cover_sheet.hide_gridlines(2)
-        cover_sheet.set_column(0, 0, 40)
+        cover_sheet.set_column(3, 3, 60)
 
         # add link to the full results page in the contents page
         position = contents_df[0].isin(['Full Results']).stack()
@@ -315,6 +315,13 @@ def create_workbook(request, data, title, dates, comments):
         img.width = img.width * scale_x
         img.height = img.height * scale_y
         ws.add_image(img, 'A1')
+
+    # Add extra space in cover page.
+    cover_page = wb['Cover Page']
+    for i in range(1, 4):
+        cover_page.insert_cols(idx=1)
+    cover_page['D10'].alignment = Alignment(wrapText=True)
+    cover_page['D12'].alignment = Alignment(wrapText=True)
 
     # Add extra row and headers for the standard crossbreaks.
     protected_sheets = [

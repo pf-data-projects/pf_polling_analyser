@@ -21,7 +21,7 @@ def calc_age(category, col_index, table, question_list, results, question_data):
         table.iat[1, col_index] = filtered_df['weighted_respondents'].astype(float).sum()
         table = calc.calc(filtered_df, col_index, table, question, results, question_data)
 
-    print(category[0], "done!")
+    # print(category[0], "done!")
     return table
 
 def age_rebase(category, col_index, table, question_list, results, question_data):

@@ -19,7 +19,7 @@ def calc_region(category, col_index, table, question_list, results, question_dat
 
         table = calc.calc(filtered_df, col_index, table, question, results, question_data)
 
-    print(category, "done!")
+    # print(category, "done!")
     return table
 
 def region_rebase(category, col_index, table, question_list, results, question_data):

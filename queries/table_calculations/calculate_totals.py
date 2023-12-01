@@ -192,7 +192,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
                 continue
     # Run calculations for standard crossbreaks
     if 'gender' in standard_cb:
-        print("---- PROCESSING GENDER CROSSBREAKS ----")
+        # print("---- PROCESSING GENDER CROSSBREAKS ----")
         table = calc_gender(
             "Male", 
             table.columns.get_loc('Male'),
@@ -210,20 +210,20 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
             question_data
         )
     if 'age' in standard_cb:
-        print("---- PROCESSING AGE CROSSBREAKS ----")
+        # print("---- PROCESSING AGE CROSSBREAKS ----")
         table = iterate_age_brackets(
             table, question_list, results, question_data)
     if 'region' in standard_cb:
-        print("---- PROCESSING REGION CROSSBREAKS ----")
+        # print("---- PROCESSING REGION CROSSBREAKS ----")
         table = iterate_regions(table, question_list, results, question_data)
     if 'seg' in standard_cb:
-        print("---- PROCESSING SEG CROSSBREAKS ----")
+        # print("---- PROCESSING SEG CROSSBREAKS ----")
         table = iterate_seg(table, question_list, results, question_data)
     if 'education' in standard_cb:
-        print("--- PROCESSING EDUCATION CROSSBREAKS ---")
+        # print("--- PROCESSING EDUCATION CROSSBREAKS ---")
         table = iterate_ed(table, question_list, results, question_data)
     if 'children' in standard_cb:
-        print("---- PROCESSING CHILDREN CROSSBREAKS ----")
+        # print("---- PROCESSING CHILDREN CROSSBREAKS ----")
         table = calc_children(
             "Yes", 
             table.columns.get_loc('Yes'),
@@ -280,23 +280,23 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
             results,
             question_data
         )
-        print("gender rebase done")
+        # print("gender rebase done")
     if 'age' in standard_cb:
         table = iterate_age_rebase(
             table, question_list, results, question_data)
-        print("age rebase done")
+        # print("age rebase done")
     if 'region' in standard_cb:
         table = iterate_regions_rebase(
             table, question_list, results, question_data)
-        print("region rebase done")
+        # print("region rebase done")
     if 'seg' in standard_cb:
         table = iterate_seg_rebase(
             table, question_list, results, question_data)
-        print("seg rebase done")
+        # print("seg rebase done")
     if 'education' in standard_cb:
         table = iterate_ed_rebase(
             table, question_list, results, question_data)
-        print("education rebase done")
+        # print("education rebase done")
     if 'children' in standard_cb:
         table = children_rebase(
             "Yes",
@@ -314,7 +314,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
             results,
             question_data
         )
-        print("children rebase done")
+        # print("children rebase done")
     if len(non_standard_cb) > 0:
         for crossbreak in non_standard_cb:
             rebase_crossbreak(
