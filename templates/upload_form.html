@@ -30,7 +30,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('add_more').addEventListener('click', function() {
+            document.getElementById('add_more').addEventListener('click', function(event) {
+                event.preventDefault();
                 // Get the formset wrapper
                 const wrapper = document.getElementById('formset-wrapper');
                 // Clone the last form in the formset
