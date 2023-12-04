@@ -10,6 +10,12 @@ input. The logic broadly follows these steps.
 5. Create links to each table and from each table back to contents in
 each sheet.
 6. cache the excel file for download later after the function has returned.
+
+#### AS OF 01/12/2023 ####
+7. re-opens cached file and carries out following edits using openpyxl.
+    - add pf logo to top corners of all sheets.
+    - add crossbreak headers to crossbreak groups.
+    - Add some custom styles to these new rows/cols.
 """
 
 import io

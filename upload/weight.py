@@ -55,7 +55,6 @@ def run_weighting(survey_data, weight_proportions):
             previous_weights = survey_data['weight'].copy()
             for _, row in weight_proportions.iterrows():
                 group, specific, target_prop = row['Group'], row['Specific'], row['Proportion']
-                print(row['Specific'])
                 if group == "Gender" and specific not in ['male', 'female']:
                     continue
                 if group == "Overall":

@@ -1,3 +1,20 @@
+"""
+This file contains one function that carries out
+a number of small processing tasks to the data before
+it is exported to excel.
+
+In future these could be split into multiple functions
+that are handled by the view. This may aid readability/maintainability
+in the longer term.
+
+1. Add edited rebase comments to the 'answers' column of the table.
+2. Add 'All respondents' as default to all other 'answers' records.
+3. trim the data according to start and end specified by user.
+4. remove unnecessary question types.
+5. deletes any html tags present in questions.
+6. add extra empty rows for excel readability.
+"""
+
 import pandas as pd
 
 def trim_table(data, start, end, comments):

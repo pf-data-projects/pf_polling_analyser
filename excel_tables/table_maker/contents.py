@@ -1,3 +1,8 @@
+"""
+This file handles the creation of the contents page
+which will be appended to the start of the excel tables.
+"""
+
 import pandas as pd
 
 def create_contents_page(data, comments):
