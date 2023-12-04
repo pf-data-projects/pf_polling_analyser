@@ -1,3 +1,8 @@
+"""
+This allows the admin to access all profile data
+and perform CRUD functionality on them.
+"""
+
 from django.contrib import admin
 from .models import Profile
 

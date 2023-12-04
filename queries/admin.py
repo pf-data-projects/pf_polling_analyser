@@ -1,3 +1,8 @@
+"""
+Allows admin to see and carry out
+CRUD functionality on all data.
+"""
+
 from django.contrib import admin
 from .models import Query
 

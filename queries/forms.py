@@ -1,3 +1,7 @@
+"""
+Defines fields for the form that receives query data.
+"""
+
 from django import forms
 from .models import Query
 

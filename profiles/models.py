@@ -1,3 +1,13 @@
+"""
+A model to handle data needed for user profiles.
+The Profile class has the handy django dunder method
+for easy identification
+
+This file also includes a function to handle the
+automatic generation of profiles when a user instance is
+created and added to the database.
+"""
+
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
@@ -14,6 +24,10 @@ class Profile(models.Model):
     approved = models.BooleanField(default=False)
 
     class Meta:
+        """
+        Ensures that profile records are ordered by
+        creation date in the database.
+        """
         ordering = ["-created_at"]
 
     def __str__(self):
