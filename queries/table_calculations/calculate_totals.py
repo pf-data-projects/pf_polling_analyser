@@ -245,6 +245,9 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
         for crossbreak in non_standard_cb:
             calc_crossbreak(table, question_list, results, question_data, crossbreak)
 
+    # test output for debugging. DELETE AFTER PROBLEM SOLVED.
+    table.to_csv('test_output_3.csv')
+
     # adjust weighted totals so that they are a proportion of actual total
     adjustment_ratio = table.loc[0, 'Total'] / table.loc[1, 'Total']
 
