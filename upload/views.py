@@ -103,7 +103,8 @@ def upload_csv(request):
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Sheet1")
 
-            # get question data from API
+            # get question data from API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            # JSON AND CSV OUTPUT CURRENTLY COMMENTED OUT FOR PERFORMANCE
             survey_questions = get_questions_json(survey_id)
             questions = extract_questions_from_pages(survey_questions)
             # with open("questions_list.json", "w") as outfile:
