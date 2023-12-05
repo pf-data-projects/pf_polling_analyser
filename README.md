@@ -85,6 +85,18 @@ The profile model is configured to auto-generate an un-approved profile for each
 
 This database schema may be expanded in future as features are added to this application.
 
+## Caching Database
+
+This application uses caching to store data processed in the instance's memory for quick retrieval and download by the user.
+
+Currently this is handled using django's default caching system. This works OK for our current use-case but has some potential drawbacks if the application was ever scaled to cater for more users.
+1. There is limited configuration/features for more advanced caching.
+2. Caching using django's built-in caching system does not easily allow you to profile the impact on performance.
+3. More critically, Django uses the application instance's own memory to store cached data. If the application were to be scaled up, the cloud computing cost of running would increase significantly, as cloud run instances are billed according to memory/CPU usage.
+4. Given that the cache occupies memory, it also means that there are fewer resources in a cloud run instance that can be devoted to processing data.
+
+Longer-term, it would be better to set up a dedicated, specialised caching database with a service like Redis (or an equivalent provision from Google Cloud). This would ideally allow us to see more analytics on caching usage, and performance, as well as limiting runaway memory usage in the application.
+
 ### Data processing
 
 The Pandas library for python is currently used to do the heavy lifting of data processing in the backend.
@@ -96,6 +108,19 @@ The following diagrams show the different processes that this project carries ou
 
 #### Calculating Crossbreaks
 <img src="docs/polling_crossbreaks_diagram.png" alt="A diagram of how the crossbreaks processing works." />
+
+### Producing Excel Files
+
+In order to produce excel outputs of the polling table data, this project makes use of 2 libraries:
+
+* [Xlsxwriter](https://xlsxwriter.readthedocs.io/)
+* [Openpyxl](https://openpyxl.readthedocs.io/en/stable/)
+
+The combination of the two of these enables the application to:
+1. Efficiently *write* pandas dataframes to excel files with simple formatting. This is important because each question in the survey needs to have it's own excel sheet displaying the results, which can mean the excel file may contain hundreds of sheets. Being able to do this quickly reduces the performance bottleneck here. Xlsxwriter is designed for this purpose.
+2. Implement style and format changes to the excel files that require the ability to read. For example, the headers that designate each set of crossbreaks are much more simply implemented if python can read the excel file and see exactly where each header needs to go. In order to do this with xlsxwriter, the headers would need to be added to the pandas dataframe beforehand which would be needlessly fiddly, and potentially slower.
+
+## Front-End Design
 
 ### Wireframes
 
