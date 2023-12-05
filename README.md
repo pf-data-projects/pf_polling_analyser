@@ -81,11 +81,20 @@ The Application does not currently require a large database to handle lots of us
 
 The profile model is configured to auto-generate an un-approved profile for each new user that is registered on the system. An admin can then log into the django admin page and update a user's profile approval status, enabling them access to the features of the application.
 
+<img src="docs/db_schema.png" alt="A diagram of the database models"/>
+
 This database schema may be expanded in future as features are added to this application.
 
 ### Data processing
 
 The Pandas library for python is currently used to do the heavy lifting of data processing in the backend.
+
+The following diagrams show the different processes that this project carries out on the survey data.
+
+#### Weighting
+<img src="docs/weighting.png" alt="A diagram of the iterative proportional fitting carried out by this application"/>
+
+#### Calculating Crossbreaks
 
 ### Wireframes
 
