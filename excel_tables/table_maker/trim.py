@@ -112,7 +112,11 @@ def trim_table(data, start, end, comments):
 
     # Reset the index of the new DataFrame
     new_data.reset_index(drop=True, inplace=True)
+    questions = new_data['Base Type'] == 'Question'
+    question_indexes = new_data[questions].index.tolist()
+    adjusted_indexes = [index + 4 for index in question_indexes]
+    adjusted_indexes.insert(0, '')
 
-    new_data.to_csv("test_output.csv", encoding="utf-8-sig", index=False)
+    # new_data.to_csv("test_output.csv", encoding="utf-8-sig", index=False)
 
-    return new_data
+    return [new_data, adjusted_indexes]

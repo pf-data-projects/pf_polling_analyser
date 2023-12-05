@@ -5,7 +5,7 @@ which will be appended to the start of the excel tables.
 
 import pandas as pd
 
-def create_contents_page(data, comments):
+def create_contents_page(data, questions_list, comments):
     """
     Build a dataframe to house the contents page
     of PF polling tables.
@@ -30,10 +30,16 @@ def create_contents_page(data, comments):
     for item in id_list:
         if item != 'Total' and item != 'Weighted':
             id_column.append(item)
-    contents = {"Question": contents_list, 'ID': id_column}
+    print(len(contents_list))
+    print(len(questions_list))
+    contents = {
+        "Question": contents_list, 
+        'ID': id_column,
+        'Row in Full Results': questions_list, 
+    }
     contents_df = pd.DataFrame(contents)
     contents_df["Number"] = range(1, len(contents_df) + 1)
-    column_order = ["Number"] + ["ID"] + ["Question"]
+    column_order = ["Number"] + ["ID"] + ["Question"] + ['Row in Full Results']
     contents_df = contents_df[column_order]
     contents_df["Base"] = "All Respondents"
 

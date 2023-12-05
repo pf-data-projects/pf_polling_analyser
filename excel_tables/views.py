@@ -50,7 +50,7 @@ def table_maker_form(request, arg1):
             trimmed = trim_table(table_data, start, end, edited_comments)
 
             # create and cache excel tables.
-            create_workbook(request, trimmed, title, dates, edited_comments)
+            create_workbook(request, trimmed[0], trimmed[1], title, dates, edited_comments)
 
             unique_id = "title_for_user_" + str(request.user.id)
             cache.set(unique_id, title, 300)

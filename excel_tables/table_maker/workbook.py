@@ -33,7 +33,7 @@ from .contents import create_contents_page
 from .cover import create_cover_page
 from .helper import get_column_letter
 
-def create_workbook(request, data, title, dates, comments):
+def create_workbook(request, data, questions_list, title, dates, comments):
     """
     The function that controls the creation and formatting of
     polling tables.
@@ -56,7 +56,7 @@ def create_workbook(request, data, title, dates, comments):
     # create cover page and contents page
     # blank = {'Table of contents'}
     cover_df = create_cover_page(data, title, dates)
-    contents_df = create_contents_page(data, comments)
+    contents_df = create_contents_page(data, questions_list, comments)
 
     # define variables for caching
     cache_key = "tables_for_user_" + str(request.user.id)
@@ -95,7 +95,12 @@ def create_workbook(request, data, title, dates, comments):
         contents_sheet = writer.sheets['Contents']
         contents_sheet.hide_gridlines(2)
         contents_sheet.set_column(2, 2, 100)
-        contents_sheet.set_column(3, 3, 40)
+        centre_format = workbook.add_format({
+            'align': 'center',
+        })
+        contents_sheet.set_column("D:D", 20, centre_format)
+        # contents_sheet.set_column(3, 3, 30)
+        contents_sheet.set_column(4, 4, 40)
         right_format = workbook.add_format({
             'align': 'right',
         })
