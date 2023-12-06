@@ -30,8 +30,6 @@ def create_contents_page(data, questions_list, comments):
     for item in id_list:
         if item != 'Total' and item != 'Weighted':
             id_column.append(item)
-    print(len(contents_list))
-    print(len(questions_list))
     contents = {
         "Question": contents_list, 
         'ID': id_column,
