@@ -136,18 +136,21 @@ def create_workbook(request, data, questions_list, title, dates, comments):
             print("Value 'Full Results' not found in DataFrame.")
 
         # Create links to full results table rows in contents page
-        for question in questions_list:
+        updated_list = questions_list[1:]
+        prev_question = 0
+        for question in updated_list:
             row_index = contents_df[0].index[contents_df[0]['Row in Full Results'] == question]
             row_index.tolist()
             excel_col = 'D'
-            excel_row = row_index[0] + 3
+            excel_row = row_index[0] + 2
             cell = f"{excel_col}{excel_row}"
             print(f"This is the row that the question appears in: {question} and this is the cell where it appears in the contents page: {cell}")
             contents_sheet.write_url(
                 cell,
-                f"internal:'Full Results'!A{question}",
+                f"internal:'Full Results'!A{prev_question}",
                 string=f"row {question}"
             )
+            prev_question = question
 
         results_sheet.set_zoom(85)
         header_format = workbook.add_format({
