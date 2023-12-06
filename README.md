@@ -128,4 +128,56 @@ One example of this is writing hyperlinks to cells in xlsxwriter, then inserting
 
 ### Wireframes
 
-## Local development and Deployment
+## Local Development and Deployment
+
+### Forking Repository
+
+You can create a fork of this repository by doing the following things:
+1. On this repository's GitHub page, navigate to the top right below the navbar.
+2. Click on the fork button
+3. Fill out the following form, optionally naming your fork.
+4. Click create fork
+
+### Cloning Repository for Local Development
+
+If you then would like to work on your fork locally, follow these steps:
+1. On this repo's page, click the code button
+2. Copy the link under HTTPS tab
+3. In your own environment run the command `git clone`, pasting in the link you just copied.
+4. This should download all project files to your working directory.
+5. You can now add, commit, and push any changes to your own fork.
+6. Next, in your Python environment run the command `pip install requirements.txt` to ensure you have all the necessary dependencies installed for this project.
+
+### DEPLOYMENT PART 1: DATABASE
+If you want to get your own version of this project off the ground, you'll need to set up a postgres database instance. At the time of writing (DEC 2023), this can be done for free on a platform called [ElephantSQ](https://www.elephantsql.com/).
+
+Follow these steps to create your ElephantSQL instance and connect it to your django project.
+1. Create an account with ElephantSQL
+2. Create an instance on the Tiny Turtle plan (free tier), selecting whichever data center is closest to your users.
+3. After creating your instance, click on it's name in the list of your instances to access the details.
+4. Copy the database URL to your clipboard.
+5. Back in your IDE, make sure you have a file called env.py in your root directory. Make sure env.py is also in your .gitignore file before pushing anything to GitHub! If you forget to do this, unauthorised people might be able to access your database from your GitHub repo.
+6. Import os at the top of the file
+7. Set the database url you just copied as an environment variable. This can be done with the following line:
+```
+os.environ["DATABASE_URL"] = YOUR_DB_URL
+```
+8. Next, add an environment variable called DEV and set it to any value. I have gone for a string; 'DEV'.
+```
+os.environ["DEV"] = 'DEV'
+
+```
+9. In settings.py in the polling_analyser directory, set the DATABASES variable to the following to access your database securely in production, and just use the default SQLite db provided by django for development.
+```
+if "DEV" in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
+    }
+```
