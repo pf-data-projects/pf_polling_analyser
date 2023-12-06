@@ -74,6 +74,8 @@ def extract_data_from_question_objects(question_list):
         # and adds their data to the lists.
         if 'sub_questions' in question:
             for sub_question in question['sub_questions']:
+                if 'attention' in sub_question['title']['English']:
+                    continue
                 if sub_question['properties']['required'] is True:
                     question_rebase.append(False)
                 elif sub_question['properties']['required'] is False:
