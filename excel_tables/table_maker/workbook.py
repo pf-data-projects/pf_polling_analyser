@@ -412,6 +412,7 @@ def create_workbook(request, data, questions_list, title, dates, comments):
     contents_page = wb['Contents']
     contents_page['C3'].hyperlink = "#'Full Results'!B2"
     contents_page['C3'].value = 'Full Results Table'
+    contents_page['E3'].value = ''
 
     protected_sheets.append('Full Results')
 
