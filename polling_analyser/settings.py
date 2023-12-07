@@ -41,7 +41,7 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'pf-polling-analyser-h34v-main-irw7hkckaa-ew.a.run.app'
-    ]
+]
 
 CACHES = {
     'default': {
@@ -58,6 +58,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    
+    # cloudinary apps
+    'cloudinary',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
     # allauth apps
     'allauth',
@@ -187,8 +191,15 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_URL = '/static/'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static', 'assets'),
+    os.path.join(BASE_DIR, 'static', 'js')
+]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+MEDIA_URL = '/media/'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
