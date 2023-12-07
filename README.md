@@ -169,7 +169,7 @@ os.environ["SECRET_KEY"] = "my_super_secret_key"
 ```
 7. Set the database url you just copied as an environment variable. This can be done with the following line:
 ```
-os.environ["DATABASE_URL"] = YOUR_DB_URLc
+os.environ["DATABASE_URL"] = YOUR_DB_URL
 ```
 8. Next, add an environment variable called DEV and set it to any value. I have gone for a string; 'DEV'.
 ```
@@ -265,14 +265,24 @@ Here's how to get started with Zeet.
 6. If you have chosen google cloud as I suggested, you'll first need to set up a service account in your cloud to give Zeet permission to perform actions in your cloud space. It's a security measure to ensure unauthorised apps don't do stuff that could get you billed a lot of money. Zeet has some helpful documentation to do this. Just follow their steps and provide them with the details of the service account.
 7. Once you've done this, you'll need to go back to your google cloud account and enable billing. You'll have to enter some card details to be allowed to host anything in order to prove you're not a robot. However, you shouldn't be charged anything in your first 3 months, or until your free credits run out.
 8. Now that all this is done, it's time to deploy. In the Zeet projects tab, select 'New Project'.
-9. Select 'Google Cloud Run'
+9. Select 'Google Cloud Run' as the blueprint
 10. You'll then be prompted to connect your GitHub account. If you used GitHub SSO, you might skip this step.
 11. Select the repository you want to deploy - this should be your fork of the project.
 12. In the 'target' section, select the region you want the application to be hosted in. Select one that's closest to most of your users.
 13. Next, in the inputs section, select 'Django' as your build template, use the auto-filled python version for now, make sure the gunicorn command port bind matches the Networking 'listen on port' option (i.e. make both 8000).
-14. Directly under the Networking sub-section, copy over all the environment variables you have set in your env.py file (your env file should only be saved in your local directory, not on GitHub!!!).
-15. DO NOT copy over the 'DEV' environment variable. That is ONLY to be used in the development environment and not in production. Having DEV here in production will open up security vulnerabilities among other things.
-16. In the 'organize' tab give your project/group/subgroup a name each. Up to you what they are.
-17. When you're ready, click 'Deploy'!
+14. Make sure to specify a custom timeout in your gunicorn run command: `--timeout 3600`. If you do not do this, the app will time out while you run large calculations.
+15. Directly under the Networking sub-section, copy over all the environment variables you have set in your env.py file (your env file should only be saved in your local directory, not on GitHub!!!).
+16. DO NOT copy over the 'DEV' environment variable. That is ONLY to be used in the development environment and not in production. Having DEV here in production will open up security vulnerabilities among other things.
+17. In the 'organize' tab give your project/group/subgroup a name each. Up to you what they are.
+18. When you're ready, click 'Deploy'!
 
 ### DEPLOYMENT PART 5: GOOGLE CLOUD RUN CONFIG
+
+By now, if you've followed all the steps, you should have a fully deployed version of the application live on your chosen IaaS account. If you have used Google Cloud Run, this will be a serverless application (meaning you will only pay for what you use in terms of resources). Here are some steps to follow to make sure your instances run smoothly and without errors.
+1. 
+
+### DEPLOYMENT PART 6: OPTIMISING PERFORMANCE
+
+Here are some things you can do to ensure that the cloud-hosted version runs as efficiently as possible.
+1. Remove any print statements from the application (print statements have negligible effect locally, but on GCP they can slow things down due to the platform's own logging feature recording printed data).
+2. Remove any pandas to_csv() statements that are not essential to the logic of the application.
