@@ -1,3 +1,9 @@
+"""
+This file handles what will go into the cover page.
+This will also be appended to the start of the polling
+tables excel file as a separate sheet.
+"""
+
 import pandas as pd
 
 def create_cover_page(data, title, dates):

@@ -1,3 +1,20 @@
+"""
+This file contains one function that carries out
+a number of small processing tasks to the data before
+it is exported to excel.
+
+In future these could be split into multiple functions
+that are handled by the view. This may aid readability/maintainability
+in the longer term.
+
+1. Add edited rebase comments to the 'answers' column of the table.
+2. Add 'All respondents' as default to all other 'answers' records.
+3. trim the data according to start and end specified by user.
+4. remove unnecessary question types.
+5. deletes any html tags present in questions.
+6. add extra empty rows for excel readability.
+"""
+
 import pandas as pd
 
 def trim_table(data, start, end, comments):
@@ -95,7 +112,11 @@ def trim_table(data, start, end, comments):
 
     # Reset the index of the new DataFrame
     new_data.reset_index(drop=True, inplace=True)
+    questions = new_data['Base Type'] == 'Question'
+    question_indexes = new_data[questions].index.tolist()
+    adjusted_indexes = [index + 4 for index in question_indexes]
+    adjusted_indexes.insert(0, '')
 
-    new_data.to_csv("test_output.csv", encoding="utf-8-sig", index=False)
+    # new_data.to_csv("test_output.csv", encoding="utf-8-sig", index=False)
 
-    return new_data
+    return [new_data, adjusted_indexes]

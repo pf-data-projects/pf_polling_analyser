@@ -50,16 +50,21 @@ def run_weighting(survey_data, weight_proportions):
 
     def ipf(survey_data, weight_proportions, max_iterations=100, convergence_threshold=0.001):
         survey_data['weight'] = 1.0
+        survey_data['is_non_binary'] = survey_data['Gender'].apply(lambda x: x not in ['male', 'female'])
         for iteration in range(max_iterations):
             previous_weights = survey_data['weight'].copy()
             for _, row in weight_proportions.iterrows():
                 group, specific, target_prop = row['Group'], row['Specific'], row['Proportion']
+                if group == "Gender" and specific not in ['male', 'female']:
+                    continue
                 if group == "Overall":
                     total_weight = survey_data['weight'].sum()
                     scaling_factor = target_prop * len(survey_data) / total_weight
                     survey_data['weight'] *= scaling_factor
                 else:
                     subset = survey_data[survey_data[group] == specific]
+                    if group == "Gender":
+                        subset = subset[~subset['is_non_binary']]
                     current_prop = subset['weight'].sum() / survey_data['weight'].sum()
                     scaling_factor = target_prop / current_prop
                     survey_data.loc[survey_data[group] == specific, 'weight'] *= scaling_factor

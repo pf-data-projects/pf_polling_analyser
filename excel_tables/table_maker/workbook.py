@@ -10,6 +10,12 @@ input. The logic broadly follows these steps.
 5. Create links to each table and from each table back to contents in
 each sheet.
 6. cache the excel file for download later after the function has returned.
+
+#### AS OF 01/12/2023 ####
+7. re-opens cached file and carries out following edits using openpyxl.
+    - add pf logo to top corners of all sheets.
+    - add crossbreak headers to crossbreak groups.
+    - Add some custom styles to these new rows/cols.
 """
 
 import io
@@ -27,7 +33,7 @@ from .contents import create_contents_page
 from .cover import create_cover_page
 from .helper import get_column_letter
 
-def create_workbook(request, data, title, dates, comments):
+def create_workbook(request, data, questions_list, title, dates, comments):
     """
     The function that controls the creation and formatting of
     polling tables.
@@ -50,7 +56,7 @@ def create_workbook(request, data, title, dates, comments):
     # create cover page and contents page
     # blank = {'Table of contents'}
     cover_df = create_cover_page(data, title, dates)
-    contents_df = create_contents_page(data, comments)
+    contents_df = create_contents_page(data, questions_list, comments)
 
     # define variables for caching
     cache_key = "tables_for_user_" + str(request.user.id)
@@ -89,7 +95,12 @@ def create_workbook(request, data, title, dates, comments):
         contents_sheet = writer.sheets['Contents']
         contents_sheet.hide_gridlines(2)
         contents_sheet.set_column(2, 2, 100)
-        contents_sheet.set_column(3, 3, 40)
+        centre_format = workbook.add_format({
+            'align': 'center',
+        })
+        contents_sheet.set_column("D:D", 20, centre_format)
+        # contents_sheet.set_column(3, 3, 30)
+        contents_sheet.set_column(4, 4, 40)
         right_format = workbook.add_format({
             'align': 'right',
         })
@@ -101,28 +112,21 @@ def create_workbook(request, data, title, dates, comments):
         cover_sheet.set_column(3, 3, 60)
         cover_sheet.set_zoom(115)
 
-        # add link to the full results page in the contents page
-        position = contents_df[0].isin(['Full Results']).stack()
-        if not position.empty:
-            # Get the first match's index
-            first_match_index = position[position].index[0]
-
-            # Get row and column for the DataFrame
-            df_row = first_match_index[0]
-            df_col = first_match_index[1]
-
-            # Convert the DataFrame column label to an Excel column letter
-            excel_col = get_column_letter(
-                contents_df[0].columns.get_loc(df_col) + 1)
-            excel_row = df_row + 2  # Adding 1 because Excel starts at 1
-            excel_cell = f"{excel_col}{excel_row}"
+        # Create links to full results table rows in contents page
+        updated_list = questions_list[1:]
+        prev_question = 0
+        for question in updated_list:
+            row_index = contents_df[0].index[contents_df[0]['Row in Full Results'] == question]
+            row_index.tolist()
+            excel_col = 'D'
+            excel_row = row_index[0] + 2
+            cell = f"{excel_col}{excel_row}"
             contents_sheet.write_url(
-                excel_cell,
-                "internal:'Full Results'!A1",
-                string="Full Results Table"
+                cell,
+                f"internal:'Full Results'!A{prev_question}",
+                string=f"row {question}"
             )
-        else:
-            print("Value 'Full Results' not found in DataFrame.")
+            prev_question = question
 
         results_sheet.set_zoom(85)
         header_format = workbook.add_format({
@@ -243,23 +247,7 @@ def create_workbook(request, data, title, dates, comments):
                 # format headers
                 for col, value in enumerate(concat_sub_table.columns.values):
                     question_sheet.write(0, col, value, header_format)
-                # add hyperlink back to contents
-                position = concat_sub_table.isin(['Back to contents']).stack()
-                if not position.empty:
-                    first_match_index = position[position].index[0]
-
-                    df_row = first_match_index[0]
-                    df_col = first_match_index[1]
-
-                    excel_col = get_column_letter(
-                        concat_sub_table.columns.get_loc(df_col) + 1)
-                    excel_row = df_row + 2
-                    excel_cell = f"{excel_col}{excel_row}"
-                    question_sheet.write_url(
-                        excel_cell,
-                        "internal:'Contents'!A1",
-                        string="Back to Contents"
-                    )
+                
                 for col, number in enumerate(row_as_list, start=0):
                     if isinstance(number, str):
                         question_sheet.write(2, col, number)
@@ -275,6 +263,7 @@ def create_workbook(request, data, title, dates, comments):
         # Once tables are made, create links to each from contents page.
         question_id_list = contents_df[1]
         i = 0
+        prev_question = 0
         for question in question_id_list:
             df_row = i + 1
             df_col = 0
@@ -283,11 +272,15 @@ def create_workbook(request, data, title, dates, comments):
                 excel_col = "C"
                 excel_row = df_row + 2
                 excel_cell = f"{excel_col}{excel_row}"
-                contents_sheet.write_url(
-                    excel_cell,
-                    f"internal:'Question ID - {question}'!A1",
-                    string=f'{cell_data}'
-                )
+                if prev_question == 0:
+                    pass
+                else:
+                    contents_sheet.write_url(
+                        excel_cell,
+                        f"internal:'Question ID - {prev_question}'!A1",
+                        string=f'{cell_data}'
+                    )
+            prev_question = question
             i += 1
 
     output.seek(0)
@@ -416,6 +409,11 @@ def create_workbook(request, data, title, dates, comments):
     full_results['C1'].font = title_font
     full_results['C1'].alignment = title_align
 
+    contents_page = wb['Contents']
+    contents_page['C3'].hyperlink = "#'Full Results'!B2"
+    contents_page['C3'].value = 'Full Results Table'
+    contents_page['E3'].value = ''
+
     protected_sheets.append('Full Results')
 
     for sheet in wb.sheetnames:
@@ -424,6 +422,8 @@ def create_workbook(request, data, title, dates, comments):
             ws['B1'] = ws['A7'].value
             ws['B1'].font = title_font_smaller
             ws['B1'].alignment = title_align
+            ws['A3'].hyperlink = '#Contents!A1'
+            ws['A3'].value = 'Back to Contents'
 
     output = io.BytesIO()
     wb.save(output)

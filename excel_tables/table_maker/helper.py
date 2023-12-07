@@ -1,3 +1,8 @@
+"""
+This is a helper function that can convert
+pandas column index to excel column letters.
+"""
+
 def get_column_letter(col_idx):
     """
     Convert a zero-indexed column number to an Excel column letter.

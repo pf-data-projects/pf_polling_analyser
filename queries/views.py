@@ -1,3 +1,10 @@
+"""
+Views to handle the CRUD functionality for db queries.
+
+Also contains a view to make a query to the alchemer API
+using data specified by the user.
+"""
+
 # ~~~~~~~~  Imports ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Standard library
 from time import sleep
@@ -69,7 +76,9 @@ class QueryDetail(View):
         query = get_object_or_404(queries, pk=pk)
         return render(request, 'query_detail.html', {'query': query})
 
-# WARNING: This view needs time to execute fully.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# WARNING: THIS VIEW IS DEPRECATED UNTIL FURTHER NOTICE
 def make_request(request, pk):
     """
     A function to make a request to alchemer api.
@@ -112,3 +121,5 @@ def make_request(request, pk):
     cache.set(unique_id, csv_buffer.getvalue(), 300)
 
     return redirect(reverse('home'))
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+

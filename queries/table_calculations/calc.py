@@ -23,11 +23,12 @@ def calc(filtered_df, col_index, table, question, results, question_data):
         ]
         options = options_df['question_title'].tolist()
         for option in options:
-            checkbox_filtered_df = filtered_df[helpers.col_with_substr_a(results, option, question['qid'])]
+            checkbox_filtered_df = filtered_df[helpers.col_with_substr_a(results, option, question['qid']) + ['weighted_respondents']]
             if checkbox_filtered_df.empty:
                 continue
-            responses_df = (checkbox_filtered_df == option).sum()
-            responses = int(responses_df.iloc[0])
+            responses_df = checkbox_filtered_df[checkbox_filtered_df.iloc[:, 0] == option]
+            responses_df.loc[:, 'weighted_respondents'] = responses_df['weighted_respondents'].astype(float)
+            responses = responses_df['weighted_respondents'].sum()
             position = table[(
                 table['Answers'] == option
             ) & (
@@ -55,12 +56,14 @@ def calc(filtered_df, col_index, table, question, results, question_data):
         ]
         options_list = options_df['question_title'].tolist()
         options = list(dict.fromkeys(options_list))
+
         for sub_question in sub_questions:
-            table_filtered_df = filtered_df[helpers.col_with_substr_a(results, sub_question, question['qid'])]
+            table_filtered_df = filtered_df[helpers.col_with_substr_a(results, sub_question, question['qid']) + ['weighted_respondents']]
             i = 1
             for option in options:
-                responses_df = (table_filtered_df == option).sum()
-                responses = int(responses_df.iloc[0])
+                responses_df = table_filtered_df[table_filtered_df.iloc[:, 0] == option]
+                responses_df.loc[:, 'weighted_respondents'] = responses_df['weighted_respondents'].astype(float)
+                responses = responses_df['weighted_respondents'].sum()
                 sub_question_position = table[(
                     table['Answers'] == sub_question
                 ) & (
@@ -89,11 +92,12 @@ def calc(filtered_df, col_index, table, question, results, question_data):
         options_list = options_df['question_title'].tolist()
         options = list(dict.fromkeys(options_list))
         for sub_question in sub_questions:
-            table_filtered_df = filtered_df[helpers.col_with_substr_a(results, sub_question, question['qid'])]
+            table_filtered_df = filtered_df[helpers.col_with_substr_a(results, sub_question, question['qid']) + ['weighted_respondents']]
             i = 1
             for option in options:
-                responses_df = (table_filtered_df == option).sum()
-                responses = int(responses_df.iloc[0])
+                responses_df = table_filtered_df[table_filtered_df.iloc[:, 0] == option]
+                responses_df.loc[:, 'weighted_respondents'] = responses_df['weighted_respondents'].astype(float)
+                responses = responses_df['weighted_respondents'].sum()
                 sub_question_position = table[(
                     table['Answers'] == sub_question
                 ) & (
