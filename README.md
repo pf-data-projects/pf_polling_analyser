@@ -106,8 +106,12 @@ The following diagrams show the different processes that this project carries ou
 #### Weighting
 <img src="docs/weighting.png" alt="A diagram of the iterative proportional fitting carried out by this application" />
 
+<hr/>
+
 #### Calculating Crossbreaks
 <img src="docs/polling_crossbreaks_diagram.png" alt="A diagram of how the crossbreaks processing works." />
+
+<hr/>
 
 ### Producing Excel Files
 
@@ -152,7 +156,7 @@ If you then would like to work on your fork locally, follow these steps:
 If you want to get your own version of this project off the ground, you'll need to set up a postgres database instance. At the time of writing (DEC 2023), this can be done for free on a platform called [ElephantSQ](https://www.elephantsql.com/).
 
 Follow these steps to create your ElephantSQL instance and connect it to your django project.
-1. Create an account with ElephantSQL
+1. Create an account with ElephantSQL. I recommend using GitHub SSO for convenience.
 2. Create an instance on the Tiny Turtle plan (free tier), selecting whichever data center is closest to your users.
 3. After creating your instance, click on it's name in the list of your instances to access the details.
 4. Copy the database URL to your clipboard.
@@ -165,7 +169,7 @@ os.environ["SECRET_KEY"] = "my_super_secret_key"
 ```
 7. Set the database url you just copied as an environment variable. This can be done with the following line:
 ```
-os.environ["DATABASE_URL"] = YOUR_DB_URL
+os.environ["DATABASE_URL"] = YOUR_DB_URLc
 ```
 8. Next, add an environment variable called DEV and set it to any value. I have gone for a string; 'DEV'.
 ```
@@ -214,16 +218,61 @@ else:
 
 ### DEPLOYMENT PART 2: HOSTING STATIC FILES
 
-Django, and the cloud instance that hosts it on the web, are not very good at serving front end files like CSS, JavaScript, and media files. Therefore we need to use a service like [Cloudinary](https://cloudinary.com/) to host them for us. We can access them from django in a similar way to the way we access our database; using a url to connect to their content delivery network. This means we will need to add a new environment variable to our env.py file
+Django, and the cloud instance that hosts it on the web, are not very good at serving front end files like CSS, JavaScript, and media files. Therefore we need to use a service like [Cloudinary](https://cloudinary.com/) to host them for us. We can access them from django in a similar way to the way we access our database; using a url to connect to their content delivery network. This means we will need to add a new environment variable to our env.py file to enable access to remote storage.
+
+1. Sign up for free on [Cloudinary](https://cloudinary.com/). I recommend using GitHub SSO for convenience.
+2. Navigate to the dashboard on the programable media tab and copy the value for the API environment variable.
+3. Paste this value into an environment variable in env.py:
+```
+os.environ["CLOUDINARY_URL"] = YOUR_CLOUDINARY_URL
+```
+4. The settings.py file should be configured to use cloudinary as static file storage. Just in case, please make sure that in INSTALLED_APPS, `django.contrib.staticfiles` comes before `cloudinary_storage`.
+5. Make sure that the following are in settings.py (they should be in the file already):
+```
+STATIC_URL = '/static/'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+```
+6. To upload your static files to cloudinary, run the following command in your termial: `python manage.py collectstatic`.
+7. You will then be prompted about whether you want to overwrite the files that are already uploaded there. Type yes and hit 'enter'.
+8. Wait for the upload to complete. It might take a minute or two to do and there's no progress bar for it in the terminal, so patience is the name of the game.
+9. Once it's finished, there will be a prompt to say which files have been changed. From here, go back to your cloudinary account, select the nexus tab > media library > Assets. You should be able to see your files uploaded successfully to the platform.
+10. You may be wondering. Do I need to run collectstatic every time I change a file? Short answer is no. If your DEBUG is set to True for production, then django will serve all static files by default (cloudinary doesn't come into the picture). That means we only need to worry about collectstatic being run when we deploy, and this can be automated. Read on to see how to do that.
 
 ### DEPLOYMENT PART 3: CONNECTING TO ALCHEMER
 
 By this point, you will have set up a database and static hosting for your application. Now you'll need to make sure you have up-to-date Alchemer API credentials in your env.py file.
 
-1. If you have not been granted an API key, ask your company's alchemer admin to create one for you. Docs can be found [here](https://apihelp.alchemer.com/help)
+1. If you have not been granted an API key, ask whoever administers your Alchemer account to create one for you. Docs can be found [here](https://apihelp.alchemer.com/help)
 2. Log in to your account and navigate to your profile.
 3. Copy the credentials and paste them into environment variables in your env.py file. Please note that if you name your versions of these variables differently, it will break the portion of code that relies on it and you'll need to rename it there / anywhere you want to make a request to the Alchemer API.
 ```
 os.environ.setdefault("API_SECRET", "YOUR SECRET HERE")
 os.environ.setdefault("API_TOKEN", "YOUR TOKEN HERE")
 ```
+
+### DEPLOYMENT PART 4: AUTOMATING GOOGLE CLOUD DEPLOYMENTS WITH ZEET
+
+Django is great because there is loads of documentation and support for deploying applications to the web. You can make use of PaaS (platform as a service) providers like Heroku, Render, etc. to deploy very easily. However, for *this* application it makes more sense to leverage the resources of IaaS (infrastructure as a service) providers like AWS, Azure, GCP since it is going to need to be affordably beefed up to crunch lots of numbers.
+
+This brings it's own set of challenges, however since IaaS providers offer so many different products, services, microservices, etc. It can be difficult and time consuming to deploy to the cloud especially if you've never done it before. That's where a service like [Zeet](https://zeet.co/) comes in very handy. It makes deploying an app to the cloud as simple as a PaaS interface like Heroku or Render. What's more, the Zeet team are super friendly and happy to help with any questions you have about cloud deployment.
+
+Here's how to get started with Zeet.
+1. Strangely enough, you actually need to start off by creating an account with the cloud provider of your choice. I recommend choosing Google Cloud Platform (GCP) because the rest of the documentation will assume you're using Google Cloud Run. However, if you want you could use AWS or Azure. Zeet supports other clouds including CoreWeave, DigitalOcean, Linode, Vultr. Feel free to read around and find the best option to suit you.
+2. Go to [Google Cloud](https://cloud.google.com/gcp?utm_source=google&utm_medium=cpc&utm_campaign=emea-gb-all-en-bkws-all-all-trial-e-gcp-1011340&utm_content=text-ad-none-any-DEV_c-CRE_495030365498-ADGP_Hybrid+%7C+BKWS+-+EXA+%7C+Txt+~+GCP+~+General%23v2-KWID_43700060384861699-kwd-6458750523-userloc_1006886&utm_term=KW_google+cloud-NET_g-PLAC_&&gad_source=1&gclid=CjwKCAiA98WrBhAYEiwA2WvhOlTAj3ut20Oc_Fy7T7ti-8iOdXSGQ7Jtf46eHpFjiCzusxLK9z-kyxoCeeMQAvD_BwE&gclsrc=aw.ds&hl=en) and click on Go to console. If you have a google account already, you should be able to start your free trial straight away. Otherwise, please create a google account.
+3. Next create an account with [Zeet](https://zeet.co/). I recommend using GitHub SSO for ease of integration.
+4. Select the clouds tab and click on new cloud.
+5. Select the cloud provider you are going to use from the list.
+6. If you have chosen google cloud as I suggested, you'll first need to set up a service account in your cloud to give Zeet permission to perform actions in your cloud space. It's a security measure to ensure unauthorised apps don't do stuff that could get you billed a lot of money. Zeet has some helpful documentation to do this. Just follow their steps and provide them with the details of the service account.
+7. Once you've done this, you'll need to go back to your google cloud account and enable billing. You'll have to enter some card details to be allowed to host anything in order to prove you're not a robot. However, you shouldn't be charged anything in your first 3 months, or until your free credits run out.
+8. Now that all this is done, it's time to deploy. In the Zeet projects tab, select 'New Project'.
+9. Select 'Google Cloud Run'
+10. You'll then be prompted to connect your GitHub account. If you used GitHub SSO, you might skip this step.
+11. Select the repository you want to deploy - this should be your fork of the project.
+12. In the 'target' section, select the region you want the application to be hosted in. Select one that's closest to most of your users.
+13. Next, in the inputs section, select 'Django' as your build template, use the auto-filled python version for now, make sure the gunicorn command port bind matches the Networking 'listen on port' option (i.e. make both 8000).
+14. Directly under the Networking sub-section, copy over all the environment variables you have set in your env.py file (your env file should only be saved in your local directory, not on GitHub!!!).
+15. DO NOT copy over the 'DEV' environment variable. That is ONLY to be used in the development environment and not in production. Having DEV here in production will open up security vulnerabilities among other things.
+16. In the 'organize' tab give your project/group/subgroup a name each. Up to you what they are.
+17. When you're ready, click 'Deploy'!
+
+### DEPLOYMENT PART 5: GOOGLE CLOUD RUN CONFIG
