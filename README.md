@@ -157,7 +157,12 @@ Follow these steps to create your ElephantSQL instance and connect it to your dj
 3. After creating your instance, click on it's name in the list of your instances to access the details.
 4. Copy the database URL to your clipboard.
 5. Back in your IDE, make sure you have a file called env.py in your root directory. Make sure env.py is also in your .gitignore file before pushing anything to GitHub! If you forget to do this, unauthorised people might be able to access your database from your GitHub repo.
-6. Import os at the top of the file
+6. Import os at the top of the file, and set a secret key for django to use so that it can run securely.
+```
+import os
+
+os.environ["SECRET_KEY"] = "my_super_secret_key"
+```
 7. Set the database url you just copied as an environment variable. This can be done with the following line:
 ```
 os.environ["DATABASE_URL"] = YOUR_DB_URL
@@ -165,9 +170,8 @@ os.environ["DATABASE_URL"] = YOUR_DB_URL
 8. Next, add an environment variable called DEV and set it to any value. I have gone for a string; 'DEV'.
 ```
 os.environ["DEV"] = 'DEV'
-
 ```
-9. In settings.py in the polling_analyser directory, set the DATABASES variable to the following to access your database securely in production, and just use the default SQLite db provided by django for development.
+9. In settings.py in the polling_analyser directory, replace the DATABASES variable with the following snippet to access your database securely in production, and just use the default SQLite db provided by django for development.
 ```
 if "DEV" in os.environ:
     DATABASES = {
@@ -180,4 +184,46 @@ else:
     DATABASES = {
         'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
     }
+```
+10. I will talk more about production shortly, but for now we need to connect to our production db temporarily and create a superuser. This will allow us to be able to log in properly when we deploy our application. So, temporarily comment-out the code we just added to our settings.py file. Just below it, add the following so that django connects to your db in your local development environment.
+```
+DATABASES = {
+    'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
+}
+```
+11. Run `python manage.py migrate` to first migrate the installed apps in settings.py as well as the database models to the production database. Please do this before creating a superuser. If you don't, you risk not getting a profile auto-created for your superuser account.
+12. Run `python manage.py createsuperuser`. You will be asked to provide a username, email, password, and password confirmation. It's optional to provide an email, but it may be useful if you decide in future to set up password reset via SMTP (password reset emails).
+13. Once your superuser is created, you will need to approve your own profile to access the features of the application with this account. The simplest way to do this is in your local development environment (while you're still connected to the production database). Therefore, run this command to launch the application on localhost: `python manage.py runserver`.
+14. If the app does not launch successfully and you get a django error message, you may need to adjust your ALLOWED_HOSTS variable in settings.py. If another error is the problem, consult django docs or chatgpt.
+15. When you successfully access the site, go to the url and add /admin to the end. This will take you to a log in page where you can log in with your superuser account.
+16. Once logged in, access the 'Profiles' option in the list of options. From the list of profiles, tick the box next to your superuser and from the dropdown menu select 'approve profiles'. Hit go and you should be all set. Your production database should be set up with a superuser.
+17. You can now close the localhosted application and un-comment/reset the DATABASES variable to the following:
+```
+if "DEV" in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
+    }
+```
+
+### DEPLOYMENT PART 2: HOSTING STATIC FILES
+
+Django, and the cloud instance that hosts it on the web, are not very good at serving front end files like CSS, JavaScript, and media files. Therefore we need to use a service like [Cloudinary](https://cloudinary.com/) to host them for us. We can access them from django in a similar way to the way we access our database; using a url to connect to their content delivery network. This means we will need to add a new environment variable to our env.py file
+
+### DEPLOYMENT PART 3: CONNECTING TO ALCHEMER
+
+By this point, you will have set up a database and static hosting for your application. Now you'll need to make sure you have up-to-date Alchemer API credentials in your env.py file.
+
+1. If you have not been granted an API key, ask your company's alchemer admin to create one for you. Docs can be found [here](https://apihelp.alchemer.com/help)
+2. Log in to your account and navigate to your profile.
+3. Copy the credentials and paste them into environment variables in your env.py file. Please note that if you name your versions of these variables differently, it will break the portion of code that relies on it and you'll need to rename it there / anywhere you want to make a request to the Alchemer API.
+```
+os.environ.setdefault("API_SECRET", "YOUR SECRET HERE")
+os.environ.setdefault("API_TOKEN", "YOUR TOKEN HERE")
 ```
