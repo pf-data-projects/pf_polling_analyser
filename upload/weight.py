@@ -40,6 +40,15 @@ def run_weighting(survey_data, weight_proportions):
     seg_col_name = next(col for col in survey_data_renamed.columns if "Think about the Chief Income Earner in your household" in col)
     survey_data_renamed['seg'] = survey_data_renamed[seg_col_name].map(SEG_Lookup.set_index('Answers')['Codes'])
 
+    region_column = None
+    for col in survey_data_renamed.columns:
+        if 'In what region of the UK do you live?' in col:
+            region_column = 'region'
+            break
+    
+    if region_column is None:
+        raise KeyError('Region column not found in survey data.')
+
     # Prepare the survey data
     survey_subset = survey_data_renamed[["How old are you?", "Which of the following best describes how you think of yourself?", "In what region of the UK do you live?", "seg"]]
     survey_subset.columns = ["Age", "Gender", "region", "seg"]
@@ -49,12 +58,21 @@ def run_weighting(survey_data, weight_proportions):
     survey_subset["genderage"] = survey_subset["Gender"] + " " + survey_subset["Age Group"].astype(str)
 
     def ipf(survey_data, weight_proportions, max_iterations=100, convergence_threshold=0.001):
+        print(survey_data)
         survey_data['weight'] = 1.0
         survey_data['is_non_binary'] = survey_data['Gender'].apply(lambda x: x not in ['male', 'female'])
         for iteration in range(max_iterations):
             previous_weights = survey_data['weight'].copy()
             for _, row in weight_proportions.iterrows():
                 group, specific, target_prop = row['Group'], row['Specific'], row['Proportion']
+                # Handling region weighting
+                if group == 'region':
+                    region_column = 'region'
+                    subset = survey_data[survey_data[region_column] == specific]
+                    current_prop = subset['weight'].sum() / survey_data['weight'].sum()
+                    scaling_factor = target_prop / current_prop
+                    survey_data.loc[survey_data[region_column] == specific, 'weight'] *= scaling_factor
+
                 if group == "Gender" and specific not in ['male', 'female']:
                     continue
                 if group == "Overall":
