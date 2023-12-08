@@ -134,6 +134,7 @@ One example of this is writing hyperlinks to cells in xlsxwriter, then inserting
 
 ## Local Development and Deployment
 
+
 ### Forking Repository
 
 You can create a fork of this repository by doing the following things:
@@ -141,6 +142,7 @@ You can create a fork of this repository by doing the following things:
 2. Click on the fork button
 3. Fill out the following form, optionally naming your fork.
 4. Click create fork
+
 
 ### Cloning Repository for Local Development
 
@@ -151,6 +153,7 @@ If you then would like to work on your fork locally, follow these steps:
 4. This should download all project files to your working directory.
 5. You can now add, commit, and push any changes to your own fork.
 6. Next, in your Python environment run the command `pip install requirements.txt` to ensure you have all the necessary dependencies installed for this project.
+
 
 ### DEPLOYMENT PART 1: DATABASE
 If you want to get your own version of this project off the ground, you'll need to set up a postgres database instance. At the time of writing (DEC 2023), this can be done for free on a platform called [ElephantSQ](https://www.elephantsql.com/).
@@ -216,6 +219,7 @@ else:
     }
 ```
 
+
 ### DEPLOYMENT PART 2: HOSTING STATIC FILES
 
 Django, and the cloud instance that hosts it on the web, are not very good at serving front end files like CSS, JavaScript, and media files. Therefore we need to use a service like [Cloudinary](https://cloudinary.com/) to host them for us. We can access them from django in a similar way to the way we access our database; using a url to connect to their content delivery network. This means we will need to add a new environment variable to our env.py file to enable access to remote storage.
@@ -238,6 +242,7 @@ STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
 9. Once it's finished, there will be a prompt to say which files have been changed. From here, go back to your cloudinary account, select the nexus tab > media library > Assets. You should be able to see your files uploaded successfully to the platform.
 10. You may be wondering. Do I need to run collectstatic every time I change a file? Short answer is no. If your DEBUG is set to True for production, then django will serve all static files by default (cloudinary doesn't come into the picture). That means we only need to worry about collectstatic being run when we deploy, and this can be automated. Read on to see how to do that.
 
+
 ### DEPLOYMENT PART 3: CONNECTING TO ALCHEMER
 
 By this point, you will have set up a database and static hosting for your application. Now you'll need to make sure you have up-to-date Alchemer API credentials in your env.py file.
@@ -249,6 +254,7 @@ By this point, you will have set up a database and static hosting for your appli
 os.environ.setdefault("API_SECRET", "YOUR SECRET HERE")
 os.environ.setdefault("API_TOKEN", "YOUR TOKEN HERE")
 ```
+
 
 ### DEPLOYMENT PART 4: AUTOMATING GOOGLE CLOUD DEPLOYMENTS WITH ZEET
 
@@ -275,11 +281,19 @@ Here's how to get started with Zeet.
 16. DO NOT copy over the 'DEV' environment variable. That is ONLY to be used in the development environment and not in production. Having DEV here in production will open up security vulnerabilities among other things.
 17. In the 'organize' tab give your project/group/subgroup a name each. Up to you what they are.
 18. When you're ready, click 'Deploy'!
+19. You can also set Zeet to automatically deploy your main branch to GCP whenever you push changes to GitHub. How cool is that?!
+
 
 ### DEPLOYMENT PART 5: GOOGLE CLOUD RUN CONFIG
 
 By now, if you've followed all the steps, you should have a fully deployed version of the application live on your chosen IaaS account. If you have used Google Cloud Run, this will be a serverless application (meaning you will only pay for what you use in terms of resources). Here are some steps to follow to make sure your instances run smoothly and without errors.
-1. 
+1. In your Google Cloud Run dashboard, click the 'revisions' tab.
+2. Click on the option to 'Edit & Deploy a New Revision'
+3. Update the resource allocation to 16GiB and 4 Cores (the min cores you're allowed with 16GiB). Assigning the instance a greater amount of memory will often have greater impact on python code. By default it won't use multiple cores.
+4. Scroll down to where it says 'Request timeout'. The default will be set to 300 seconds. Set it to the max (3600 seconds). This will make sure, like we did with the gunicorn server, that the application won't be stopped halfway through crunching some numbers.
+5. You'll also need to set max instances to 12. Google doesn't like handing over that much computing power in one go...
+6. CURRENTLY, YOU'LL HAVE TO MANUALLY DO THIS EVERY TIME YOU DEPLOY. AT TIME OF WRITING ZEET DOES NOT YET HAVE A FEATURE TO AUTOMATE THIS.
+
 
 ### DEPLOYMENT PART 6: OPTIMISING PERFORMANCE
 
