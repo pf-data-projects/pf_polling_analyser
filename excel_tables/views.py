@@ -1,3 +1,24 @@
+"""
+These views handle the page logic for all pages associated
+with the excel_tables app.
+
+1. scan_table either returns empty form, or finds out how many
+forms are required for the rebase comment section of the main
+table form and saves them in session storage (in the DB I think...).
+
+2. table_maker_form returns a blank form (with appropriate number of
+rebase comment forms) when the user scans their dataset. Or, it will
+handle the logic for creating a set of polling tables.
+
+~~ Currently this is a little awkward as the user must upload 
+their data twice. Maybe we could cache it, but don't
+want to waste memory ~~
+
+3. download_tables works like other download functions. It fetches 
+and downloads tables from the cache if they exist and displays an
+error if not.
+"""
+
 from io import BytesIO
 
 import pandas as pd

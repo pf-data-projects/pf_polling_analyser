@@ -4,9 +4,10 @@ This is the alpha release of a cloud-based application to allow Public First to 
 
 ## User Manual
 
-### Logging in
-
-*Currently users cannot sign up for a new account and access to the calculation portion of this application is restricted*
+<details>
+<summary>Logging in</summary>
+*This section is still being written*
+</details>
 
 <details>
 <summary>Weighting data</summary>
