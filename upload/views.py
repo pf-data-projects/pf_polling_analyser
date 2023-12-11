@@ -1,3 +1,25 @@
+"""
+This file handles the logic for the pages associated with this
+app; the weighting and crossbreaks forms and their respective logic.
+
+1. weight_data is a function that either displays the empty form
+or submits data depending on whether the request method is
+POST or GET.
+
+2. upload_csv is a function that similarly either displays
+the empty form if the request method is GET, and handles
+calculations if the request method us POST.
+
+3. download_csv is a function that downloads the output of
+the crossbreak calculations on the user's machine if it
+exists in the cache, else display a message saying it's 
+not there
+
+4. download_weights is a function that downloads the
+weighted data if it exists, or displays a message
+if not.
+"""
+
 from io import BytesIO
 import json
 import os
@@ -21,20 +43,15 @@ from queries.api_request.get_processed_questions import (
 )
 from . import weight as wgt
 
-def read_word_file(file):
-    """ 
-    Helper function to convert word file into string.
-    """
-    doc = Document(file)
-    result = []
-    for paragraph in doc.paragraphs:
-        result.append(paragraph.text)
-    return '\n'.join(result)
-
 def weight_data(request):
     """
     A view that:
-    1. calls the run_weighting function in the weight file.
+    1. renders the weighting form.
+    2. processes the data submitted in the weight form.
+    3. calls the run_weighting function if it's valid and if the
+    user has selected to weight it.
+    4. calls the apply_no_weight function if the user
+    has not selected to weight the data.
     """
     if request.method == 'POST':
         form = WeightForm(request.POST, request.FILES)
@@ -71,8 +88,15 @@ def weight_data(request):
 def upload_csv(request):
     """
     A view that:
-    1. renders the csv upload form
-    2. reads submitted csvs as a pandas dataframe
+    1. renders the csv upload for.
+    2. restrict unauthorised users.
+    3. processes form data.
+    4. If form data is valid, it calls the API with survey ID supplied
+    by the user.
+    5. calls function to process data returned by API
+    6. runs table calculation passing in user-submitted data as well 
+    as data from API.
+    7. Return the empty form when all this is complete.
     """
     if request.method == 'POST':
         if not request.user.is_authenticated:
