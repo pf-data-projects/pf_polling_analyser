@@ -121,7 +121,7 @@ def trim_table(data, start, end, comments):
 
     # new_data.to_csv("test_output.csv", encoding="utf-8-sig", index=False)
 
-    return [new_data, adjusted_indexes]
+    return [new_data, adjusted_indexes, grid_summaries[0], grid_summaries[1]]
 
 def create_grid_summaries(data):
     """
@@ -167,8 +167,6 @@ def create_grid_summaries(data):
             if within_sub_question:
                 question.at[index, 'Identifier'] = identifier
 
-        # question.to_csv("question_csv.csv", encoding="utf-8-sig", index=None)
-
         # get the question and options
         options =  question[question['Types'] == 'TABLE']
         options_list = options['Answers'].tolist()
@@ -188,8 +186,6 @@ def create_grid_summaries(data):
             grid[sub_question.iloc[0, 3]] = sub_options[1:]
 
         grid_df = pd.DataFrame(grid)
-        # grid_df.to_csv('grid_df.csv', encoding="utf-8-sig", index=None)
         grids.append(grid_df)
 
-    print(grids)
-    return grids
+    return [grids, unique_ids]
