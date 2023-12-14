@@ -142,12 +142,16 @@ def create_grid_summaries(data):
 
     # Get a list of IDs for table questions
     table_questions = data[data['Types'] == 'TABLE']
+    # rank_questions = data[data['Types'] == 'RANK']
     table_ids = table_questions['IDs'].tolist()
-    unique_ids = list(dict.fromkeys(table_ids))
+    # rank_ids = rank_questions['IDs'].tolist()
+    all_ids = table_ids # + rank_ids
+    unique_ids = list(dict.fromkeys(all_ids))
 
     grids = []
 
     for qid in unique_ids:
+        print(qid)
         question = data[data['IDs'] == qid]
 
         identifier = 0
@@ -161,6 +165,9 @@ def create_grid_summaries(data):
             if row['Base Type'] == 'sub_Question':
                 identifier += 1
                 within_sub_question = True
+            elif row['Types'] == 'RANK' and row['Base Type'] == 'Option':
+                identifier += 1
+                within_sub_question = True
             elif row['Base Type'] != 'sub_option':
                 within_sub_question = False
             # Assign the identifier to 'sub_Question' and its 'sub_option' rows
@@ -168,8 +175,11 @@ def create_grid_summaries(data):
                 question.at[index, 'Identifier'] = identifier
 
         # get the question and options
-        options =  question[question['Types'] == 'TABLE']
-        options_list = options['Answers'].tolist()
+        table_options =  question[question['Types'] == 'TABLE']
+        # rank_options = question[question['Types'] == 'RANK']
+        table_options_list = table_options['Answers'].tolist()
+        # rank_options_list = rank_options['Answers'].tolist()
+        options_list = table_options_list # + rank_options_list
         sliced = options_list[1:]
         grid = {
             f'{options_list[0]}': sliced,
@@ -185,7 +195,9 @@ def create_grid_summaries(data):
             sub_options = sub_question['Total'].tolist()
             grid[sub_question.iloc[0, 3]] = sub_options[1:]
 
+        print(grid)
         grid_df = pd.DataFrame(grid)
         grids.append(grid_df)
 
+    print(grids)
     return [grids, unique_ids]

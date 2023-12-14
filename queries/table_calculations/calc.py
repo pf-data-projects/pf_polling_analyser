@@ -93,9 +93,15 @@ def calc(filtered_df, col_index, table, question, results, question_data):
         options = list(dict.fromkeys(options_list))
         for sub_question in sub_questions:
             table_filtered_df = filtered_df[helpers.col_with_substr_a(results, sub_question, question['qid']) + ['weighted_respondents']]
+            table_filtered_df = table_filtered_df.astype(float)
             i = 1
             for option in options:
+                print("----------------")
+                print(type(option))
+                print("Option", option)
+                print(table_filtered_df.iloc[:, 0])
                 responses_df = table_filtered_df[table_filtered_df.iloc[:, 0] == option]
+                # print(responses_df)
                 responses_df.loc[:, 'weighted_respondents'] = responses_df['weighted_respondents'].astype(float)
                 responses = responses_df['weighted_respondents'].sum()
                 sub_question_position = table[(
