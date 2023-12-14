@@ -96,12 +96,7 @@ def calc(filtered_df, col_index, table, question, results, question_data):
             table_filtered_df = table_filtered_df.astype(float)
             i = 1
             for option in options:
-                print("----------------")
-                print(type(option))
-                print("Option", option)
-                print(table_filtered_df.iloc[:, 0])
                 responses_df = table_filtered_df[table_filtered_df.iloc[:, 0] == option]
-                # print(responses_df)
                 responses_df.loc[:, 'weighted_respondents'] = responses_df['weighted_respondents'].astype(float)
                 responses = responses_df['weighted_respondents'].sum()
                 sub_question_position = table[(
@@ -142,8 +137,6 @@ def calc(filtered_df, col_index, table, question, results, question_data):
                     ) & (
                         table['IDs'] == question['qid']
                     )].index
-                    # print(options[i])
-                    # print(question['qid'])
                     # Checks that this exists in the table.
                     # I think the different indexers for
                     # different loops are not quite the same.
