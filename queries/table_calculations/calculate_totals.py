@@ -265,7 +265,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
     # Iterate through standard crossbreaks to rebase any questions that need it.
     if 'gender' in standard_cb:
         table = gender_rebase(
-            "Male", 
+            "Male",
             table.columns.get_loc('Male'),
             table,
             question_list,
@@ -273,7 +273,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
             question_data
         )
         table = gender_rebase(
-            "Female", 
+            "Female",
             table.columns.get_loc('Female'),
             table,
             question_list,

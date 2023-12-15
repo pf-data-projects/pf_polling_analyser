@@ -33,7 +33,9 @@ from .contents import create_contents_page
 from .cover import create_cover_page
 from .helper import get_column_letter
 
-def create_workbook(request, data, questions_list, title, dates, comments):
+def create_workbook(
+    request, data, questions_list, grids, unique_ids,
+    title, dates, comments, start, end):
     """
     The function that controls the creation and formatting of
     polling tables.
@@ -179,6 +181,15 @@ def create_workbook(request, data, questions_list, title, dates, comments):
         ids = non_header_data['IDs'].tolist()
         checked = []
         for qid in ids:
+            # add a grid summary to the table if it exists
+            if qid in unique_ids:
+                idx = unique_ids.index(qid)
+                grid_summary = grids[idx]
+                grid_summary.to_excel(
+                    writer,
+                    index=False,
+                    sheet_name=f'Grid Summary - {qid}'
+                )
             if qid != "" and qid not in checked:
                 # create table containing just 1 question
                 sub_table = data[(data['IDs'] == qid)]
@@ -234,6 +245,18 @@ def create_workbook(request, data, questions_list, title, dates, comments):
                 format_percentages(
                     concat_sub_table, question_sheet, percent_format
                 )
+
+                # Do the same for grid summaries
+                if qid in unique_ids:
+                    grid_sheet = writer.sheets[f'Grid Summary - {qid}']
+                    grid_sheet.set_column(1, len(grid_summary.columns) - 1, 40)
+                    grid_sheet.set_column(0, 0, 80, cell_format=questions_border)
+                    grid_sheet.hide_gridlines(2)
+                    grid_sheet.freeze_panes(2, 1)
+                    format_percentages(
+                        grid_summary, grid_sheet, percent_format
+                    )
+
                 # format questions
                 for i in range(len(sub_table)):
                     question_value = concat_sub_table.iloc[i + 2, 0]
@@ -244,10 +267,11 @@ def create_workbook(request, data, questions_list, title, dates, comments):
                             question_value,
                             question_format
                         )
+
                 # format headers
                 for col, value in enumerate(concat_sub_table.columns.values):
                     question_sheet.write(0, col, value, header_format)
-                
+
                 for col, number in enumerate(row_as_list, start=0):
                     if isinstance(number, str):
                         question_sheet.write(2, col, number)
@@ -329,6 +353,10 @@ def create_workbook(request, data, questions_list, title, dates, comments):
     ]
 
     for sheet in wb.sheetnames:
+        if 'Grid' in sheet:
+            protected_sheets.append(sheet)
+
+    for sheet in wb.sheetnames:
         if sheet not in protected_sheets:
             ws = wb[sheet]
             ws.insert_rows(2)
@@ -383,11 +411,14 @@ def create_workbook(request, data, questions_list, title, dates, comments):
                 ws[header_coords] = header
                 ws[title_coords] = col_title
 
-    # Add styles to the crossbreak heaeders.
+    # Add styles to the crossbreak headers.
+    # (and grid headers)
 
     fill = PatternFill(start_color='FFA500', end_color='FFA500', fill_type='solid')
     font = Font(bold=True, color='FFFFFF', size=14)
+    smaller_font = Font(bold=True, color='FFFFFF', size=11)
     alignment = Alignment(horizontal='center', vertical='center')
+    left_align = Alignment(horizontal='left')
 
     for sheet in wb.sheetnames:
         if sheet not in protected_sheets:
@@ -397,6 +428,30 @@ def create_workbook(request, data, questions_list, title, dates, comments):
                 cell.fill = fill
                 cell.font = font
                 cell.alignment = alignment
+        if 'Grid' in sheet:
+            ws = wb[sheet]
+            for cell in ws['2']:
+                cell.fill = fill
+                cell.font = smaller_font
+                cell.alignment = alignment
+            ws['A2'].alignment = left_align
+
+    # format grid numbers as percentages.
+    for qid in unique_ids:
+        try:
+            grid = wb[f'Grid Summary - {qid}']
+            idx = unique_ids.index(qid)
+            grid_summary = grids[idx]
+            for row in range(3, len(grid_summary) + 3):
+                for col in range(2, len(grid_summary.columns) + 2):
+                    cell = grid.cell(row=row, column=col)
+                    if cell.value is not None:
+                        cell.value = round(cell.value)
+                        cell.number_format = '0%'
+                        cell.value = cell.value / 100
+        except KeyError:
+            print("This grid does not exist")
+
 
     # Add the mini titles to the full results sheet, and then to all sheets.
 
@@ -456,6 +511,17 @@ def format_percentages(data, sheet, cell_format):
                 else:
                     # Otherwise, write the value as it is
                     sheet.write(row_num + 1, col_num, cell_value)
+
+# def format_grid_percentages(data, sheet, cell_format):
+#     """
+#     Loop through rows, starting from 2nd row,
+#     applying percent format.
+#     """
+#     for row_num in range(1, len(data)):
+#         row_data = data.iloc[row_num]
+#         for col_num in range(1, len(data.columns)):
+#             col_name = data.columns[col_num]
+#             if col_name != " ":
 
 def get_header_coords(colname, data):
     """

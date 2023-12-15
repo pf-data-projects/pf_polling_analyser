@@ -1,3 +1,17 @@
+"""
+Defines the different forms used in the excel table generator.
+
+1. TableUploadForm: contains all the fields for user uploading
+their dataset and parameters for displaying it in tables.
+
+2. RebaseForm: contains all the fields for an individual
+rebase comment. This is handled by a formset in the view.
+
+3. TableScanForm: This contains a single field for the user
+to upload their dataset so that the backend can find out
+which questions need a rebase comment form in the frontend.
+"""
+
 from django import forms
 
 

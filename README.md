@@ -4,9 +4,10 @@ This is the alpha release of a cloud-based application to allow Public First to 
 
 ## User Manual
 
-### Logging in
-
-*Currently users cannot sign up for a new account and access to the calculation portion of this application is restricted*
+<details>
+<summary>Logging in</summary>
+*This section is still being written*
+</details>
 
 <details>
 <summary>Weighting data</summary>
@@ -132,6 +133,41 @@ One example of this is writing hyperlinks to cells in xlsxwriter, then inserting
 
 ### Wireframes
 
+<details>
+    <summary>Home page</summary>
+    <img src="docs\wireframes\homepage.png" alt="a mock layout of the home page.">
+</details>
+
+<details>
+    <summary>Log in page</summary>
+    <img src="docs\wireframes\login.png" alt="a mock layout of the log in page.">
+</details>
+
+<details>
+    <summary>Instructions page</summary>
+    <img src="docs\wireframes\instructions.png" alt="a mock layout of a page of instructions on how to use the site.">
+</details>
+
+<details>
+    <summary>Report page</summary>
+    <img src="docs\wireframes\report_issue.png" alt="a mock layout of a form to report issues with the site.">
+</details>
+
+<details>
+    <summary>Weight form</summary>
+    <img src="docs\wireframes\weight_form.png" alt="a mock layout of form to upload data to be weighted">
+</details>
+
+<details>
+    <summary>Crossbreaks form</summary>
+    <img src="docs\wireframes\crossbreak_form.png" alt="a mock layout of form to upload weighted data and run calculations from them">
+</details>
+
+<details>
+    <summary>Table-maker form</summary>
+    <img src="docs\wireframes\table_form.png" alt="a mock layout of form to upload weighted data and run calculations from them">
+</details>
+
 ## Local Development and Deployment
 
 
@@ -141,7 +177,7 @@ You can create a fork of this repository by doing the following things:
 1. On this repository's GitHub page, navigate to the top right below the navbar.
 2. Click on the fork button
 3. Fill out the following form, optionally naming your fork.
-4. Click create fork
+4. Click 'create fork'
 
 
 ### Cloning Repository for Local Development

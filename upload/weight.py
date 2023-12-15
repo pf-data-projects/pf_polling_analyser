@@ -1,3 +1,31 @@
+"""
+This file handles the weighting of survey respondents via
+a method called iterative proportional fitting.
+
+The run_weighting function handles the overall logic
+as well as preparing the columns of data that will be 
+used in the weighting process
+
+There is a helper function that extracts columns with
+substrings. This makes it easier to work with pandas here.
+
+ipf is a function that handles applying each respondent a weight
+and then adjusting it gradually according to the different
+categories. The function returns the same user-submitted 
+survey results but this time with an extra column on the end
+specifying each respondent's weight.
+
+~~ Currently the questions used to define the IPF are
+hardcoded. It also won't work unless there is a specific set of
+weight proportions uploaded. In future this could be updated to
+take user inputs for which questions to use, as well as being
+able to take custom weight files as inputs. ~~
+
+The apply_no_weight function simply adds a column to the end of
+the file applying a weight of '1' to each person (i.e., no weight
+at all because everyone has the same weight).
+"""
+
 import pandas as pd
 
 def run_weighting(survey_data, weight_proportions):
@@ -58,7 +86,14 @@ def run_weighting(survey_data, weight_proportions):
     survey_subset["genderage"] = survey_subset["Gender"] + " " + survey_subset["Age Group"].astype(str)
 
     def ipf(survey_data, weight_proportions, max_iterations=100, convergence_threshold=0.001):
-        print(survey_data)
+        """
+        Iterates up to the max iterations val unless 
+        convergence threshold reached.
+
+        Within this, the code iterates through each category
+        specified in weight proportions and applies weights
+        to each relevant respondent based on the UK proportions.
+        """
         survey_data['weight'] = 1.0
         survey_data['is_non_binary'] = survey_data['Gender'].apply(lambda x: x not in ['male', 'female'])
         for iteration in range(max_iterations):

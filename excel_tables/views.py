@@ -1,3 +1,24 @@
+"""
+These views handle the page logic for all pages associated
+with the excel_tables app.
+
+1. scan_table either returns empty form, or finds out how many
+forms are required for the rebase comment section of the main
+table form and saves them in session storage (in the DB I think...).
+
+2. table_maker_form returns a blank form (with appropriate number of
+rebase comment forms) when the user scans their dataset. Or, it will
+handle the logic for creating a set of polling tables.
+
+~~ Currently this is a little awkward as the user must upload 
+their data twice. Maybe we could cache it, but don't
+want to waste memory ~~
+
+3. download_tables works like other download functions. It fetches 
+and downloads tables from the cache if they exist and displays an
+error if not.
+"""
+
 from io import BytesIO
 
 import pandas as pd
@@ -50,7 +71,18 @@ def table_maker_form(request, arg1):
             trimmed = trim_table(table_data, start, end, edited_comments)
 
             # create and cache excel tables.
-            create_workbook(request, trimmed[0], trimmed[1], title, dates, edited_comments)
+            create_workbook(
+                request,
+                trimmed[0],
+                trimmed[1],
+                trimmed[2],
+                trimmed[3],
+                title,
+                dates,
+                edited_comments,
+                start,
+                end
+            )
 
             unique_id = "title_for_user_" + str(request.user.id)
             cache.set(unique_id, title, 300)

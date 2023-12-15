@@ -1,3 +1,7 @@
+"""
+Maps the urls for the views associated with the excel_tables app.
+"""
+
 from django.urls import path
 from . import views
 

@@ -1,3 +1,9 @@
+"""
+This file defines the url paths that django will
+look for when running views from this app's views.py
+file.
+"""
+
 from django.urls import path
 from . import views
 

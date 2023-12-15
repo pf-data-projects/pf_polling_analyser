@@ -25,6 +25,8 @@ def trim_table(data, start, end, comments):
     are not needed.
     2. removes other unnecessary rows of the table.
     """
+    grid_summaries = create_grid_summaries(data)
+
     # Add the edited rebase comments to the table.
     for comment in comments:
         filtered_df = data[data['IDs'] == str(comment[0])]
@@ -119,4 +121,83 @@ def trim_table(data, start, end, comments):
 
     # new_data.to_csv("test_output.csv", encoding="utf-8-sig", index=False)
 
-    return [new_data, adjusted_indexes]
+    return [new_data, adjusted_indexes, grid_summaries[0], grid_summaries[1]]
+
+def create_grid_summaries(data):
+    """
+    This function:
+
+    1. filters the dataframe by questions that have table
+    or rank base type
+
+    2. get a unique list of ids
+
+    3. for each of these create a table by:
+    - iterating through the sub-options
+    - adding the totals data to to a new column in a new dataframe
+    
+    4. Each table saved in a list of tables that is returned by the
+    main trim function.
+    """
+
+    # Get a list of IDs for table questions
+    table_questions = data[data['Types'] == 'TABLE']
+    # rank_questions = data[data['Types'] == 'RANK']
+    table_ids = table_questions['IDs'].tolist()
+    # rank_ids = rank_questions['IDs'].tolist()
+    all_ids = table_ids # + rank_ids
+    unique_ids = list(dict.fromkeys(all_ids))
+
+    grids = []
+
+    for qid in unique_ids:
+        print(qid)
+        question = data[data['IDs'] == qid]
+
+        identifier = 0
+        within_sub_question = False
+
+        # Create a new column for the identifier
+        question['Identifier'] = None
+
+        # Logic for adding mapping
+        for index, row in question.iterrows():
+            if row['Base Type'] == 'sub_Question':
+                identifier += 1
+                within_sub_question = True
+            elif row['Types'] == 'RANK' and row['Base Type'] == 'Option':
+                identifier += 1
+                within_sub_question = True
+            elif row['Base Type'] != 'sub_option':
+                within_sub_question = False
+            # Assign the identifier to 'sub_Question' and its 'sub_option' rows
+            if within_sub_question:
+                question.at[index, 'Identifier'] = identifier
+
+        # get the question and options
+        table_options =  question[question['Types'] == 'TABLE']
+        # rank_options = question[question['Types'] == 'RANK']
+        table_options_list = table_options['Answers'].tolist()
+        # rank_options_list = rank_options['Answers'].tolist()
+        options_list = table_options_list # + rank_options_list
+        sliced = options_list[1:]
+        grid = {
+            f'{options_list[0]}': sliced,
+        }
+
+        all_identifiers = question['Identifier'].to_list()
+        identifiers = list(dict.fromkeys(all_identifiers))
+
+        for identifier in identifiers:
+            if identifier is None:
+                continue
+            sub_question = question[question['Identifier'] == identifier]
+            sub_options = sub_question['Total'].tolist()
+            grid[sub_question.iloc[0, 3]] = sub_options[1:]
+
+        print(grid)
+        grid_df = pd.DataFrame(grid)
+        grids.append(grid_df)
+
+    print(grids)
+    return [grids, unique_ids]

@@ -1,3 +1,22 @@
+"""
+This file defines the forms for the weighting section of the code
+as well as the crossbreak form calculator. The forms include:
+
+1. CSVUploadForm: the overall form for handling the upload 
+of the weighted data along with standard crossbreaks.
+
+2. CrossbreakFormSet: the formset to handle sub-forms for
+individual non-standard crossbreaks. This uses Django's built-in 
+formset_factory function.
+
+3. CrossbreakForm: the fields for the individual forms
+for the non-standard crossbreaks.
+
+4. WeightForm: the form that handles the upload of unweighted
+data, weight propotions, and whether the user would like to
+weight the data.
+"""
+
 from django import forms
 from django.forms import formset_factory
 
@@ -9,6 +28,7 @@ CB_OPTIONS = (
         ('children', 'Children'),
         ('education', 'Education'),
     )
+
 
 class CSVUploadForm(forms.Form):
     """
@@ -62,6 +82,7 @@ class CrossbreakForm(forms.Form):
     )
 
 CrossbreakFormSet = formset_factory(CrossbreakForm, extra=1)
+
 
 class WeightForm(forms.Form):
     """
