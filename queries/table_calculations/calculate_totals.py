@@ -261,6 +261,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
 
     # Get rebased values for totals column.
     table = rebase(question_data, results, question_list, table, 5)
+    # print("main rebase done")
 
     # Iterate through standard crossbreaks to rebase any questions that need it.
     if 'gender' in standard_cb:
