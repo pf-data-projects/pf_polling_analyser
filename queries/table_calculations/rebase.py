@@ -11,7 +11,6 @@ def rebase(question_data, results, question_list, table, col_index):
     weighted_totals = table.iloc[1, col_index]
     checked = []
 
-    print("hello")
     for question in question_list:
         column = results[helpers.col_with_substr(results, question['qid'])]
         contains_nan = (column == 'nan').any().any()
@@ -33,10 +32,9 @@ def rebase(question_data, results, question_list, table, col_index):
                             value = table.iloc[idx, col_index]
                             table.iloc[idx, col_index] = (value / non_nan_count) * 100
                             sum_percentages += (value / non_nan_count) * 100
-                        if question['type'] != 'RANK':
-                            for idx in matching_indices:
-                                value = table.iloc[idx, col_index]
-                                table.iloc[idx, col_index] = (value / sum_percentages) * 100
+                        # for idx in matching_indices:
+                        #     value = table.iloc[idx, col_index]
+                        #     table.iloc[idx, col_index] = (value / sum_percentages) * 100
                 checked.append(question['qid'])
             else:
                 checked.append(question['qid'])

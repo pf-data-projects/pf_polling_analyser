@@ -25,8 +25,19 @@ def trim_table(data, start, end, comments):
     are not needed.
     2. removes other unnecessary rows of the table.
     """
+
+    # remove any html tags from questions
+    data["Answers"] = data["Answers"].str.replace(
+        r'<[^>]+>',
+        '',
+        regex=True
+    )
+
     grid_summaries = create_grid_summaries(data)
     rank_summaries = create_rank_summaries(data)
+
+    summaries = grid_summaries[0] + rank_summaries[0]
+    unique_ids = grid_summaries[1] + rank_summaries[1]
 
     # Add the edited rebase comments to the table.
     for comment in comments:
@@ -91,13 +102,6 @@ def trim_table(data, start, end, comments):
     concatenated_data = pd.concat([headers, trimmed_data], ignore_index=True)
     concatenated_data.reset_index(drop=True, inplace=True)
 
-    # remove any html tags from questions
-    concatenated_data["Answers"] = concatenated_data["Answers"].str.replace(
-        r'<[^>]+>',
-        '',
-        regex=True
-    )
-
     # Create a list to store the rows
     rows_list = []
 
@@ -124,7 +128,7 @@ def trim_table(data, start, end, comments):
 
     # new_data.to_csv("test_output.csv", encoding="utf-8-sig", index=False)
 
-    return [new_data, adjusted_indexes, grid_summaries[0], grid_summaries[1]]
+    return [new_data, adjusted_indexes, summaries, unique_ids]
 
 def create_grid_summaries(data):
     """
@@ -247,10 +251,8 @@ def create_rank_summaries(data):
             sub_question = question[question['Identifier'] == identifier]
             sub_options = sub_question['Total'].tolist()
             grid[sub_question.iloc[0, 3]] = sub_options[1:]
-            print(grid)
 
         grid_df = pd.DataFrame(grid)
         grids.append(grid_df)
 
-    print(grids)
     return [grids, unique_ids]
