@@ -58,7 +58,7 @@ def create_workbook(
     # create cover page and contents page
     # blank = {'Table of contents'}
     cover_df = create_cover_page(data, title, dates)
-    contents_df = create_contents_page(data, questions_list, comments)
+    contents_df = create_contents_page(data, questions_list, comments, grids, unique_ids)
 
     # define variables for caching
     cache_key = "tables_for_user_" + str(request.user.id)
@@ -289,15 +289,21 @@ def create_workbook(
         i = 0
         prev_question = 0
         for question in question_id_list:
-            df_row = i + 1
+            df_row = i
             df_col = 0
             if i < len(contents_df[0]):
-                cell_data = contents_df[0].iat[i + 1, 2]
+                cell_data = contents_df[0].iat[i, 2]
                 excel_col = "C"
                 excel_row = df_row + 2
                 excel_cell = f"{excel_col}{excel_row}"
                 if prev_question == 0:
                     pass
+                elif 'Grid Summary' in cell_data:
+                    contents_sheet.write_url(
+                        excel_cell,
+                        f"internal:'Grid Summary - {prev_question}'!A1",
+                        string=f'{cell_data}'
+                    )
                 else:
                     contents_sheet.write_url(
                         excel_cell,
@@ -511,17 +517,6 @@ def format_percentages(data, sheet, cell_format):
                 else:
                     # Otherwise, write the value as it is
                     sheet.write(row_num + 1, col_num, cell_value)
-
-# def format_grid_percentages(data, sheet, cell_format):
-#     """
-#     Loop through rows, starting from 2nd row,
-#     applying percent format.
-#     """
-#     for row_num in range(1, len(data)):
-#         row_data = data.iloc[row_num]
-#         for col_num in range(1, len(data.columns)):
-#             col_name = data.columns[col_num]
-#             if col_name != " ":
 
 def get_header_coords(colname, data):
     """
