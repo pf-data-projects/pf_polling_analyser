@@ -5,18 +5,18 @@ html {
 }
 
 body {
-    min-height: 100vh;
     font-family: "Raleway", sans-serif;
 }
 
 main {
     margin-top: 50px;
+    min-height: 100vh;
 }
 
 /* Styles for navbar and footer */
 .header-footer-bg {
     background-color: #ECECEC;
-    padding: 20px;
+    padding: 10px;
 }
 
 #logo {
@@ -26,7 +26,8 @@ main {
 }
 
 .nav-option {
-    margin: 15px;
+    margin-right: 10px;
+    margin-left: 10px;
     font-weight: 500;
 }
 
@@ -48,6 +49,16 @@ main {
 
 #signup-prompt {
     text-align: center;
+}
+
+#signin-prompt {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.sign-in-card > form {
+    margin: auto;
+    max-width: 500px;
 }
 
 .form-container {
@@ -95,4 +106,3 @@ main {
     text-align: center;
     font-weight: 700;
 }
-
