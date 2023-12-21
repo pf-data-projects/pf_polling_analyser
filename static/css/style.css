@@ -32,6 +32,29 @@ main {
 
 /* Styles for the allauth pages */
 
+.sign-in-card {
+    background-color: #343a40;
+    color: #fff;
+    padding: 40px;
+}
+
+.sign-in-card > h1 {
+    text-align: center;
+}
+
+.sign-in-card > form {
+    margin: auto;
+}
+
+#signup-prompt {
+    text-align: center;
+}
+
+.form-container {
+    margin: auto;
+    max-width: 500px;
+}
+
 .sign-out-card {
     background-color: #343a40;
     color: #fff;
