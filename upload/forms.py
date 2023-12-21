@@ -39,12 +39,11 @@ class CSVUploadForm(forms.Form):
     """
 
     data_file = forms.FileField(
-        label='SURVEY RESPONSE DATA (same data file you would use normally)',
-        help_text='Only .xlsx files are accepted.',
+        label='Survey Response Data (data file)',
         validators=[]
     )
     survey_id = forms.IntegerField(
-        label='SURVEY ID',
+        label='Survey ID',
         help_text='This can be found on the first page of the survey legend',
         required=True
         )

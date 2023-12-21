@@ -11,6 +11,7 @@ body {
 
 main {
     margin-top: 50px;
+    margin-bottom: 120px;
     min-height: 100vh;
 }
 
@@ -134,4 +135,28 @@ main {
 .btn-spacing {
     margin-top: 20px;
     margin-bottom: 20px;
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* Crossbreaks form styles */
+
+.crossbreak-form-card {
+    background-color: #FFA500;
+    padding: 40px;
+}
+
+.crossbreak-form-card > h1, h3 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-row {
+    border: solid 1px #343a40;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.btn-less-spacing {
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
