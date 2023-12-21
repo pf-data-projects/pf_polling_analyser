@@ -4,5 +4,20 @@ html {
 
 body {
     min-height: 100vh;
-    /* background-color: red; */
+}
+
+/* Styles for navbar and footer */
+.header-footer-bg {
+    background-color: #ECECEC;
+    padding: 20px;
+}
+
+#logo {
+    font-size: 200%;
+    font-weight: 700;
+    margin-right: 50px;
+}
+
+.nav-option {
+    margin: 5px;
 }
