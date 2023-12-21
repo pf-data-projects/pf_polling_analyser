@@ -7,6 +7,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description" content="a web app to analyse polling data" />
         <meta name="author" content="Public First" />
+        <!--Google Fonts CDN-->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link 
+          href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;700;800&display=swap" 
+          rel="stylesheet"
+        >
         <!--Bootstrap CSS CDN-->
         <link 
           rel="stylesheet" 
@@ -22,7 +29,15 @@
         <header class="sticky-top">
             <nav class="navbar navbar-expand-lg navbar-light header-footer-bg">
               <a id="logo" class="navbar-brand" href="{% url 'home' %}">Polling Analyser</a>
-              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <button
+                class="navbar-toggler" 
+                type="button" 
+                data-toggle="collapse" 
+                data-target="#navbarSupportedContent" 
+                aria-controls="navbarSupportedContent" 
+                aria-expanded="false" 
+                aria-label="Toggle navigation"
+              >
                 <span class="navbar-toggler-icon"></span>
               </button>
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -31,6 +46,9 @@
                     <a class="nav-link" href="{% url 'home' %}">Home</a>
                   </li>
                   {% if user.is_authenticated %}
+                  <li class="nav-item nav-option">
+                    <a class="nav-link" href="#">Guide</a>
+                  </li>
                   <li class="nav-item nav-option">
                     <a class="nav-link" href="{% url 'account_logout' %}">Log Out</a>
                   </li>

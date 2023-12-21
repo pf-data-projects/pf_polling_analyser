@@ -6,6 +6,7 @@ html {
 
 body {
     min-height: 100vh;
+    font-family: "Raleway", sans-serif;
 }
 
 main {
@@ -25,8 +26,28 @@ main {
 }
 
 .nav-option {
-    margin: 5px;
+    margin: 15px;
     font-weight: 500;
+}
+
+/* Styles for the allauth pages */
+
+.sign-out-card {
+    background-color: #343a40;
+    color: #fff;
+    padding: 40px;
+    text-align: center;
+}
+
+.auth-btn {
+    background-color: #FFA500;
+    color: #343a40;
+    font-weight: 500;
+    border: transparent 1px solid;
+}
+
+.auth-btn:hover {
+    border: #ECECEC 1px solid;
 }
 
 /* Styles for home page */
