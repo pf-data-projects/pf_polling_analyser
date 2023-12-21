@@ -19,7 +19,7 @@ main {
 }
 
 #logo {
-    font-size: 200%;
+    font-size: 250%;
     font-weight: 700;
     margin-right: 50px;
 }
@@ -30,3 +30,25 @@ main {
 }
 
 /* Styles for home page */
+
+.feature-card {
+    background-color: #FFA500;
+    padding: 20px;
+    margin: auto;
+    text-align: center;
+}
+
+.feature-card-text {
+    color: #343a40;
+}
+
+.feature-card-text:hover {
+    color: black;
+    text-decoration: none;
+}
+
+.steps {
+    text-align: center;
+    font-weight: 700;
+}
+
