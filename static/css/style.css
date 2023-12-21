@@ -1,9 +1,15 @@
+/* general style rules for page */
+
 html {
     scroll-behavior: smooth;
 }
 
 body {
     min-height: 100vh;
+}
+
+main {
+    margin-top: 50px;
 }
 
 /* Styles for navbar and footer */
@@ -20,4 +26,7 @@ body {
 
 .nav-option {
     margin: 5px;
+    font-weight: 500;
 }
+
+/* Styles for home page */
