@@ -43,6 +43,8 @@ from queries.api_request.get_processed_questions import (
 )
 from . import weight as wgt
 
+from . import validation as vld
+
 def weight_data(request):
     """
     A view that:
@@ -126,10 +128,20 @@ def upload_csv(request):
 
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Sheet1")
+            # print(data.head(10))
+            is_valid = vld.validate_cb_inputs(data, standard_cb)
+            if not is_valid[0]:
+                return HttpResponse(f"An error occured: {is_valid[1]}")
 
             # get question data from API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             # JSON AND CSV OUTPUT CURRENTLY COMMENTED OUT FOR PERFORMANCE
             survey_questions = get_questions_json(survey_id)
+            if survey_questions is None:
+                message = """
+                    No data returned from Alchemer.
+                    Did you enter a valid surveyID?
+                    """
+                return HttpResponse(message)
             questions = extract_questions_from_pages(survey_questions)
             # with open("questions_list.json", "w") as outfile:
             #     json.dump(survey_questions, outfile, indent=2)

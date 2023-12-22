@@ -7,24 +7,109 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description" content="a web app to analyse polling data" />
         <meta name="author" content="Public First" />
+        <!--Google Fonts CDN-->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link 
+          href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;700;800&display=swap" 
+          rel="stylesheet"
+        >
+        <!--Bootstrap CSS CDN-->
+        <link 
+          rel="stylesheet" 
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" 
+          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" 
+          crossorigin="anonymous"
+        >
+        <!--Custom CSS-->
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
         <title>Polling Analyser</title>
     </head>
     <body>
-        <header>
-            <h1 style="margin: auto">Polling Analyser</h1>
-            {% if user.is_authenticated %}
-                <p><span><a href="{% url 'account_logout' %}">log out</a></span></p>
-            {% else %}
-                <p><span><a href="{% url 'account_login' %}">log in</a></span> | <span><a href="{% url 'account_signup' %}">sign up</a></span></p>
-            {% endif %}
+        <header class="sticky-top">
+            <nav class="navbar navbar-expand-lg navbar-light header-footer-bg">
+              <a id="logo" class="navbar-brand" href="{% url 'home' %}">Polling Analyser</a>
+              <button
+                class="navbar-toggler" 
+                type="button" 
+                data-toggle="collapse" 
+                data-target="#navbarSupportedContent" 
+                aria-controls="navbarSupportedContent" 
+                aria-expanded="false" 
+                aria-label="Toggle navigation"
+              >
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                  <li class="nav-item nav-option">
+                    <a class="nav-link" href="{% url 'home' %}">Home</a>
+                  </li>
+                  {% if user.is_authenticated %}
+                  <li class="nav-item nav-option">
+                    <a class="nav-link" href="#">Guide</a>
+                  </li>
+                  <li class="nav-item nav-option">
+                    <a class="nav-link" href="{% url 'account_logout' %}">Log Out</a>
+                  </li>
+                  {% else %}
+                  <li class="nav-item nav-option">
+                    <a class="nav-link" href="{% url 'account_login' %}">Log In</a>
+                  </li>
+                  <li class="nav-item nav-option">
+                    <a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a>
+                  </li>
+                  {% endif %}
+                </ul>
+              </div>
+            </nav>
+
+            <!--~~~~~~~~~~~~~~~~~~~~~~ PLACEHOLDER NAVBAR ~~~~~~~~~~~~~~~~~~~~~~~-->
+            <!-- <div class="container">
+                <div class="row">
+                    <div class="col-sm">
+                        <h1 style="margin: auto">Polling Analyser</h1>
+                    </div>
+                    <div class="col-sm">
+                        {% if user.is_authenticated %}
+                        <p><span><a href="{% url 'account_logout' %}">log out</a></span></p>
+                        {% else %}
+                        <p><span><a href="{% url 'account_login' %}">log in</a></span> | <span><a href="{% url 'account_signup' %}">sign up</a></span></p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div> -->
         </header>
         <main>
-
             {% block content %}
             {% endblock %}
-
         </main>
-        <footer>
+        <footer class="header-footer-bg">
+            <div class="container">
+                <nav class="navbar navbar-light">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item nav-option">
+                            <a class="nav-link" href="#">Admin</a>
+                        </li>
+                        <li class="nav-item nav-option">
+                            <a class="nav-link" href="#">Report Issue</a>
+                        </li>
+                    </ul>
+                </nav>
+                
+            </div>
         </footer>
+        
+        <!--Bootstrap / JQuery scripts-->
+        <script 
+            src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" 
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" 
+            crossorigin="anonymous">
+        </script>
+        <script 
+            src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" 
+            crossorigin="anonymous">
+        </script>
     </body>
 </html>

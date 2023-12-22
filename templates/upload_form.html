@@ -1,32 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class=" container crossbreak-form-card rounded">
     <h1>Upload Results</h1>
-    <h2>
+    <h3>
         Please make sure you have run the results through the weighting process first.
         You can do this <a href="{% url 'weight_data' %}">here</a>
-    </h2>
+    </h3>
 
     <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-
-        <div id="formset-wrapper">
-            {{ formset.management_form }}
-            {% for sub_form in formset %}
-                <div class="formset-form">
-                    <hr/>
-                    <h4>Non-standard crossbreak</h4>
-                    {{ sub_form.as_p }}
-                    <button type="button" class="remove-form">Remove crossbreak</button>
+        <div class="row form-row">
+            <div class="col-md">
+                <h4>Data & Standard Crossbreaks</h4>
+                {% csrf_token %}
+                {{ form.as_p }}
+            </div>
+            <div class="col-md">
+                <div id="formset-wrapper">
+                    {{ formset.management_form }}
+                    {% for sub_form in formset %}
+                        <div class="formset-form">
+                            <h4>Non-standard crossbreak</h4>
+                            {{ sub_form.as_p }}
+                            <button type="button" class="remove-form btn btn-dark btn-less-spacing">Remove crossbreak</button>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
+                <button class="btn btn-dark btn-less-spacing" id="add_more">Add another crossbreak</button><br/>
+                <button class="btn btn-dark btn-less-spacing" type="submit">Upload</button>
+            </div>
         </div>
-        <button id="add_more">Add another crossbreak</button><br/>
-        <button type="submit">Upload</button>
     </form>
 
-    <p><a href="{% url 'home' %}">Back</a></p>
+    <p><a class="btn btn-dark btn-spacing" href="{% url 'home' %}">Back</a></p>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -60,6 +66,7 @@
 
                 // Add a listener for the remove button of the newly added form
                 newForm.querySelector('.remove-form').addEventListener('click', removeForm);
+                updateRemoveButtons()
             });
 
             function removeForm(event) {
@@ -84,13 +91,25 @@
                         input.id = input.id.replace(/_\d+_/, '_' + index + '_');
                     });
                 });
+                updateRemoveButtons()
             }
 
             // Attach remove event to all existing remove buttons
             document.querySelectorAll('.remove-form').forEach(btn => {
                 btn.addEventListener('click', removeForm);
             });
+
+            function updateRemoveButtons() {
+                const forms = document.querySelectorAll('#formset-wrapper .formset-form');
+                forms.forEach((form, index) => {
+                    const removeButton = form.querySelector('.remove-form');
+                    if (removeButton) {
+                        removeButton.style.display = (forms.length === 1) ? 'none' : 'inline-block';
+                    }
+                });
+            }
+            updateRemoveButtons()
         });
     </script>
-
+</div>
 {% endblock %}

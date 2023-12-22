@@ -69,6 +69,10 @@ def table_maker_form(request, arg1):
 
             # Run table maker modules
             trimmed = trim_table(table_data, start, end, edited_comments)
+            if trimmed is False:
+                return HttpResponse(
+                    "Invalid start or end ID."
+                )
 
             # create and cache excel tables.
             create_workbook(

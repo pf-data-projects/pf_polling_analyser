@@ -1,0 +1,179 @@
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* general style rules for page */
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: "Raleway", sans-serif;
+}
+
+main {
+    margin-top: 50px;
+    /* margin-bottom: 120px; */
+    min-height: 100vh;
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* Styles for navbar and footer */
+
+.header-footer-bg {
+    background-color: #ECECEC;
+    padding: 10px;
+}
+
+#logo {
+    font-size: 250%;
+    font-weight: 700;
+    margin-right: 50px;
+}
+
+.nav-option {
+    margin-right: 10px;
+    margin-left: 10px;
+    font-weight: 500;
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* Styles for the allauth pages */
+
+.sign-in-card {
+    background-color: #343a40;
+    color: #fff;
+    padding: 40px;
+}
+
+.sign-in-card > h1 {
+    text-align: center;
+}
+
+.sign-in-card > form {
+    margin: auto;
+}
+
+#signup-prompt {
+    text-align: center;
+}
+
+#signin-prompt {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.sign-in-card > form {
+    margin: auto;
+    max-width: 500px;
+}
+
+.form-container {
+    margin: auto;
+    max-width: 500px;
+}
+
+.sign-out-card {
+    background-color: #343a40;
+    color: #fff;
+    padding: 40px;
+    text-align: center;
+}
+
+.auth-btn {
+    background-color: #FFA500;
+    color: #343a40;
+    font-weight: 500;
+    border: transparent 1px solid;
+}
+
+.auth-btn:hover {
+    border: #ECECEC 1px solid;
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* Styles for home page */
+
+.feature-card {
+    background-color: #FFA500;
+    padding: 20px;
+    margin: auto;
+    text-align: center;
+}
+
+.feature-card-text {
+    color: #343a40;
+}
+
+.feature-card-text:hover {
+    color: black;
+    text-decoration: none;
+}
+
+.steps {
+    text-align: center;
+    font-weight: 700;
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* Weighting form styles*/
+
+.weight-form-card {
+    background-color: #FFA500;
+    padding: 40px;
+}
+
+.weight-form-card > h1 {
+    margin-bottom: 40px;
+}
+
+.weight-form {
+    border: solid 1px #343a40;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.btn-spacing {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* Crossbreaks form styles */
+
+.crossbreak-form-card {
+    background-color: #FFA500;
+    padding: 40px;
+    margin-bottom: 40px;
+}
+
+.crossbreak-form-card > h1, h3 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.remove-button {
+    display: none;
+}
+
+.form-row {
+    border: solid 1px #343a40;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.btn-less-spacing {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* Table forms styles */
+
+.table-scan-card {
+    background-color: #FFA500;
+    padding: 40px;
+}
+
+.table-scan-card > h1, h4 {
+    margin-bottom: 40px;
+}

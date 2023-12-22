@@ -71,7 +71,8 @@ def trim_table(data, start, end, comments):
 
     # Check if both indices are found
     if pd.isna(start_index) or pd.isna(end_index):
-        raise ValueError("The specified IDs were not found in the CSV file.")
+        return False
+        # raise ValueError("The specified IDs were not found in the CSV file.")
 
     # Save the totals/weighted totals
     headers = data.loc[0:1]

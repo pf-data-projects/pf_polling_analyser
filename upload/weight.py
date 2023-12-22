@@ -65,6 +65,7 @@ def run_weighting(survey_data, weight_proportions):
         ],
         "Codes": ["E", "E", "A", "E", "B", "0", "E", "D", "C2", "C1", "C1", "E"]
     })
+    
     seg_col_name = next(col for col in survey_data_renamed.columns if "Think about the Chief Income Earner in your household" in col)
     survey_data_renamed['seg'] = survey_data_renamed[seg_col_name].map(SEG_Lookup.set_index('Answers')['Codes'])
 
