@@ -25,21 +25,33 @@
         <div class="col">
             <h2 class="steps">Step 1:</h2>
             <div class="container feature-card rounded">
-                <p><a class="feature-card-text" href="{% url 'weight_data' %}">Click here to weight survey responses</a></p>
+                <p>You first need to weight your survey data. 
+                    If you are creating tables for a smaller sample and don't need to make tables, 
+                    you still need to process your data to add the necessary markers for subsequent processes.</p>
+                <p><a class="btn btn-warning" href="{% url 'weight_data' %}">Click here to weight survey responses</a></p>
+                <p>Don't forget to download your weighted data once it's done!</p>
                 <p><a class="btn btn-dark" href="{% url 'download_weights' %}">DOWNLOAD WEIGHTED DATA</a></p>
             </div>
         </div>
         <div class="col">
             <h2 class="steps">Step 2:</h2>
             <div class="container feature-card rounded">
-                <p><a class="feature-card-text" href="{% url 'upload_data' %}">Click here to run calculations for crossbreaks</a></p>
+                <p>Once your data has the markers generated from the weighting process, 
+                    You need to reupload your weighted data here and specify 
+                    the crossbreaks for which you'd like to see data.</p>
+                <p><a class="btn btn-warning" href="{% url 'upload_data' %}">Click here to run calculations for crossbreaks</a></p>
+                <p>Don't forget to download your crossbreaks output once it's done!</p>
                 <p><a class="btn btn-dark" href="{% url 'download_csv' %}">DOWNLOAD CROSSBREAKS DATA</a></p>
             </div>
         </div>
         <div class="col">
             <h2 class="steps">Step 3:</h2>
             <div class="container feature-card rounded">
-                <p><a class="feature-card-text" href="{% url 'scan_table' %}">Click here to scan the table for rebase comments</a></p>
+                <p>Once you've downloaded the output data for the crossbreaks,
+                    You need to reupload your data here to scan for rebase comments
+                    and add other information for your polling tables.</p>
+                <p><a class="btn btn-warning" href="{% url 'scan_table' %}">Click here to scan the table for rebase comments</a></p>
+                <p>Don't forget to download your polling tables once they're done!</p>
                 <p><a class="btn btn-dark" href="{% url 'table_download' %}">DOWNLOAD POLLING TABLES</a></p>
             </div>
         </div>

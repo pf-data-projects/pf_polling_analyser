@@ -22,7 +22,7 @@ class TableUploadForm(forms.Form):
     """
 
     data_file = forms.FileField(
-        label='UPLOAD THE TABLE HERE',
+        label='Upload The Table',
         validators=[]
     )
     title = forms.CharField(
@@ -48,7 +48,7 @@ class RebaseForm(forms.Form):
     A component for a single rebase comment in the form.
     """
     question_id = forms.IntegerField(
-        label="Type the question ID here.",
+        label="Type the question ID here:",
         required=False
     )
     rebase = forms.CharField(
