@@ -11,7 +11,7 @@ body {
 
 main {
     margin-top: 50px;
-    margin-bottom: 120px;
+    /* margin-bottom: 120px; */
     min-height: 100vh;
 }
 
@@ -159,4 +159,16 @@ main {
 .btn-less-spacing {
     margin-top: 5px;
     margin-bottom: 5px;
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* Table forms styles */
+
+.table-scan-card {
+    background-color: #FFA500;
+    padding: 40px;
+}
+
+.table-scan-card > h1, h4 {
+    margin-bottom: 20px;
 }
