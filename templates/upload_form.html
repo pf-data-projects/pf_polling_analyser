@@ -66,6 +66,7 @@
 
                 // Add a listener for the remove button of the newly added form
                 newForm.querySelector('.remove-form').addEventListener('click', removeForm);
+                updateRemoveButtons()
             });
 
             function removeForm(event) {
@@ -90,12 +91,24 @@
                         input.id = input.id.replace(/_\d+_/, '_' + index + '_');
                     });
                 });
+                updateRemoveButtons()
             }
 
             // Attach remove event to all existing remove buttons
             document.querySelectorAll('.remove-form').forEach(btn => {
                 btn.addEventListener('click', removeForm);
             });
+
+            function updateRemoveButtons() {
+                const forms = document.querySelectorAll('#formset-wrapper .formset-form');
+                forms.forEach((form, index) => {
+                    const removeButton = form.querySelector('.remove-form');
+                    if (removeButton) {
+                        removeButton.style.display = (forms.length === 1) ? 'none' : 'inline-block';
+                    }
+                });
+            }
+            updateRemoveButtons()
         });
     </script>
 </div>
