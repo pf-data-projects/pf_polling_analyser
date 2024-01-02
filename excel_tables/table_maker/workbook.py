@@ -284,35 +284,6 @@ def create_workbook(
                         question_sheet.write_number(1, col, number, totals_format)
                 checked.append(qid)
 
-        # Once tables are made, create links to each from contents page.
-        question_id_list = contents_df[1]
-        i = 0
-        prev_question = 0
-        for question in question_id_list:
-            df_row = i
-            df_col = 0
-            if i < len(contents_df[0]):
-                cell_data = contents_df[0].iat[i, 2]
-                excel_col = "C"
-                excel_row = df_row + 2
-                excel_cell = f"{excel_col}{excel_row}"
-                if prev_question == 0:
-                    pass
-                elif 'Grid Summary' in cell_data:
-                    contents_sheet.write_url(
-                        excel_cell,
-                        f"internal:'Grid Summary - {prev_question}'!A1",
-                        string=f'{cell_data}'
-                    )
-                else:
-                    contents_sheet.write_url(
-                        excel_cell,
-                        f"internal:'Question ID - {prev_question}'!A1",
-                        string=f'{cell_data}'
-                    )
-            prev_question = question
-            i += 1
-
     output.seek(0)
     cache.set(cache_key, output.getvalue(), timeout=300)
 
@@ -357,6 +328,18 @@ def create_workbook(
         'Cover Page',
         'Contents',
     ]
+
+    # create links to all the tables in the contents page.
+    contents_sheet = wb['Contents']
+    for cell in contents_sheet['C']:
+        qid = contents_sheet[f'B{cell.row}']
+        if cell.value is None:
+            continue
+        if 'Grid' and 'Question' not in cell.value:
+            print(f"#'Question ID - {qid.value}'!A1")
+            cell.hyperlink = f"#'Question ID - {qid.value}'!A1"
+        if 'Grid' in cell.value:
+            cell.hyperlink = f"#'{cell.value}'!A1"
 
     for sheet in wb.sheetnames:
         if 'Grid' in sheet:
@@ -470,10 +453,10 @@ def create_workbook(
     full_results['C1'].font = title_font
     full_results['C1'].alignment = title_align
 
-    contents_page = wb['Contents']
-    contents_page['C3'].hyperlink = "#'Full Results'!B2"
-    contents_page['C3'].value = 'Full Results Table'
-    contents_page['E3'].value = ''
+    # contents_page = wb['Contents']
+    # contents_page['C3'].hyperlink = "#'Full Results'!B2"
+    # contents_page['C3'].value = 'Full Results Table'
+    # contents_page['E3'].value = ''
 
     protected_sheets.append('Full Results')
 
