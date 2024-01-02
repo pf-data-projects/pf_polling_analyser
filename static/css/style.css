@@ -178,3 +178,21 @@ main {
 .table-scan-card > h1, h4 {
     margin-bottom: 40px;
 }
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* Guide page styles */
+
+.instructions {
+    background-color: #FFA500;
+    padding: 40px;
+    margin-bottom: 50px;
+}
+
+.instructions > h1 {
+    margin-bottom: 50px;
+}
+
+.instructions > div > h3 {
+    text-align: left;
+    margin-top: 50px;
+}
