@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'queries',
     'upload',
     'excel_tables',
+    'report',
 ]
 
 SITE_ID = 1
