@@ -18,6 +18,8 @@ not there
 4. download_weights is a function that downloads the
 weighted data if it exists, or displays a message
 if not.
+
+5. GuideView handles logic to get the instructions page.
 """
 
 from io import BytesIO
@@ -28,6 +30,7 @@ import pandas as pd
 from docx import Document
 
 from django.shortcuts import render, redirect, reverse
+from django.views import View
 from .forms import CSVUploadForm, WeightForm, CrossbreakFormSet
 from django.core.cache import cache
 from django.http import HttpResponse
@@ -44,6 +47,16 @@ from queries.api_request.get_processed_questions import (
 from . import weight as wgt
 
 from . import validation as vld
+
+class GuideView(View):
+    """
+    A view to handle the guide/instructions page.
+    """
+    def get(self, request):
+        """
+        Gets the guide page.
+        """
+        return render(request, "guide.html")
 
 def weight_data(request):
     """
