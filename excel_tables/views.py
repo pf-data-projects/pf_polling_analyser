@@ -27,6 +27,7 @@ from django.shortcuts import render, reverse, redirect
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.forms import formset_factory
+from django.contrib import messages
 
 from .forms import TableUploadForm, RebaseForm, TableScanForm
 from .table_maker.trim import trim_table
@@ -140,7 +141,17 @@ def scan_table(request):
 
             request.session['rebase_questions'] = rebase_questions
 
+            messages.success(
+                request,
+                "Crossbreaks successfully scanned."
+            )
             return redirect('table_maker', arg1=forms_needed)
+        else:
+            messages.error(
+                request,
+                "There was a problem processing this form. Please try again"
+            )
+            return redirect('scan_table')
     else:
         form = TableScanForm()
 
@@ -162,6 +173,11 @@ def download_tables(request):
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
         response['Content-Disposition'] = f'attachment; filename="Public First Poll For {title}.xlsx"'
+        messages.success(request, "Downloading tables...")
         return response
     else:
-        return HttpResponse("TABLES NOT FOUND")
+        messages.error(
+            request,
+            "No polling tables found. Please create them first."
+        )
+        return redirect('home')
