@@ -3,15 +3,17 @@ A module to handle
 """
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Django
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.views import generic
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal
 from .models import ReportMessage
 from .forms import ReportForm
 
 
-class CreateReportMessage(generic.CreateView):
+class CreateReportMessage(generic.CreateView, SuccessMessageMixin):
     """
     A class for handling submitting bug reports.
     """
@@ -28,8 +30,13 @@ class CreateReportMessage(generic.CreateView):
             form.instance.user = request.user
             form.save()
             print("Issue report successfully submitted")
+            messages.success(request, 'Issue report successfully submitted')
             return redirect('home')
         else:
             form = ReportMessage()
-            print("Issue report submission not valid")
+            print("Issue report submission not valid. Please try again.")
+            messages.error(
+                request,
+                "Issue report submission not valid. Please try again."
+            )
             return redirect('report')

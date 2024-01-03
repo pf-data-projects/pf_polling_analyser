@@ -3,9 +3,12 @@
 
 {% if user.is_authenticated %}
 <div class="container report-card rounded">
-    <h1>Report an issue</h1>
-    {{ form.as_p }}
-    <button class="btn btn-primary" type="submit">Submit</button>
+    <form method="POST">
+        <h1>Report an issue</h1>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
 </div>
 {% else %}
 <hr>
