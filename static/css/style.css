@@ -210,7 +210,7 @@ main {
     padding: 40px;
     color: #ECECEC;
     text-align: center;
-    max-width: 50%;
+    max-width: 80%;
 }
 
 .report-card > h1 {
@@ -221,6 +221,12 @@ main {
     text-align: center;
 }
 
-.report-card > p > label {
+.report-card > form > p > label {
     display: block;
+}
+
+@media only screen and (min-width: 900px) {
+    .report-card {
+      max-width: 50%;
+    }
 }

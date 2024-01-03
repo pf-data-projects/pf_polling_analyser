@@ -7,7 +7,7 @@
         <h1>Report an issue</h1>
         {% csrf_token %}
         {{ form.as_p }}
-        <button class="btn btn-primary" type="submit">Submit</button>
+        <button class="btn auth-btn" type="submit">Submit</button>
     </form>
 </div>
 {% else %}
