@@ -26,6 +26,7 @@
         <title>Polling Analyser</title>
     </head>
     <body>
+        <!--~~~~~~~~~~~~~~~~~~~Navigation~~~~~~~~~~~~~~~~~~~-->
         <header class="sticky-top">
             <nav class="navbar navbar-expand-lg navbar-light header-footer-bg">
               <a id="logo" class="navbar-brand" href="{% url 'home' %}">Polling Analyser</a>
@@ -63,33 +64,19 @@
                 </ul>
               </div>
             </nav>
-
-            <!--~~~~~~~~~~~~~~~~~~~~~~ PLACEHOLDER NAVBAR ~~~~~~~~~~~~~~~~~~~~~~~-->
-            <!-- <div class="container">
-                <div class="row">
-                    <div class="col-sm">
-                        <h1 style="margin: auto">Polling Analyser</h1>
-                    </div>
-                    <div class="col-sm">
-                        {% if user.is_authenticated %}
-                        <p><span><a href="{% url 'account_logout' %}">log out</a></span></p>
-                        {% else %}
-                        <p><span><a href="{% url 'account_login' %}">log in</a></span> | <span><a href="{% url 'account_signup' %}">sign up</a></span></p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div> -->
         </header>
+        <!--~~~~~~~~~~~~~~~~~~~Page Content~~~~~~~~~~~~~~~~~~~-->
         <main>
             {% block content %}
             {% endblock %}
         </main>
+        <!--~~~~~~~~~~~~~~~~~~~Footer~~~~~~~~~~~~~~~~~~~-->
         <footer class="header-footer-bg">
             <div class="container">
                 <nav class="navbar navbar-light">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item nav-option">
-                            <a class="nav-link" href="#">Admin</a>
+                            <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
                         </li>
                         <li class="nav-item nav-option">
                             <a class="nav-link" href="{% url 'report' %}">Report Issue</a>
