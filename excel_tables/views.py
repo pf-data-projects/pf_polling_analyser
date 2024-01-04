@@ -38,7 +38,9 @@ def table_maker_form(request, arg1):
     A view that:
     1. calls the run_weighting function in the weight file.
     """
-    rebase_questions = request.session.get('rebase_questions')
+    unique_id = "rebase_questions_for_user_" + str(request.user.id)
+    rebase_questions = cache.get(unique_id)
+    # rebase_questions = request.session.get('rebase_questions')
     if request.method == 'POST':
         form = TableUploadForm(request.POST, request.FILES)
         RebaseFormSet = formset_factory(RebaseForm)
@@ -139,7 +141,10 @@ def scan_table(request):
                 pair = f"{key}: {value}"
                 rebase_questions.append(pair)
 
-            request.session['rebase_questions'] = rebase_questions
+            unique_id = "rebase_questions_for_user_" + str(request.user.id)
+            cache.set(unique_id, rebase_questions, 300)
+
+            # request.session['rebase_questions'] = rebase_questions
 
             messages.success(
                 request,
