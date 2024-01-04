@@ -94,7 +94,7 @@ def table_maker_form(request, arg1):
             unique_id = "title_for_user_" + str(request.user.id)
             cache.set(unique_id, title, 300)
 
-            print("table making SUCCESS!!")
+            # print("table making SUCCESS!!")
             return redirect(reverse('home'))
     else:
         form = TableUploadForm()
