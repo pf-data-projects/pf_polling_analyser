@@ -27,6 +27,7 @@ from django.shortcuts import render, reverse, redirect
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.forms import formset_factory
+from django.contrib import messages
 
 from .forms import TableUploadForm, RebaseForm, TableScanForm
 from .table_maker.trim import trim_table
@@ -37,7 +38,9 @@ def table_maker_form(request, arg1):
     A view that:
     1. calls the run_weighting function in the weight file.
     """
-    rebase_questions = request.session.get('rebase_questions')
+    unique_id = "rebase_questions_for_user_" + str(request.user.id)
+    rebase_questions = cache.get(unique_id)
+    # rebase_questions = request.session.get('rebase_questions')
     if request.method == 'POST':
         form = TableUploadForm(request.POST, request.FILES)
         RebaseFormSet = formset_factory(RebaseForm)
@@ -91,7 +94,7 @@ def table_maker_form(request, arg1):
             unique_id = "title_for_user_" + str(request.user.id)
             cache.set(unique_id, title, 300)
 
-            print("table making SUCCESS!!")
+            # print("table making SUCCESS!!")
             return redirect(reverse('home'))
     else:
         form = TableUploadForm()
@@ -138,9 +141,22 @@ def scan_table(request):
                 pair = f"{key}: {value}"
                 rebase_questions.append(pair)
 
-            request.session['rebase_questions'] = rebase_questions
+            unique_id = "rebase_questions_for_user_" + str(request.user.id)
+            cache.set(unique_id, rebase_questions, 300)
 
+            # request.session['rebase_questions'] = rebase_questions
+
+            messages.success(
+                request,
+                "Crossbreaks successfully scanned."
+            )
             return redirect('table_maker', arg1=forms_needed)
+        else:
+            messages.error(
+                request,
+                "There was a problem processing this form. Please try again"
+            )
+            return redirect('scan_table')
     else:
         form = TableScanForm()
 
@@ -162,6 +178,11 @@ def download_tables(request):
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
         response['Content-Disposition'] = f'attachment; filename="Public First Poll For {title}.xlsx"'
+        messages.success(request, "Downloading tables...")
         return response
     else:
-        return HttpResponse("TABLES NOT FOUND")
+        messages.error(
+            request,
+            "No polling tables found. Please create them first."
+        )
+        return redirect('home')

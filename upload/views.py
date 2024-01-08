@@ -18,6 +18,8 @@ not there
 4. download_weights is a function that downloads the
 weighted data if it exists, or displays a message
 if not.
+
+5. GuideView handles logic to get the instructions page.
 """
 
 from io import BytesIO
@@ -28,6 +30,8 @@ import pandas as pd
 from docx import Document
 
 from django.shortcuts import render, redirect, reverse
+from django.views import View
+from django.contrib import messages
 from .forms import CSVUploadForm, WeightForm, CrossbreakFormSet
 from django.core.cache import cache
 from django.http import HttpResponse
@@ -44,6 +48,16 @@ from queries.api_request.get_processed_questions import (
 from . import weight as wgt
 
 from . import validation as vld
+
+class GuideView(View):
+    """
+    A view to handle the guide/instructions page.
+    """
+    def get(self, request):
+        """
+        Gets the guide page.
+        """
+        return render(request, "guide.html")
 
 def weight_data(request):
     """
@@ -78,7 +92,10 @@ def weight_data(request):
             excel_buffer.seek(0)
             unique_id = "weights_for_user_" + str(request.user.id)
             cache.set(unique_id, excel_buffer.getvalue(), 300)
-            print("Weighting SUCCESS!!")
+            messages.success(request, "Data successfully weighted")
+            return redirect(reverse('home'))
+        else:
+            messages.error(request, "Invalid form submission. Please try again")
             return redirect(reverse('home'))
     else:
         form = WeightForm()
@@ -102,11 +119,8 @@ def upload_csv(request):
     """
     if request.method == 'POST':
         if not request.user.is_authenticated:
-            print('You are not logged in to the PF polling analyser.')
-            print('You cannot make this request until you log in.')
-            return HttpResponse(
-                "You are not logged in. Please log in to use this feature"
-            )
+            messages.error(request, "You cannot access this feature until you are logged in")
+            return redirect(reverse('home'))
         form = CSVUploadForm(request.POST, request.FILES)
         formset = CrossbreakFormSet(request.POST, prefix="crossbreaks")
         if form.is_valid() and formset.is_valid():
@@ -128,7 +142,6 @@ def upload_csv(request):
 
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Sheet1")
-            # print(data.head(10))
             is_valid = vld.validate_cb_inputs(data, standard_cb)
             if not is_valid[0]:
                 return HttpResponse(f"An error occured: {is_valid[1]}")
@@ -158,10 +171,15 @@ def upload_csv(request):
             csv_buffer.seek(0)
             unique_id = "csv_for_user_" + str(request.user.id)
             cache.set(unique_id, csv_buffer.getvalue(), 300)
-            print("SUCCESS!!")
-
+            messages.success(request, "Crossbreaks successfully calculated!")
             # Redirect user to homepage.
             return redirect(reverse('home'))
+        else:
+            messages.error(
+                request,
+                "There was a problem processing this request. Please try again."
+            )
+            return redirect('home')
     else:
         form = CSVUploadForm()
         formset = CrossbreakFormSet(prefix="crossbreaks")
@@ -179,10 +197,14 @@ def download_csv(request):
     csv_data = cache.get(unique_id)
     if csv_data:
         response = HttpResponse(csv_data, content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="table.csv"'
+        response['Content-Disposition'] = 'attachment; filename="crossbreaks_data.csv"'
         return response
     else:
-        return HttpResponse("CSV NOT FOUND")
+        messages.error(
+            request,
+            "No crossbreaks data found. Please run the calculations first."
+        )
+        return redirect('home')
 
 def download_weights(request):
     """
@@ -198,4 +220,8 @@ def download_weights(request):
         response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
         return response
     else:
-        return HttpResponse("WEIGHTS NOT FOUND")
+        messages.error(
+            request,
+            "No weighted data found. Please weight the data first."
+        )
+        return redirect('home')

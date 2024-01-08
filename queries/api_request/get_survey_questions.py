@@ -28,7 +28,7 @@ def get_questions_json(survey_id):
     Makes a get request to the endpoint for the survey specified
     and returns survey question data to the view.
     """
-    print("getting data for this survey's questions...")
+    # print("getting data for this survey's questions...")
     survey_questions = get_survey_questions(
         api_token=os.environ.get("API_TOKEN"),
         api_token_secret=os.environ.get("API_SECRET"),

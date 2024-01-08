@@ -15,6 +15,11 @@ main {
     min-height: 100vh;
 }
 
+.warning-text {
+    color: darkred;
+    font-weight: 800;
+}
+
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Styles for navbar and footer */
 
@@ -172,8 +177,56 @@ main {
 .table-scan-card {
     background-color: #FFA500;
     padding: 40px;
+    margin-bottom: 40px;
 }
 
 .table-scan-card > h1, h4 {
     margin-bottom: 40px;
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* Guide page styles */
+
+.instructions {
+    background-color: #FFA500;
+    padding: 40px;
+    margin-bottom: 70px;
+}
+
+.instructions > h1 {
+    margin-bottom: 50px;
+}
+
+.instructions > div > h3 {
+    text-align: left;
+    margin-top: 50px;
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* Report page styles */
+
+.report-card {
+    background-color: #343a40;
+    padding: 40px;
+    color: #ECECEC;
+    text-align: center;
+    max-width: 80%;
+}
+
+.report-card > h1 {
+    text-align: center;
+}
+
+.report-card > p {
+    text-align: center;
+}
+
+.report-card > form > p > label {
+    display: block;
+}
+
+@media only screen and (min-width: 900px) {
+    .report-card {
+      max-width: 50%;
+    }
 }

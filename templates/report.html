@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if user.is_authenticated %}
+<div class="container report-card rounded">
+    <form method="POST">
+        <h1>Report an issue</h1>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn auth-btn" type="submit">Submit</button>
+    </form>
+</div>
+{% else %}
+<hr>
+<p class="m-5 warning-text">Please log in to report a problem with the site.</p>
+{% endif %}
+
+{% endblock %}

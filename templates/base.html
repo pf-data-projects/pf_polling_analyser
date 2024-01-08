@@ -26,6 +26,7 @@
         <title>Polling Analyser</title>
     </head>
     <body>
+        <!--~~~~~~~~~~~~~~~~~~~Navigation~~~~~~~~~~~~~~~~~~~-->
         <header class="sticky-top">
             <nav class="navbar navbar-expand-lg navbar-light header-footer-bg">
               <a id="logo" class="navbar-brand" href="{% url 'home' %}">Polling Analyser</a>
@@ -45,10 +46,10 @@
                   <li class="nav-item nav-option">
                     <a class="nav-link" href="{% url 'home' %}">Home</a>
                   </li>
-                  {% if user.is_authenticated %}
                   <li class="nav-item nav-option">
-                    <a class="nav-link" href="#">Guide</a>
+                    <a class="nav-link" href="{% url 'instructions' %}">Guide</a>
                   </li>
+                  {% if user.is_authenticated %}
                   <li class="nav-item nav-option">
                     <a class="nav-link" href="{% url 'account_logout' %}">Log Out</a>
                   </li>
@@ -63,36 +64,29 @@
                 </ul>
               </div>
             </nav>
-
-            <!--~~~~~~~~~~~~~~~~~~~~~~ PLACEHOLDER NAVBAR ~~~~~~~~~~~~~~~~~~~~~~~-->
-            <!-- <div class="container">
-                <div class="row">
-                    <div class="col-sm">
-                        <h1 style="margin: auto">Polling Analyser</h1>
-                    </div>
-                    <div class="col-sm">
-                        {% if user.is_authenticated %}
-                        <p><span><a href="{% url 'account_logout' %}">log out</a></span></p>
-                        {% else %}
-                        <p><span><a href="{% url 'account_login' %}">log in</a></span> | <span><a href="{% url 'account_signup' %}">sign up</a></span></p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div> -->
         </header>
+        <!--~~~~~~~~~~~~~~~~~~~Page Content~~~~~~~~~~~~~~~~~~~-->
         <main>
+            <div class="container">
+                {% for message in messages %}
+                    <div id="msg" class="p-2 container {{ message.tags }}">
+                        {{ message | safe }}
+                    </div>
+                {% endfor %}
+            </div>
             {% block content %}
             {% endblock %}
         </main>
+        <!--~~~~~~~~~~~~~~~~~~~Footer~~~~~~~~~~~~~~~~~~~-->
         <footer class="header-footer-bg">
             <div class="container">
                 <nav class="navbar navbar-light">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item nav-option">
-                            <a class="nav-link" href="#">Admin</a>
+                            <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
                         </li>
                         <li class="nav-item nav-option">
-                            <a class="nav-link" href="#">Report Issue</a>
+                            <a class="nav-link" href="{% url 'report' %}">Report Issue</a>
                         </li>
                     </ul>
                 </nav>
@@ -111,5 +105,6 @@
             integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" 
             crossorigin="anonymous">
         </script>
+        <script src="{% static 'js/script.js' %}"></script>
     </body>
 </html>

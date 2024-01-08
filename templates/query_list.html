@@ -1,20 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- <h2>Instructions</h2>
-<p>Once you are logged in, follow the following steps:</p>
-<ol>
-    <li>Click on the link to upload and weight the survey results.</li><br/>
-    <li>A loading icon will appear on this page's browser tab while the data is weighted.</li><br/>
-    <li>Once the data is weighted you will be redirected here. You can then click on the link to download the weighted data.</li><br/>
-    <li>Click on the link to upload data, specify crossbreaks, and calculate response percentages.</li><br/>
-    <li>A loading icon will appear on this page's browser tab while the responses for each question are calculated.</li><br/>
-    <li>Once that is completed you will be redirected here. You can then click on the link to download the data.</li><br/>
-    <li>Click on the link to upload calculated data and run the table-maker.</li><br/>
-    <li>A loading icon will appear on this page's browser tab while the tables are generated.</li><br/>
-    <li>Once that is completed you will be redirected here. You can then click on the link to download the data.</li><br/>
-</ol> -->
-
 {% if user.is_authenticated %}
 {% for profile in profiles %}
 {% if profile.user == user %}
@@ -57,19 +43,11 @@
         </div>
     </div>
 </div>
-<!-- <p><a href="{% url 'weight_data' %}">Click here to weight survey responses</a></p>
-<p><a href="{% url 'upload_data' %}">Click here to run calculations for crossbreaks</a></p>
-<p><a href="{% url 'scan_table' %}">Click here to scan the table for rebase comments</a></p> -->
-
-<!-- <hr/>
-<p><a href="{% url 'download_weights' %}">DOWNLOAD WEIGHTED DATA</a></p>
-<p><a href="{% url 'download_csv' %}">DOWNLOAD CROSSBREAKS DATA</a></p>
-<p><a href="{% url 'table_download' %}">DOWNLOAD POLLING TABLES</a></p> -->
 
 {% else %}
 
 <hr/>
-<p>Your profile is awaiting approval. Please ask an admin to approve it for you.</p>
+<p class="m-5 warning-text">Your profile is awaiting approval. Please ask an admin to approve it for you.</p>
 
 {% endif %}
 {% endif %}
@@ -77,7 +55,7 @@
 
 {% else %}
 <hr/>
-<p>Please log in to access the features of this site.</p>
+<p class="m-5 warning-text">Please log in to access the features of this site.</p>
 
 {% endif %}
 
