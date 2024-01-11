@@ -124,7 +124,7 @@ main {
 .weight-form-card {
     background-color: #FFA500;
     padding: 40px;
-    margin-top: 30px;
+    margin-top: 40px;
 }
 
 .weight-form-card > h1 {
@@ -150,6 +150,7 @@ main {
     background-color: #FFA500;
     padding: 40px;
     margin-bottom: 40px;
+    margin-top: 40px;
 }
 
 .crossbreak-form-card > h1, h3 {
@@ -179,6 +180,7 @@ main {
     background-color: #FFA500;
     padding: 40px;
     margin-bottom: 40px;
+    margin-top: 40px;
 }
 
 .table-scan-card > h1, h4 {

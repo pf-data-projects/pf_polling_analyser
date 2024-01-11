@@ -78,7 +78,7 @@ def table_maker_form(request, arg1):
                 )
 
             # create and cache excel tables.
-            create_workbook(
+            cache_key = create_workbook(
                 request,
                 trimmed[0],
                 trimmed[1],
@@ -91,8 +91,19 @@ def table_maker_form(request, arg1):
                 end
             )
 
+            # cache title for use with download button
             unique_id = "title_for_user_" + str(request.user.id)
             cache.set(unique_id, title, 300)
+
+            # auto-download for the excel tables.
+            excel_data = cache.get(cache_key)
+            response = HttpResponse(
+                excel_data,
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            response['Content-Disposition'] = f'attachment; filename="Public First Poll For {title}.xlsx"'
+            messages.success(request, "Downloading tables...")
+            return response
 
             # print("table making SUCCESS!!")
             return redirect(reverse('home'))
