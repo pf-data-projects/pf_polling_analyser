@@ -39,8 +39,8 @@ def calc(filtered_df, col_index, table, question, results, question_data):
             table.iat[position_int, col_index] = responses
         return table
 
-    elif question['Base Type'] == 'Option' and question['type'] == 'CHECKBOX':
-        return table
+    # elif question['Base Type'] == 'Option' and question['type'] == 'CHECKBOX':
+    #     return table
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Calculates responses for table questions
 
@@ -74,8 +74,8 @@ def calc(filtered_df, col_index, table, question, results, question_data):
                 i += 1
         return table
 
-    elif question['Base Type'] == 'Option' and question['type'] == 'TABLE':
-        return table
+    # elif question['Base Type'] == 'Option' and question['type'] == 'TABLE':
+    #     return table
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Calculates responses for rank questions
 
@@ -109,8 +109,8 @@ def calc(filtered_df, col_index, table, question, results, question_data):
                 i += 1
         return table
 
-    elif question['Base Type'] == 'Option' and question['type'] == 'Rank':
-        return table
+    # elif question['Base Type'] == 'Option' and question['type'] == 'Rank':
+    #     return table
 
     # ~~~~~~~ Calculates responses for Single-select radio button questions
 

@@ -86,14 +86,22 @@ def weight_data(request):
             else:
                 weighted_data = wgt.apply_no_weight(survey_data)
 
-            # Cache the weighted data to be downloaded by user later
-            excel_buffer = BytesIO()
-            weighted_data.to_excel(excel_buffer, index=False)
-            excel_buffer.seek(0)
-            unique_id = "weights_for_user_" + str(request.user.id)
-            cache.set(unique_id, excel_buffer.getvalue(), 300)
+            response = HttpResponse(
+                weighted_data,
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
+            )
+            response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
             messages.success(request, "Data successfully weighted")
-            return redirect(reverse('home'))
+            return download_weights(request, weighted_data)
+
+            # Cache the weighted data to be downloaded by user later
+            # excel_buffer = BytesIO()
+            # weighted_data.to_excel(excel_buffer, index=False)
+            # excel_buffer.seek(0)
+            # unique_id = "weights_for_user_" + str(request.user.id)
+            # cache.set(unique_id, excel_buffer.getvalue(), 300)
+            # messages.success(request, "Data successfully weighted")
+            # return redirect(reverse('home'))
         else:
             messages.error(request, "Invalid form submission. Please try again")
             return redirect(reverse('home'))
@@ -206,13 +214,13 @@ def download_csv(request):
         )
         return redirect('home')
 
-def download_weights(request):
+def download_weights(request, excel_data):
     """
     Handles retrieval of cached weighted data.
     """
-    unique_id = "weights_for_user_" + str(request.user.id)
-    excel_data = cache.get(unique_id)
-    if excel_data:
+    # unique_id = "weights_for_user_" + str(request.user.id)
+    # excel_data = cache.get(unique_id)
+    if not excel_data.empty:
         response = HttpResponse(
             excel_data,
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa

@@ -124,6 +124,7 @@ main {
 .weight-form-card {
     background-color: #FFA500;
     padding: 40px;
+    margin-top: 30px;
 }
 
 .weight-form-card > h1 {
