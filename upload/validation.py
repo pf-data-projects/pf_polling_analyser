@@ -20,7 +20,6 @@ def validate_cb_inputs(data, standard_cb):
     ]
 
     for cb in crossbreaks:
-        print(cb[0], cb[1])
         if cb[0] in standard_cb:
             present = False
             for col in data.columns:
