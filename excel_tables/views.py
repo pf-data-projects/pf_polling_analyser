@@ -102,11 +102,10 @@ def table_maker_form(request, arg1):
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
             response['Content-Disposition'] = f'attachment; filename="Public First Poll For {title}.xlsx"'
-            messages.success(request, "Downloading tables...")
+            # messages.success(request, "Downloading tables...")
             return response
 
-            # print("table making SUCCESS!!")
-            return redirect(reverse('home'))
+            # return redirect(reverse('home'))
     else:
         form = TableUploadForm()
         RebaseFormSet = formset_factory(RebaseForm, extra=0)

@@ -198,6 +198,8 @@ main {
 
 .instructions > h1 {
     margin-bottom: 50px;
+    font-weight: 700;
+    text-align: center;
 }
 
 .instructions > div > h3 {
