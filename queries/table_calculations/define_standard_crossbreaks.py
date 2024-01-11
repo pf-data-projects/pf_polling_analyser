@@ -45,7 +45,7 @@ def calc_standard(value, col_index, cb_question, table, question_list, results, 
         filtered_df = results.loc[(results[get_cb.columns[0]] == value)]
         table.iat[0, col_index] = len(filtered_df.index)
         table.iat[1, col_index] = filtered_df['weighted_respondents'].astype(float).sum()
-        table = calc.calc(filtered_df, col_index, table, question, results, question_data)
+        table = calc.calc(filtered_df, col_index, table, question, results, question_data, False)
     return table
 
 def rebase_standard(value, col_index, cb_question, table, question_list, results, question_data):

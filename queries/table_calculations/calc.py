@@ -5,7 +5,8 @@ crossbreak to be calculated in the table.
 
 from . import helpers
 
-def calc(filtered_df, col_index, table, question, results, question_data):
+
+def calc(filtered_df, col_index, table, question, results, question_data, is_total):
     """
     This function checks the question type and calulates
     the number of respondents who answered a particular way
@@ -26,9 +27,13 @@ def calc(filtered_df, col_index, table, question, results, question_data):
             checkbox_filtered_df = filtered_df[helpers.col_with_substr_a(results, option, question['qid']) + ['weighted_respondents']]
             if checkbox_filtered_df.empty:
                 continue
-            responses_df = checkbox_filtered_df[checkbox_filtered_df.iloc[:, 0] == option]
-            responses_df.loc[:, 'weighted_respondents'] = responses_df['weighted_respondents'].astype(float)
-            responses = responses_df['weighted_respondents'].sum()
+            if is_total:
+                responses_df = (checkbox_filtered_df == option).sum()
+                responses = int(responses_df.iloc[0])
+            else:
+                responses_df = checkbox_filtered_df[checkbox_filtered_df.iloc[:, 0] == option]
+                responses_df.loc[:, 'weighted_respondents'] = responses_df['weighted_respondents'].astype(float)
+                responses = responses_df['weighted_respondents'].sum()
             position = table[(
                 table['Answers'] == option
             ) & (
@@ -61,9 +66,13 @@ def calc(filtered_df, col_index, table, question, results, question_data):
             table_filtered_df = filtered_df[helpers.col_with_substr_a(results, sub_question, question['qid']) + ['weighted_respondents']]
             i = 1
             for option in options:
-                responses_df = table_filtered_df[table_filtered_df.iloc[:, 0] == option]
-                responses_df.loc[:, 'weighted_respondents'] = responses_df['weighted_respondents'].astype(float)
-                responses = responses_df['weighted_respondents'].sum()
+                if is_total:
+                    responses_df = (table_filtered_df == option).sum()
+                    responses = int(responses_df.iloc[0])
+                else:
+                    responses_df = table_filtered_df[table_filtered_df.iloc[:, 0] == option]
+                    responses_df.loc[:, 'weighted_respondents'] = responses_df['weighted_respondents'].astype(float)
+                    responses = responses_df['weighted_respondents'].sum()
                 sub_question_position = table[(
                     table['Answers'] == sub_question
                 ) & (
@@ -96,9 +105,13 @@ def calc(filtered_df, col_index, table, question, results, question_data):
             table_filtered_df = table_filtered_df.astype(float)
             i = 1
             for option in options:
-                responses_df = table_filtered_df[table_filtered_df.iloc[:, 0] == option]
-                responses_df.loc[:, 'weighted_respondents'] = responses_df['weighted_respondents'].astype(float)
-                responses = responses_df['weighted_respondents'].sum()
+                if is_total:
+                    responses_df = (table_filtered_df == option).sum()
+                    responses = int(responses_df.iloc[0])
+                else:
+                    responses_df = table_filtered_df[table_filtered_df.iloc[:, 0] == option]
+                    responses_df.loc[:, 'weighted_respondents'] = responses_df['weighted_respondents'].astype(float)
+                    responses = responses_df['weighted_respondents'].sum()
                 sub_question_position = table[(
                     table['Answers'] == sub_question
                 ) & (
@@ -142,8 +155,11 @@ def calc(filtered_df, col_index, table, question, results, question_data):
                     # different loops are not quite the same.
                     if len(position) > 0:
                         position_int = int(position[0])
-                        table.iat[position_int, col_index] = len(second_filtered_df.index)
-                        table.iat[position_int, col_index] = second_filtered_df['weighted_respondents'].astype(float).sum()
+                        if is_total:
+                            table.iat[position_int, 5] = len(second_filtered_df.index)
+                        else:
+                            table.iat[position_int, col_index] = len(second_filtered_df.index)
+                            table.iat[position_int, col_index] = second_filtered_df['weighted_respondents'].astype(float).sum()
                     else:
                         pass
                 return table
