@@ -336,7 +336,7 @@ def create_workbook(
         if cell.value is None:
             continue
         if 'Grid' and 'Question' not in cell.value:
-            print(f"#'Question ID - {qid.value}'!A1")
+            # print(f"#'Question ID - {qid.value}'!A1")
             cell.hyperlink = f"#'Question ID - {qid.value}'!A1"
         if 'Grid' in cell.value:
             cell.hyperlink = f"#'{cell.value}'!A1"
@@ -453,10 +453,10 @@ def create_workbook(
     full_results['C1'].font = title_font
     full_results['C1'].alignment = title_align
 
-    # contents_page = wb['Contents']
-    # contents_page['C3'].hyperlink = "#'Full Results'!B2"
-    # contents_page['C3'].value = 'Full Results Table'
-    # contents_page['E3'].value = ''
+    contents_page = wb['Contents']
+    contents_page['C3'].hyperlink = "#'Full Results'!B2"
+    contents_page['C3'].value = 'Full Results Table'
+    contents_page['E3'].value = ''
 
     protected_sheets.append('Full Results')
 
