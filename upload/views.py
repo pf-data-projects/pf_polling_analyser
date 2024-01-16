@@ -150,7 +150,9 @@ def upload_csv(request):
                 for sub_form in formset:
                     cb_name = sub_form.cleaned_data['non_standard_cb_name']
                     cb_question = sub_form.cleaned_data['non_standard_cb_question']
-                    cb_answer = sub_form.cleaned_data['non_standard_cb_answer']
+                    cb_answer = sub_form.cleaned_data['non_standard_cb_answers']
+                    if "|" in cb_answer:
+                        cb_answer = cb_answer.split("|")
                     cb_data = [cb_name, cb_question, cb_answer]
                     non_standard_cb.append(cb_data)
 

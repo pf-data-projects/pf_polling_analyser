@@ -118,9 +118,7 @@ def create_workbook(
         updated_list = questions_list[1:]
         prev_question = 0
         for question in updated_list:
-
             row_index = contents_df[0].index[contents_df[0]['Row in Full Results'] == question]
-            print(row_index)
             row_index.tolist()
             excel_col = 'D'
             excel_row = row_index[0] + 2
@@ -394,13 +392,21 @@ def create_workbook(
     for sheet in wb.sheetnames:
         if sheet not in protected_sheets:
             ws = wb[sheet]
+            cols_done = []
             for col in non_standard:
                 header_coords = get_header_coords(col, trimmed_data)
                 title_coords = get_title_coords(col, trimmed_data)
                 header = col.split(":")[0]
                 col_title = col.split(":")[1]
-                ws[header_coords] = header
-                ws[title_coords] = col_title
+                cols_count = len([col for col in non_standard if header in col])
+                if header not in cols_done:
+                    ws[header_coords] = header
+                    ws[title_coords] = col_title
+                    last_col_coords = shift_right(header_coords, cols_count - 1)
+                    ws.merge_cells(f'{header_coords}:{last_col_coords}')
+                else:
+                    ws[title_coords] = col_title
+                cols_done.append(header)
 
     # Add styles to the crossbreak headers.
     # (and grid headers)
@@ -522,3 +528,32 @@ def get_title_coords(colname, data):
     excel_col = get_column_letter(col_index + 1)
     excel_coord = excel_col + '3'
     return excel_coord
+
+def shift_right(cell, x):
+    """
+    Gets the excel coordinates
+    x to the right of the coordinates entered.
+    """
+    # Function to convert a column letter to a number (e.g., 'A' -> 1, 'B' -> 2)
+    def col_to_num(col_str):
+        num = 0
+        for c in col_str:
+            num = num * 26 + (ord(c.upper()) - ord('A')) + 1
+        return num
+
+    # Function to convert a number back to a column letter (e.g., 1 -> 'A', 2 -> 'B')
+    def num_to_col(n):
+        col_str = ''
+        while n > 0:
+            n, remainder = divmod(n - 1, 26)
+            col_str = chr(65 + remainder) + col_str
+        return col_str
+
+    # Split the cell address into column and row parts
+    col = ''.join(filter(str.isalpha, cell))
+    row = ''.join(filter(str.isdigit, cell))
+
+    # Shift the column
+    new_col_num = col_to_num(col) + x
+    new_col = num_to_col(new_col_num)
+    return new_col + row

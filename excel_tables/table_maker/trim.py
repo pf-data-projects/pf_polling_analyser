@@ -44,7 +44,6 @@ def trim_table(data, start, end, comments):
         filtered_df = data[data['IDs'] == str(comment[0])]
         filtered_df = filtered_df[filtered_df['Base Type'] == 'Question']
         updated_question = filtered_df['Answers'] + f" BASE: {comment[1]}"
-        print(updated_question, comment[1])
         updated_question = pd.DataFrame(updated_question)
         
         data_row_index = data[
@@ -64,7 +63,7 @@ def trim_table(data, start, end, comments):
         if row['Base Type'] == 'Question':
             updated = row['Answers'] + " BASE: All respondents"
             data.iat[index, 3] = updated
-    data.to_csv("test_rebase.csv", index=False)
+    # data.to_csv("test_rebase.csv", index=False)
 
     # Find the index for the first row with the start_id
     start_index = data[data['IDs'] == str(start)].index.min()

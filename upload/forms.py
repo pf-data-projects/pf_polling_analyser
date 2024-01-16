@@ -74,9 +74,9 @@ class CrossbreakForm(forms.Form):
         help_text="Please put the exact text of the question that determines this crossbreak here.",
         required=False
     )
-    non_standard_cb_answer = forms.CharField(
-        label="Answer",
-        help_text="Please put the exact answer for this question which you would like to check.",
+    non_standard_cb_answers = forms.CharField(
+        label="Answers",
+        help_text="Enter the answers for this question which you would like to check, separated by | e.g., Yes|No|Maybe ",
         required=False
     )
 

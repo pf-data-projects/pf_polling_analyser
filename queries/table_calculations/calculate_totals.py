@@ -5,12 +5,8 @@ from .helpers import (
     col_with_substr,
     col_with_substr_a
     )
-from .gender import calc_gender, gender_rebase
 from .age import iterate_age_brackets, iterate_age_rebase
-from .region import iterate_regions, iterate_regions_rebase
 from .seg import iterate_seg, iterate_seg_rebase
-from .children import calc_children, children_rebase
-from .education import iterate_ed, iterate_ed_rebase
 from .define_standard_crossbreaks import CROSSBREAKS, QUESTIONS, calc_standard, rebase_standard
 from .define_non_standard_cb import calc_crossbreak, rebase_crossbreak
 from .calc import calc
