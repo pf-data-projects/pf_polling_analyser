@@ -118,7 +118,9 @@ def create_workbook(
         updated_list = questions_list[1:]
         prev_question = 0
         for question in updated_list:
+            
             row_index = contents_df[0].index[contents_df[0]['Row in Full Results'] == question]
+            print(row_index)
             row_index.tolist()
             excel_col = 'D'
             excel_row = row_index[0] + 2

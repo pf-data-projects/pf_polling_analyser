@@ -44,12 +44,15 @@ def trim_table(data, start, end, comments):
         filtered_df = data[data['IDs'] == str(comment[0])]
         filtered_df = filtered_df[filtered_df['Base Type'] == 'Question']
         updated_question = filtered_df['Answers'] + f" BASE: {comment[1]}"
+        print(updated_question, comment[1])
         updated_question = pd.DataFrame(updated_question)
+        
         data_row_index = data[
             (data['Base Type'] == "Question") & (data['IDs'] == str(comment[0]))
         ].index
         if not data_row_index.empty:
             data.iat[data_row_index[0], 3] = updated_question.iat[0, 0]
+
 
     # Add 'BASE: All respondents' to all other questions
     comment_ids = []

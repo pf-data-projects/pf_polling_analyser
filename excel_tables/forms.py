@@ -47,10 +47,10 @@ class RebaseForm(forms.Form):
     """
     A component for a single rebase comment in the form.
     """
-    question_id = forms.IntegerField(
-        label="Type the question ID here:",
-        required=False
-    )
+    # question_id = forms.IntegerField(
+    #     label="Type the question ID here:",
+    #     required=False
+    # )
     rebase = forms.CharField(
         initial="Assigned Randomly",
         required=False
@@ -65,7 +65,6 @@ class RebaseForm(forms.Form):
         super(RebaseForm, self).__init__(*args, **kwargs)
 
         if item_number is not None:
-            print(self.fields)
             self.fields['name'].label = 'base'
 
 class TableScanForm(forms.Form):

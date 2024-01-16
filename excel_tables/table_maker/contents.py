@@ -59,6 +59,6 @@ def create_contents_page(data, questions_list, comments, grids, unique_ids):
     for comment in comments:
         contents_df_index = contents_df[contents_df['ID'] == str(comment[0])].index
         if not contents_df_index.empty:
-            contents_df.iat[contents_df_index[0], 3] = comment[1]
+            contents_df.iat[contents_df_index[0], 4] = comment[1]
 
     return [contents_df, id_column]
