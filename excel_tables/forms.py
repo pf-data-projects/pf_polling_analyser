@@ -52,9 +52,7 @@ class RebaseForm(forms.Form):
         required=False
     )
     rebase = forms.CharField(
-        widget=forms.TextInput(
-            attrs={'placeholder': 'All respondents'}
-        ),
+        initial="Assigned Randomly",
         required=False
     )
     def __init__(self, *args, **kwargs):
@@ -67,8 +65,8 @@ class RebaseForm(forms.Form):
         super(RebaseForm, self).__init__(*args, **kwargs)
 
         if item_number is not None:
+            print(self.fields)
             self.fields['name'].label = 'base'
-
 
 class TableScanForm(forms.Form):
     """
