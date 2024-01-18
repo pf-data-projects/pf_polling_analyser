@@ -117,6 +117,7 @@ def weight_data(request):
 
     return render(request, 'weight_form.html', {
         'form': form,
+        'formset': formset
     })
 
 def upload_csv(request):
