@@ -85,6 +85,7 @@ def run_weighting(survey_data, weight_proportions):
     labels = ["18-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75-84", "85+"]
     survey_subset["Age Group"] = pd.cut(survey_subset["Age"], bins=bins, labels=labels, right=True, include_lowest=True)
     survey_subset["genderage"] = survey_subset["Gender"] + " " + survey_subset["Age Group"].astype(str)
+    survey_subset.to_csv("weight_data_prep.csv")
 
     def ipf(survey_data, weight_proportions, max_iterations=100, convergence_threshold=0.001):
         """
@@ -96,7 +97,7 @@ def run_weighting(survey_data, weight_proportions):
         to each relevant respondent based on the UK proportions.
         """
         survey_data['weight'] = 1.0
-        survey_data['is_non_binary'] = survey_data['Gender'].apply(lambda x: x not in ['male', 'female'])
+        survey_data['is_non_binary'] = survey_data['Gender'].apply(lambda x: x not in ['Male', 'Female'])
         for iteration in range(max_iterations):
             previous_weights = survey_data['weight'].copy()
             for _, row in weight_proportions.iterrows():
@@ -108,17 +109,15 @@ def run_weighting(survey_data, weight_proportions):
                     current_prop = subset['weight'].sum() / survey_data['weight'].sum()
                     scaling_factor = target_prop / current_prop
                     survey_data.loc[survey_data[region_column] == specific, 'weight'] *= scaling_factor
-
-                if group == "Gender" and specific not in ['male', 'female']:
-                    continue
                 if group == "Overall":
                     total_weight = survey_data['weight'].sum()
                     scaling_factor = target_prop * len(survey_data) / total_weight
                     survey_data['weight'] *= scaling_factor
                 else:
                     subset = survey_data[survey_data[group] == specific]
-                    if group == "Gender":
-                        subset = subset[~subset['is_non_binary']]
+                    if group == "genderage":
+                        if not subset.empty:
+                            subset = subset[~subset['is_non_binary'] == True]
                     current_prop = subset['weight'].sum() / survey_data['weight'].sum()
                     scaling_factor = target_prop / current_prop
                     survey_data.loc[survey_data[group] == specific, 'weight'] *= scaling_factor
@@ -147,4 +146,44 @@ def apply_no_weight(survey_data):
     rather than a weight.
     """
     survey_data['weighted_respondents'] = 1
+    return survey_data
+
+def apply_custom_weight(survey_data, weight_proportions, questions, groups):
+    """
+    A function for applying custom weights to 
+    data.
+    """
+    def extract_column_name(col_name):
+        if ":" in col_name:
+            return col_name.split(":")[1].strip()
+        return col_name
+
+    column_mapping = {col: extract_column_name(col) for col in survey_data.columns}
+    survey_data_renamed = survey_data.rename(columns=column_mapping)
+
+    survey_subset = survey_data_renamed[questions]
+    survey_subset.columns = [group for group in groups]
+
+    def custom_ipf(survey_data, weight_proportions, max_iterations=100, convergence_threshold=0.001):
+        survey_data['weight'] = 1.0
+        for iteration in range(max_iterations):
+            previous_weights = survey_data['weight'].copy()
+            for _, row in weight_proportions.iterrows():
+                group, specific, target_prop = row['Group'], row['Specific'], row['Proportion']
+                if group == "Overall":
+                    total_weight = survey_data['weight'].sum()
+                    scaling_factor = target_prop * len(survey_data) / total_weight
+                    survey_data['weight'] *= scaling_factor
+                else:
+                    subset = survey_data[survey_data[group] == specific]
+                    current_prop = subset['weight'].sum() / survey_data['weight'].sum()
+                    scaling_factor = target_prop / current_prop
+                    survey_data.loc[survey_data[group] == specific, 'weight'] *= scaling_factor
+            weight_change = (survey_data['weight'] - previous_weights).abs().sum()
+            if weight_change < convergence_threshold:
+                break
+        return survey_data
+
+    ipf_result = custom_ipf(survey_subset, weight_proportions)
+    survey_data['weighted_respondents'] = ipf_result['weight']
     return survey_data

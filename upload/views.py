@@ -32,7 +32,7 @@ from docx import Document
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.contrib import messages
-from .forms import CSVUploadForm, WeightForm, CrossbreakFormSet
+from .forms import CSVUploadForm, WeightForm, CrossbreakFormSet, CustomWeightFormSet
 from django.core.cache import cache
 from django.http import HttpResponse
 
@@ -113,6 +113,7 @@ def weight_data(request):
             return redirect(reverse('home'))
     else:
         form = WeightForm()
+        formset = CustomWeightFormSet(prefix="weights")
 
     return render(request, 'weight_form.html', {
         'form': form,
