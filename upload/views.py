@@ -173,7 +173,6 @@ def upload_csv(request):
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Sheet1")
             data.columns = [preprocess_header(col) for col in data.columns]
-            print(data)
 
             # validate the standard crossbreaks the the user selects.
             is_valid = vld.validate_cb_inputs(data, standard_cb)
@@ -265,6 +264,11 @@ def download_weights(request):
         return redirect('home')
 
 def preprocess_header(header):
+    """
+    Helper func to normalise encoding
+    and remove any chars that look like
+    space but arent.
+    """
     header = header.encode('utf-8').decode('utf-8')
     header = re.sub(r'\s+', ' ', header)
     return header

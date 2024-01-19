@@ -35,7 +35,7 @@ from .helper import get_column_letter
 
 def create_workbook(
     request, data, questions_list, grids, unique_ids,
-    title, dates, comments, start, end):
+    title, dates, comments, start, end, id_column):
     """
     The function that controls the creation and formatting of
     polling tables.
@@ -58,7 +58,7 @@ def create_workbook(
     # create cover page and contents page
     # blank = {'Table of contents'}
     cover_df = create_cover_page(data, title, dates)
-    contents_df = create_contents_page(data, questions_list, comments, grids, unique_ids)
+    contents_df = create_contents_page(data, questions_list, comments, grids, unique_ids, id_column)
 
     # define variables for caching
     cache_key = "tables_for_user_" + str(request.user.id)
@@ -67,7 +67,6 @@ def create_workbook(
     # Format the tables with xlsxwriter and pandas
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create main results polling table
-        print(trimmed_data)
         cover_df.to_excel(writer, index=False, sheet_name="Cover Page")
         contents_df[0].to_excel(writer, index=False, sheet_name="Contents")
         trimmed_data.to_excel(writer, index=False, sheet_name='Full Results')
@@ -343,10 +342,20 @@ def create_workbook(
             cell.hyperlink = f"#'{cell.value}'!A1"
 
     # remove any n/a values from the contents Full Results column
+    # and remove id column if user has not chosen it.
     ws = wb['Contents']
     for cell in ws['D']:
         if cell.value == 'n/a':
             cell.value = None
+    if not id_column:
+        for cell in ws['A']:
+            cell.value = None
+    img = Image(img_path)
+    scale_x = 0.5
+    scale_y = 0.5
+    img.width = img.width * scale_x
+    img.height = img.height * scale_y
+    ws.add_image(img, 'A1')
 
     for sheet in wb.sheetnames:
         if 'Grid' in sheet:
@@ -356,8 +365,12 @@ def create_workbook(
         if sheet not in protected_sheets:
             for row in [4, 5]:
                 for cell in sheet[row]:
-                    if cell.value == 0:
-                        cell.value = None
+                    try:
+                        if cell.value == 0:
+                            cell.value = None
+                    except AttributeError:
+                        # print("This cell is an empty string")
+                        pass
 
     # add standard cb headers.
     for sheet in wb.sheetnames:

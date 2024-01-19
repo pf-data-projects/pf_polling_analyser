@@ -52,6 +52,7 @@ def table_maker_form(request, arg1):
             dates = form.cleaned_data['dates']
             start = form.cleaned_data['start']
             end = form.cleaned_data['end']
+            id_column = form.cleaned_data['id_column']
 
             # Fetches data from formset and stores in 'edited_comments'
             edited_comments = []
@@ -84,7 +85,8 @@ def table_maker_form(request, arg1):
                 dates,
                 edited_comments,
                 start,
-                end
+                end,
+                id_column
             )
 
             # cache title for use with download button
