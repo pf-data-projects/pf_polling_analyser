@@ -35,7 +35,7 @@ from .helper import get_column_letter
 
 def create_workbook(
     request, data, questions_list, grids, unique_ids,
-    title, dates, comments, start, end):
+    title, dates, comments, start, end, id_column):
     """
     The function that controls the creation and formatting of
     polling tables.
@@ -58,7 +58,7 @@ def create_workbook(
     # create cover page and contents page
     # blank = {'Table of contents'}
     cover_df = create_cover_page(data, title, dates)
-    contents_df = create_contents_page(data, questions_list, comments, grids, unique_ids)
+    contents_df = create_contents_page(data, questions_list, comments, grids, unique_ids, id_column)
 
     # define variables for caching
     cache_key = "tables_for_user_" + str(request.user.id)
@@ -341,10 +341,38 @@ def create_workbook(
         if 'Grid' in cell.value:
             cell.hyperlink = f"#'{cell.value}'!A1"
 
+    # remove any n/a values from the contents Full Results column
+    # and remove id column if user has not chosen it.
+    ws = wb['Contents']
+    for cell in ws['D']:
+        if cell.value == 'n/a':
+            cell.value = None
+    if not id_column:
+        for cell in ws['A']:
+            cell.value = None
+    img = Image(img_path)
+    scale_x = 0.5
+    scale_y = 0.5
+    img.width = img.width * scale_x
+    img.height = img.height * scale_y
+    ws.add_image(img, 'A1')
+
     for sheet in wb.sheetnames:
         if 'Grid' in sheet:
             protected_sheets.append(sheet)
 
+    for sheet in wb.sheetnames:
+        if sheet not in protected_sheets:
+            for row in [4, 5]:
+                for cell in sheet[row]:
+                    try:
+                        if cell.value == 0:
+                            cell.value = None
+                    except AttributeError:
+                        # print("This cell is an empty string")
+                        pass
+
+    # add standard cb headers.
     for sheet in wb.sheetnames:
         if sheet not in protected_sheets:
             ws = wb[sheet]
@@ -392,13 +420,21 @@ def create_workbook(
     for sheet in wb.sheetnames:
         if sheet not in protected_sheets:
             ws = wb[sheet]
+            cols_done = []
             for col in non_standard:
                 header_coords = get_header_coords(col, trimmed_data)
                 title_coords = get_title_coords(col, trimmed_data)
                 header = col.split(":")[0]
                 col_title = col.split(":")[1]
-                ws[header_coords] = header
-                ws[title_coords] = col_title
+                cols_count = len([col for col in non_standard if header in col])
+                if header not in cols_done:
+                    ws[header_coords] = header
+                    ws[title_coords] = col_title
+                    last_col_coords = shift_right(header_coords, cols_count - 1)
+                    ws.merge_cells(f'{header_coords}:{last_col_coords}')
+                else:
+                    ws[title_coords] = col_title
+                cols_done.append(header)
 
     # Add styles to the crossbreak headers.
     # (and grid headers)
@@ -520,3 +556,32 @@ def get_title_coords(colname, data):
     excel_col = get_column_letter(col_index + 1)
     excel_coord = excel_col + '3'
     return excel_coord
+
+def shift_right(cell, x):
+    """
+    Gets the excel coordinates
+    x to the right of the coordinates entered.
+    """
+    # Function to convert a column letter to a number (e.g., 'A' -> 1, 'B' -> 2)
+    def col_to_num(col_str):
+        num = 0
+        for c in col_str:
+            num = num * 26 + (ord(c.upper()) - ord('A')) + 1
+        return num
+
+    # Function to convert a number back to a column letter (e.g., 1 -> 'A', 2 -> 'B')
+    def num_to_col(n):
+        col_str = ''
+        while n > 0:
+            n, remainder = divmod(n - 1, 26)
+            col_str = chr(65 + remainder) + col_str
+        return col_str
+
+    # Split the cell address into column and row parts
+    col = ''.join(filter(str.isalpha, cell))
+    row = ''.join(filter(str.isdigit, cell))
+
+    # Shift the column
+    new_col_num = col_to_num(col) + x
+    new_col = num_to_col(new_col_num)
+    return new_col + row

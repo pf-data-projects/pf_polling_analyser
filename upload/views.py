@@ -23,21 +23,18 @@ if not.
 """
 
 from io import BytesIO
+import re
 import json
 import os
 
 import pandas as pd
-from docx import Document
 
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.contrib import messages
-from .forms import CSVUploadForm, WeightForm, CrossbreakFormSet
+from .forms import CSVUploadForm, WeightForm, CrossbreakFormSet, CustomWeightFormSet
 from django.core.cache import cache
 from django.http import HttpResponse
-
-from .clean_data.clean_survey_legend import clean_survey_legend
-from .clean_data.clean_order import clean_order
 
 from queries.table_calculations.calculate_totals import table_calculation
 from queries.api_request.get_survey_questions import get_questions_json
@@ -71,18 +68,35 @@ def weight_data(request):
     """
     if request.method == 'POST':
         form = WeightForm(request.POST, request.FILES)
+        formset = CustomWeightFormSet(request.POST, prefix="weights") 
         if form.is_valid():
-            # Fetches data from form & converts them to df
+            # Handles all the form data
             survey_data = request.FILES['results']
             survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
+            survey_data.columns = [preprocess_header(col) for col in survey_data.columns]
             weight_proportions = request.FILES['weights']
             weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
             apply = form.cleaned_data['apply_weights']
+            custom = form.cleaned_data['custom_weights']
+            if custom:
+                if len(formset) < 1:
+                    return HttpResponse(
+                        "Error: Please specify your custom weights in the form."
+                        )
+                groups = []
+                questions = []
+                for sub_form in formset:
+                    groups.append(sub_form.cleanded_data['group'])
+                    questions.append(sub_form.cleanded_data['question'])
+
+            # print(groups)
+            # print(questions)
 
             # Run ipf module
             if apply:
                 weighted_data = wgt.run_weighting(survey_data, weight_proportions)
-
+            # elif custom:
+            #     weighted_data = wgt.apply_custom_weight(survey_data, weight_proportions)
             else:
                 weighted_data = wgt.apply_no_weight(survey_data)
 
@@ -91,8 +105,6 @@ def weight_data(request):
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
             )
             response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
-            # messages.success(request, "Data successfully weighted")
-            # return download_weights(request, weighted_data)
 
             # Cache the weighted data to be downloaded by user later
             excel_buffer = BytesIO()
@@ -113,9 +125,11 @@ def weight_data(request):
             return redirect(reverse('home'))
     else:
         form = WeightForm()
+        formset = CustomWeightFormSet(prefix="weights")
 
     return render(request, 'weight_form.html', {
         'form': form,
+        'formset': formset
     })
 
 def upload_csv(request):
@@ -150,12 +164,17 @@ def upload_csv(request):
                 for sub_form in formset:
                     cb_name = sub_form.cleaned_data['non_standard_cb_name']
                     cb_question = sub_form.cleaned_data['non_standard_cb_question']
-                    cb_answer = sub_form.cleaned_data['non_standard_cb_answer']
+                    cb_answer = sub_form.cleaned_data['non_standard_cb_answers']
+                    if "|" in cb_answer:
+                        cb_answer = cb_answer.split("|")
                     cb_data = [cb_name, cb_question, cb_answer]
                     non_standard_cb.append(cb_data)
 
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Sheet1")
+            data.columns = [preprocess_header(col) for col in data.columns]
+
+            # validate the standard crossbreaks the the user selects.
             is_valid = vld.validate_cb_inputs(data, standard_cb)
             if not is_valid[0]:
                 return HttpResponse(f"An error occured: {is_valid[1]}")
@@ -243,3 +262,13 @@ def download_weights(request):
             "No weighted data found. Please weight the data first."
         )
         return redirect('home')
+
+def preprocess_header(header):
+    """
+    Helper func to normalise encoding
+    and remove any chars that look like
+    space but arent.
+    """
+    header = header.encode('utf-8').decode('utf-8')
+    header = re.sub(r'\s+', ' ', header)
+    return header

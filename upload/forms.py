@@ -74,9 +74,9 @@ class CrossbreakForm(forms.Form):
         help_text="Please put the exact text of the question that determines this crossbreak here.",
         required=False
     )
-    non_standard_cb_answer = forms.CharField(
-        label="Answer",
-        help_text="Please put the exact answer for this question which you would like to check.",
+    non_standard_cb_answers = forms.CharField(
+        label="Answers",
+        help_text="Enter the answers for this question which you would like to check, separated by | e.g., Yes|No|Maybe ",
         required=False
     )
 
@@ -94,10 +94,31 @@ class WeightForm(forms.Form):
         validators=[]
     )
     weights = forms.FileField(
-        label='Weight Proportions Data (same as the standard weight proportions we already use)',
+        label='Weight Proportions Data',
         validators=[]
     )
     apply_weights = forms.BooleanField(
         label="Weight the data?",
         required=False
     )
+    custom_weights = forms.BooleanField(
+        label="Customise your weights?",
+        required=False
+    )
+
+
+class CustomWeightForm(forms.Form):
+    """
+    A form to handle custom fields by which
+    the data will be weighted by the program.
+    """
+    group = forms.CharField(
+        label="The category you want to weight by: e.g., Region, Ethnicity, Income, etc...",
+        required=False
+    )
+    question = forms.CharField(
+        label="The exact question in the survey associated with this category",
+        required=False
+    )
+
+CustomWeightFormSet = formset_factory(CustomWeightForm, extra=1)

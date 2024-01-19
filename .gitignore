@@ -31,3 +31,6 @@ test_output_2.csv
 test_rebase.csv
 question_csv.csv
 grid_df.csv
+weight_data_prep.csv
+non_binary_check.csv
+non_binary_check_2.csv

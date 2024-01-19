@@ -1,14 +1,35 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container weight-form-card rounded">
     <h1>Upload Data and Proportions for Weighting</h1>
 
     <form class="weight-form" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button class="btn btn-dark btn-spacing" type="submit">Run weighting</button>
+        <div class="col-md">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <!-- <button class="btn btn-dark btn-spacing" type="submit">Run weighting</button> -->
+        </div>
+        <div class="col-md">
+            <div id="formset-wrapper">
+                <h1>---------------------------------</h1>
+                <h1>THIS FEATURE BELOW IS STILL IN DEVELOPMENT. IT WONT WORK YET :)</h1>
+                {{ formset.management_form }}
+                {% for sub_form in formset %}
+                    <div class="formset-form">
+                        <h4>Custom Weight Category</h4>
+                        {{ sub_form.as_p }}
+                        <button type="button" class="remove-form btn btn-dark btn-less-spacing">Remove category</button>
+                    </div>
+                {% endfor %}
+            </div>
+            <button class="btn btn-dark btn-less-spacing" id="add_more">Add another category</button><br/>
+            <button class="btn btn-dark btn-less-spacing" type="submit">Run weighting</button>
+        </div>
     </form>
     <p><a class="btn btn-dark" href="{% url 'home' %}">Back</a></p>
 </div>
+<script src="{% static 'js/dynamicForm.js' %}"></script>
+
 {% endblock %}

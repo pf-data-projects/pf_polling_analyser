@@ -40,7 +40,6 @@ def table_maker_form(request, arg1):
     """
     unique_id = "rebase_questions_for_user_" + str(request.user.id)
     rebase_questions = cache.get(unique_id)
-    # rebase_questions = request.session.get('rebase_questions')
     if request.method == 'POST':
         form = TableUploadForm(request.POST, request.FILES)
         RebaseFormSet = formset_factory(RebaseForm)
@@ -53,22 +52,20 @@ def table_maker_form(request, arg1):
             dates = form.cleaned_data['dates']
             start = form.cleaned_data['start']
             end = form.cleaned_data['end']
+            id_column = form.cleaned_data['id_column']
 
             # Fetches data from formset and stores in 'edited_comments'
             edited_comments = []
-            num_submitted_forms = 0
+            j = 0
             for sub_form in formset:
-                if sub_form.has_changed():
-                    num_submitted_forms += 1
-            if num_submitted_forms > 0:
-                for sub_form in formset:
-                    question = sub_form.cleaned_data['question_id']
-                    comment = sub_form.cleaned_data['rebase']
-                    comment_data = [question, comment]
-                    if question is None or comment == "":
-                        continue
-                    else:
-                        edited_comments.append(comment_data)
+                comment = sub_form.cleaned_data['rebase']
+                question = rebase_questions[1][j]
+                comment_data = [question, comment]
+                if question is None or comment == "":
+                    continue
+                else:
+                    edited_comments.append(comment_data)
+                j += 1
 
             # Run table maker modules
             trimmed = trim_table(table_data, start, end, edited_comments)
@@ -88,7 +85,8 @@ def table_maker_form(request, arg1):
                 dates,
                 edited_comments,
                 start,
-                end
+                end,
+                id_column
             )
 
             # cache title for use with download button
@@ -109,12 +107,12 @@ def table_maker_form(request, arg1):
     else:
         form = TableUploadForm()
         RebaseFormSet = formset_factory(RebaseForm, extra=0)
-        formset = RebaseFormSet(initial=[{'item_number': number} for number in rebase_questions])
+        formset = RebaseFormSet(initial=[{'item_number': number} for number in rebase_questions[0]])
 
     return render(request, 'table_maker_form.html', {
         'form': form,
         'formset': formset,
-        'questions': rebase_questions
+        'questions': rebase_questions[0]
     })
 
 def scan_table(request):
@@ -151,6 +149,9 @@ def scan_table(request):
                 pair = f"{key}: {value}"
                 rebase_questions.append(pair)
 
+            rebase_ids = [key for key, value in id_answer_dict.items()]
+
+            rebase_questions = [rebase_questions, rebase_ids]
             unique_id = "rebase_questions_for_user_" + str(request.user.id)
             cache.set(unique_id, rebase_questions, 300)
 
