@@ -67,6 +67,7 @@ def create_workbook(
     # Format the tables with xlsxwriter and pandas
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create main results polling table
+        print(trimmed_data)
         cover_df.to_excel(writer, index=False, sheet_name="Cover Page")
         contents_df[0].to_excel(writer, index=False, sheet_name="Contents")
         trimmed_data.to_excel(writer, index=False, sheet_name='Full Results')
@@ -341,10 +342,24 @@ def create_workbook(
         if 'Grid' in cell.value:
             cell.hyperlink = f"#'{cell.value}'!A1"
 
+    # remove any n/a values from the contents Full Results column
+    ws = wb['Contents']
+    for cell in ws['D']:
+        if cell.value == 'n/a':
+            cell.value = None
+
     for sheet in wb.sheetnames:
         if 'Grid' in sheet:
             protected_sheets.append(sheet)
 
+    for sheet in wb.sheetnames:
+        if sheet not in protected_sheets:
+            for row in [4, 5]:
+                for cell in sheet[row]:
+                    if cell.value == 0:
+                        cell.value = None
+
+    # add standard cb headers.
     for sheet in wb.sheetnames:
         if sheet not in protected_sheets:
             ws = wb[sheet]

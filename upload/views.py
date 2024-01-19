@@ -27,7 +27,6 @@ import json
 import os
 
 import pandas as pd
-from docx import Document
 
 from django.shortcuts import render, redirect, reverse
 from django.views import View
@@ -35,9 +34,6 @@ from django.contrib import messages
 from .forms import CSVUploadForm, WeightForm, CrossbreakFormSet, CustomWeightFormSet
 from django.core.cache import cache
 from django.http import HttpResponse
-
-from .clean_data.clean_survey_legend import clean_survey_legend
-from .clean_data.clean_order import clean_order
 
 from queries.table_calculations.calculate_totals import table_calculation
 from queries.api_request.get_survey_questions import get_questions_json
@@ -71,18 +67,34 @@ def weight_data(request):
     """
     if request.method == 'POST':
         form = WeightForm(request.POST, request.FILES)
+        formset = CustomWeightFormSet(request.POST, prefix="weights") 
         if form.is_valid():
-            # Fetches data from form & converts them to df
+            # Handles all the form data
             survey_data = request.FILES['results']
             survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
             weight_proportions = request.FILES['weights']
             weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
             apply = form.cleaned_data['apply_weights']
+            custom = form.cleaned_data['custom_weights']
+            if custom:
+                if len(formset) < 1:
+                    return HttpResponse(
+                        "Error: Please specify your custom weights in the form."
+                        )
+                groups = []
+                questions = []
+                for sub_form in formset:
+                    groups.append(sub_form.cleanded_data['group'])
+                    questions.append(sub_form.cleanded_data['question'])
+
+            # print(groups)
+            # print(questions)
 
             # Run ipf module
             if apply:
                 weighted_data = wgt.run_weighting(survey_data, weight_proportions)
-
+            # elif custom:
+            #     weighted_data = wgt.apply_custom_weight(survey_data, weight_proportions)
             else:
                 weighted_data = wgt.apply_no_weight(survey_data)
 
@@ -91,8 +103,6 @@ def weight_data(request):
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
             )
             response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
-            # messages.success(request, "Data successfully weighted")
-            # return download_weights(request, weighted_data)
 
             # Cache the weighted data to be downloaded by user later
             excel_buffer = BytesIO()

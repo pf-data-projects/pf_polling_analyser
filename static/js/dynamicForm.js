@@ -121,8 +121,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Loading data from local storage
     window.onload = () => {
         // Restore the form count
-        const formCount = localStorage.getItem('wgt-count') || 1; // Default to 1 if nothing is stored
-        for (let i = 0; i < formCount; i++) {
+        const formCount = localStorage.getItem('wgt-count') || 0; // Default to 1 if nothing is stored
+        for (let i = 1; i <= formCount; i++) {
             addForm(); // Replace with your function to add a new form to the formset
         }
 
