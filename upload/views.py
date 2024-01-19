@@ -23,6 +23,7 @@ if not.
 """
 
 from io import BytesIO
+import re
 import json
 import os
 
@@ -72,6 +73,7 @@ def weight_data(request):
             # Handles all the form data
             survey_data = request.FILES['results']
             survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
+            survey_data.columns = [preprocess_header(col) for col in survey_data.columns]
             weight_proportions = request.FILES['weights']
             weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
             apply = form.cleaned_data['apply_weights']
@@ -170,6 +172,10 @@ def upload_csv(request):
 
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Sheet1")
+            data.columns = [preprocess_header(col) for col in data.columns]
+            print(data)
+
+            # validate the standard crossbreaks the the user selects.
             is_valid = vld.validate_cb_inputs(data, standard_cb)
             if not is_valid[0]:
                 return HttpResponse(f"An error occured: {is_valid[1]}")
@@ -257,3 +263,8 @@ def download_weights(request):
             "No weighted data found. Please weight the data first."
         )
         return redirect('home')
+
+def preprocess_header(header):
+    header = header.encode('utf-8').decode('utf-8')
+    header = re.sub(r'\s+', ' ', header)
+    return header

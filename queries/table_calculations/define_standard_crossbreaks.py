@@ -32,7 +32,7 @@ QUESTIONS = {
     "region": "In what region of the UK do you live?",
     "seg": "Think about the Chief Income Earner in your household",
     "children": "Do you have any children under the age of 18 living at home?",
-    "education": "What is the highest level of education you have achieved?",
+    "education": "What is the highest level of education you have achieved?",
 }
 
 def calc_standard(value, col_index, cb_question, table, question_list, results, question_data):

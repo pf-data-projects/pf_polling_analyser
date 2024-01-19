@@ -16,7 +16,13 @@ def validate_cb_inputs(data, standard_cb):
         ['region', "In what region of the UK do you live?"],
         ['seg', "Think about the Chief Income Earner in your household"],
         ['children', "Do you have any children under the age of 18 living at home?"],
-        ['education', ["What is the highest level of education you have achieved?", "What is the highest level of education you have achieved?"]],
+        [
+            'education', 
+            [
+                "What is the highest level of education you have achieved?", 
+                "What is the highest level of education you have achieved?"
+            ]
+        ],
     ]
 
     for cb in crossbreaks:
@@ -24,7 +30,7 @@ def validate_cb_inputs(data, standard_cb):
             present = False
             for col in data.columns:
                 if cb[0] == 'education':
-                    if cb[0][0] in col or cb[0][1] in col:
+                    if cb[1][0] in col or cb[1][1] in col:
                         present = True
                 elif cb[1] in col:
                     present = True
