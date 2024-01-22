@@ -368,13 +368,14 @@ def create_workbook(
             for row in [4, 5]:
                 for cell in ws.iter_rows(min_row=row, max_row=row, min_col=1, max_col=max_column):
                     for c in cell:
+                        # print(cell)
+                        # print(c.value)
                         try:
                             if c.value == 0 or c.value == "0":
                                 print(cell.value)
                                 c.value = None
-                        except AttributeError:
-                            print("This cell is an empty string")
-                            pass
+                        except AttributeError as e:
+                            print(e)
 
     # add standard cb headers.
     for sheet in wb.sheetnames:
