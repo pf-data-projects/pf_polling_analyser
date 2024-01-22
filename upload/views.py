@@ -265,10 +265,15 @@ def download_weights(request):
 
 def preprocess_header(header):
     """
-    Helper func to normalise encoding
-    and remove any chars that look like
-    space but arent.
+    Helper func to normalise encoding:
+    1. remove any chars that look like
+    space but aren't.
+    2. replace weird hyphens with normal
+    hyphens.
     """
     header = header.encode('utf-8').decode('utf-8')
     header = re.sub(r'\s+', ' ', header)
+    en_dash = '\u2013'
+    hyphen_minus = '\u002D'
+    header.replace(en_dash, hyphen_minus)
     return header

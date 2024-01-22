@@ -26,6 +26,7 @@ CB_OPTIONS = (
         ('region', 'Region'),
         ('seg', 'Socio-economic Group'),
         ('children', 'Children'),
+        ('children(updated)', "Children (Age breakdown)"),
         ('education', 'Education'),
     )
 
