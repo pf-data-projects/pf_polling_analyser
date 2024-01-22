@@ -365,14 +365,18 @@ def create_workbook(
         if sheet not in protected_sheets:
             ws = wb[sheet]
             max_column = ws.max_column
-            for row in [4, 5]:
+            for row in [3, 4]:
                 for col in range(1, max_column + 1):
                     c = ws.cell(row=row, column=col)
+                    if col == 25:
+                        print(c.value)
+                        print(type(c.value))
+                        # print()
                     # print(cell)
-                    print(c)
+                    # print(c)
                     try:
                         if c.value == 0 or c.value == "0":
-                            print(cell.value)
+                            print(c.value)
                             c.value = None
                     except AttributeError as e:
                         print(e)

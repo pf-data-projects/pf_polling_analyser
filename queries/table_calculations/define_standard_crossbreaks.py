@@ -16,6 +16,12 @@ CROSSBREAKS = {
     ],
     "seg": ['AB', 'C1', 'C2', 'DE'],
     "children": ["Yes", "No"],
+    "children(updated)": [
+        "No children", "Yes - child/children aged under 5 years old",
+        "Yes – child/children aged 5-10 years old", "Yes – child/children aged 11-15 years old",
+        "Yes – child/children aged 16-18 years old", "Yes - child/children over 18 years old",
+        "Prefer not to answer",
+    ],
     "education": [
         "GCSE or equivalent (Scottish National/O Level)",
         "A Level or equivalent (GCE/Higher/Advanced Higher)",
@@ -32,6 +38,7 @@ QUESTIONS = {
     "region": "In what region of the UK do you live?",
     "seg": "Think about the Chief Income Earner in your household",
     "children": "Do you have any children under the age of 18 living at home?",
+    "children(updated)": "Do you have any children?",
     "education": "What is the highest level of education you have achieved?",
 }
 
