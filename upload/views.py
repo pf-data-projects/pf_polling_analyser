@@ -173,6 +173,8 @@ def upload_csv(request):
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Sheet1")
             data.columns = [preprocess_header(col) for col in data.columns]
+            if 'weighted_respondents' not in data.columns:
+                return HttpResponse('No weights found. Please weight your data first.')
 
             # validate the standard crossbreaks the the user selects.
             is_valid = vld.validate_cb_inputs(data, standard_cb)
