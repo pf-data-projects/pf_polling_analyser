@@ -275,5 +275,7 @@ def preprocess_header(header):
     header = re.sub(r'\s+', ' ', header)
     en_dash = '\u2013'
     hyphen_minus = '\u002D'
-    header.replace(en_dash, hyphen_minus)
+    header = header.replace(en_dash, hyphen_minus)
+    for char in header:
+        print(f'{char}: {ord(char):x}')
     return header

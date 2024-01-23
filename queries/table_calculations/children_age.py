@@ -11,9 +11,9 @@ from .rebase import rebase
 AGE_QUESTIONS = [
     "No children",
     "Yes - child/children aged under 5 years old",
-    "Yes – child/children aged 5-10 years old",
-    "Yes – child/children aged 11-15 years old",
-    "Yes – child/children aged 16-18 years old",
+    "Yes - child/children aged 5-10 years old",
+    "Yes - child/children aged 11-15 years old",
+    "Yes - child/children aged 16-18 years old",
     "Yes - child/children over 18 years old",
 ]
 
@@ -26,19 +26,15 @@ def iterate_over_children_ages(table, question_list, results, question_data):
     for question_header in AGE_QUESTIONS:
         try:
             get_col = results[helpers.col_substr_partial(results, question_header)]
-            print("-----------------------------")
-            print(get_col.columns)
-            print("-----------------------------")
             filtered_df = results.loc[results[get_col.columns[0]] == question_header]
-            print(filtered_df)
             table.iat[0, table_col] = len(filtered_df.index)
             table.iat[1, table_col] = filtered_df['weighted_respondents'].astype(float).sum()
             for question in question_list:
                 table = calc.calc(
                     filtered_df, table_col, table, question, results, question_data, False)
-            print(table)
             table_col += 1
         except IndexError:
+            print("there was an encoding error.")
             continue
     return table
 
