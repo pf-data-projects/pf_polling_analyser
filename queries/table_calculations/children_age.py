@@ -26,8 +26,10 @@ def iterate_over_children_ages(table, question_list, results, question_data):
     for question_header in AGE_QUESTIONS:
         try:
             get_col = results[helpers.col_substr_partial(results, question_header)]
-            filtered_df = results.loc[results[get_col.columns[0]] == question_header]
+            print(get_col)
+            filtered_df = results.loc[results[get_col.columns[0]] != 'nan']
             table.iat[0, table_col] = len(filtered_df.index)
+            print(len(filtered_df.index))
             table.iat[1, table_col] = filtered_df['weighted_respondents'].astype(float).sum()
             for question in question_list:
                 table = calc.calc(
