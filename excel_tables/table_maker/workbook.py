@@ -368,19 +368,11 @@ def create_workbook(
             for row in [3, 4]:
                 for col in range(1, max_column + 1):
                     c = ws.cell(row=row, column=col)
-                    if col == 25:
-                        print(c.value)
-                        print(type(c.value))
-                        # print()
-                    # print(cell)
-                    # print(c)
                     try:
                         if c.value == 0 or c.value == "0":
-                            print(c.value)
                             c.value = None
                     except AttributeError as e:
                         print(e)
-                        print(c)
 
     # add standard cb headers.
     for sheet in wb.sheetnames:
@@ -412,6 +404,11 @@ def create_workbook(
             if "Yes" in cols:
                 excel_coord = get_header_coords("Yes", trimmed_data)
                 excel_coord2 = get_header_coords("No", trimmed_data)
+                ws[excel_coord] = "Has Children?"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+            if "No children" in cols:
+                excel_coord = get_header_coords("No children", trimmed_data)
+                excel_coord2 = get_header_coords("Yes - child/children over 18 years old", trimmed_data)
                 ws[excel_coord] = "Has Children?"
                 ws.merge_cells(f"{excel_coord}:{excel_coord2}")
             if "GCSE or equivalent (Scottish National/O Level)" in cols:

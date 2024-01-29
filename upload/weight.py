@@ -164,6 +164,8 @@ def apply_custom_weight(survey_data, weight_proportions, questions, groups):
     survey_subset = survey_data_renamed[questions]
     survey_subset.columns = [group for group in groups]
 
+    print(survey_subset)
+
     def custom_ipf(survey_data, weight_proportions, max_iterations=100, convergence_threshold=0.001):
         survey_data['weight'] = 1.0
         for iteration in range(max_iterations):

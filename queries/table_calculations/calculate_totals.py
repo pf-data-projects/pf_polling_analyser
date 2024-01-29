@@ -7,6 +7,7 @@ from .helpers import (
     )
 from .age import iterate_age_brackets, iterate_age_rebase
 from .seg import iterate_seg, iterate_seg_rebase
+from .children_age import iterate_over_children_ages, rebase_children_ages
 from .define_standard_crossbreaks import CROSSBREAKS, QUESTIONS, calc_standard, rebase_standard
 from .define_non_standard_cb import calc_crossbreak, rebase_crossbreak
 from .calc import calc
@@ -75,6 +76,11 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
             if key == 'seg':
                 table = iterate_seg(table, question_list, results, question_data)
                 continue
+            if key == 'children(updated)':
+                table = iterate_over_children_ages(
+                    table, question_list, results, question_data
+                )
+                continue
             for i in value:
                 table = calc_standard(
                     i,
@@ -122,6 +128,11 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
             if key == 'seg':
                 table = iterate_seg_rebase(
                     table, question_list, results, question_data)
+                continue
+            if key == 'children(updated)':
+                table = rebase_children_ages(
+                    table, question_list, results, question_data
+                )
                 continue
             for i in value:
                 table = rebase_standard(

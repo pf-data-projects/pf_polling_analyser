@@ -26,6 +26,7 @@ CB_OPTIONS = (
         ('region', 'Region'),
         ('seg', 'Socio-economic Group'),
         ('children', 'Children'),
+        ('children(updated)', "Children (Age breakdown)"),
         ('education', 'Education'),
     )
 
@@ -103,6 +104,7 @@ class WeightForm(forms.Form):
     )
     custom_weights = forms.BooleanField(
         label="Customise your weights?",
+        help_text="Tick if you've added a custom weight file. You'll need to add your categories in the form below",
         required=False
     )
 

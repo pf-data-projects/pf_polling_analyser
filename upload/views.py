@@ -78,7 +78,7 @@ def weight_data(request):
             weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
             apply = form.cleaned_data['apply_weights']
             custom = form.cleaned_data['custom_weights']
-            if custom:
+            if custom and formset.is_valid():
                 if len(formset) < 1:
                     return HttpResponse(
                         "Error: Please specify your custom weights in the form."
@@ -86,17 +86,17 @@ def weight_data(request):
                 groups = []
                 questions = []
                 for sub_form in formset:
-                    groups.append(sub_form.cleanded_data['group'])
-                    questions.append(sub_form.cleanded_data['question'])
+                    groups.append(sub_form.cleaned_data['group'])
+                    questions.append(sub_form.cleaned_data['question'])
 
             # print(groups)
             # print(questions)
 
             # Run ipf module
-            if apply:
+            if apply and not custom:
                 weighted_data = wgt.run_weighting(survey_data, weight_proportions)
-            # elif custom:
-            #     weighted_data = wgt.apply_custom_weight(survey_data, weight_proportions)
+            elif custom:
+                weighted_data = wgt.apply_custom_weight(survey_data, weight_proportions, questions, groups)
             else:
                 weighted_data = wgt.apply_no_weight(survey_data)
 
@@ -173,6 +173,8 @@ def upload_csv(request):
             # convert the data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Sheet1")
             data.columns = [preprocess_header(col) for col in data.columns]
+            if 'weighted_respondents' not in data.columns:
+                return HttpResponse('No weights found. Please weight your data first.')
 
             # validate the standard crossbreaks the the user selects.
             is_valid = vld.validate_cb_inputs(data, standard_cb)
@@ -265,10 +267,15 @@ def download_weights(request):
 
 def preprocess_header(header):
     """
-    Helper func to normalise encoding
-    and remove any chars that look like
-    space but arent.
+    Helper func to normalise encoding:
+    1. remove any chars that look like
+    space but aren't.
+    2. replace weird hyphens with normal
+    hyphens.
     """
     header = header.encode('utf-8').decode('utf-8')
     header = re.sub(r'\s+', ' ', header)
+    en_dash = '\u2013'
+    hyphen_minus = '\u002D'
+    header = header.replace(en_dash, hyphen_minus)
     return header
