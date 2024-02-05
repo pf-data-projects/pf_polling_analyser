@@ -78,6 +78,7 @@ def weight_data(request):
             weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
             apply = form.cleaned_data['apply_weights']
             custom = form.cleaned_data['custom_weights']
+            standard_weights = form.cleaned_data['standard_weights']
             if custom and formset.is_valid():
                 if len(formset) < 1:
                     return HttpResponse(
@@ -96,7 +97,7 @@ def weight_data(request):
             if apply and not custom:
                 weighted_data = wgt.run_weighting(survey_data, weight_proportions)
             elif custom:
-                weighted_data = wgt.apply_custom_weight(survey_data, weight_proportions, questions, groups)
+                weighted_data = wgt.apply_custom_weight(survey_data, weight_proportions, questions, groups, standard_weights)
             else:
                 weighted_data = wgt.apply_no_weight(survey_data)
 

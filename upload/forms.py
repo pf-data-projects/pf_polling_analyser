@@ -24,12 +24,17 @@ CB_OPTIONS = (
         ('gender', 'Gender'),
         ('age', 'Age'),
         ('region', 'Region'),
-        ('seg', 'Socio-economic Group'),
+        ('seg', 'Socio-economic Grade'),
         ('children', 'Children'),
         ('children(updated)', "Children (Age breakdown)"),
         ('education', 'Education'),
     )
 
+STANDARD_WEIGHTS = (
+    ('seg', 'Socio-economic Grade'),
+    ('region', 'Region'),
+    ('genderage', 'Interlocking Gender and Age')
+)
 
 class CSVUploadForm(forms.Form):
     """
@@ -104,7 +109,13 @@ class WeightForm(forms.Form):
     )
     custom_weights = forms.BooleanField(
         label="Customise your weights?",
-        help_text="Tick if you've added a custom weight file. You'll need to add your categories in the form below",
+        help_text="Leave this blank unless you're using custom weights and some standard weight categories",
+        required=False
+    )
+    standard_weights = forms.MultipleChoiceField(
+        label="Include any standard weights in the custom weighting process?",
+        choices=STANDARD_WEIGHTS,
+        widget=forms.CheckboxSelectMultiple,
         required=False
     )
 
@@ -116,11 +127,13 @@ class CustomWeightForm(forms.Form):
     """
     group = forms.CharField(
         label="The category you want to weight by: e.g., Region, Ethnicity, Income, etc...",
+        help_text="Tick if you've added a custom weight file. You'll need to add your categories in the form below",
         required=False
     )
     question = forms.CharField(
         label="The exact question in the survey associated with this category",
         required=False
     )
+    
 
 CustomWeightFormSet = formset_factory(CustomWeightForm, extra=1)
