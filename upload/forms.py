@@ -127,13 +127,12 @@ class CustomWeightForm(forms.Form):
     """
     group = forms.CharField(
         label="The category you want to weight by: e.g., Region, Ethnicity, Income, etc...",
-        help_text="Tick if you've added a custom weight file. You'll need to add your categories in the form below",
+        help_text="This needs to match the custom category in the 'group' column of the weight proportions file",
         required=False
     )
     question = forms.CharField(
         label="The exact question in the survey associated with this category",
         required=False
     )
-    
 
 CustomWeightFormSet = formset_factory(CustomWeightForm, extra=1)
