@@ -1,5 +1,7 @@
 import os
+import json
 import pandas as pd
+from django.core.cache import cache
 from .create_blank_table import create_blank_table
 from .helpers import (
     col_with_substr,
@@ -12,6 +14,7 @@ from .define_standard_crossbreaks import CROSSBREAKS, QUESTIONS, calc_standard, 
 from .define_non_standard_cb import calc_crossbreak, rebase_crossbreak
 from .calc import calc
 from .rebase import rebase
+from .rebase_headers import rebase_headers
 
 def table_calculation(results, question_data, standard_cb, non_standard_cb):
     """
@@ -151,5 +154,10 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
         for crossbreak in non_standard_cb:
             rebase_crossbreak(
                 table, question_list, results, question_data, crossbreak)
+    
+    rebased_header_data = rebase_headers(results, question_list, standard_cb, non_standard_cb)
+    rebased_json = json.dumps(rebased_header_data)
+    cache_key = 'rebase_json'
+    cache.set(cache_key, rebased_json, 300)
 
     return table

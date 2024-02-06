@@ -266,6 +266,27 @@ def download_weights(request):
         )
         return redirect('home')
 
+def download_headers(request):
+    """
+    Handles downloading cached rebased header data.
+    """
+    unique_id = 'rebase_json'
+    json_data = cache.get(unique_id)
+    if json_data:
+        response = HttpResponse(
+            json_data,
+            content_type='application/json'
+        )
+        response['Content-Disposition'] = 'attachment; filename="table_headers.json"'
+        return response
+    else:
+        messages.error(
+            request,
+            "No JSON file was found for your table's headers."
+        )
+        return redirect('home')
+
+
 def preprocess_header(header):
     """
     Helper func to normalise encoding:
