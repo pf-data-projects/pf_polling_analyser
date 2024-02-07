@@ -223,7 +223,7 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
                                         sum1 = int(non_nan_count)
                                         sum2 = filtered_df.loc[non_nan_rows, 'weighted_respondents'].sum()
                                         sum2 = int(sum2)
-                                        header_data[question['qid']][iteration['name']] = [sum1, sum2]
+                                        header_data[question['qid']][age_question] = [sum1, sum2]
                             elif key == 'age':
                                 ages = CROSSBREAKS["age"]
                                 age_brackets = []
