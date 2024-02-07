@@ -322,5 +322,5 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
         else:
             checked.append(question['qid'])
             continue
-    print(header_data)
+    # print(header_data)
     return header_data

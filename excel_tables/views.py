@@ -20,6 +20,7 @@ error if not.
 """
 
 from io import BytesIO
+import json
 
 import pandas as pd
 
@@ -48,6 +49,8 @@ def table_maker_form(request, arg1):
             # Fetches data from form & converts them to df
             table_data = request.FILES['data_file']
             table_data = pd.read_csv(table_data)
+            rebased_headers = request.FILES['rebased_header_file']
+            rebased_headers = json.load(rebased_headers)
             title = form.cleaned_data['title']
             dates = form.cleaned_data['dates']
             start = form.cleaned_data['start']
@@ -86,7 +89,8 @@ def table_maker_form(request, arg1):
                 edited_comments,
                 start,
                 end,
-                id_column
+                id_column,
+                rebased_headers
             )
 
             # cache title for use with download button

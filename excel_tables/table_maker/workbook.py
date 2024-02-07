@@ -35,7 +35,7 @@ from .helper import get_column_letter
 
 def create_workbook(
     request, data, questions_list, grids, unique_ids,
-    title, dates, comments, start, end, id_column):
+    title, dates, comments, start, end, id_column, rebased_headers):
     """
     The function that controls the creation and formatting of
     polling tables.
@@ -399,7 +399,7 @@ def create_workbook(
             if "AB" in cols:
                 excel_coord = get_header_coords("AB", trimmed_data)
                 excel_coord2 = get_header_coords("DE", trimmed_data)
-                ws[excel_coord] = "Socio-Economic Group"
+                ws[excel_coord] = "Socio-Economic Grade"
                 ws.merge_cells(f"{excel_coord}:{excel_coord2}")
             if "Yes" in cols:
                 excel_coord = get_header_coords("Yes", trimmed_data)
@@ -512,6 +512,8 @@ def create_workbook(
             ws['A3'].hyperlink = '#Contents!A1'
             ws['A3'].value = 'Back to Contents'
 
+    wb = update_column_headers(wb, rebased_headers)
+
     output = io.BytesIO()
     wb.save(output)
 
@@ -592,3 +594,41 @@ def shift_right(cell, x):
     new_col_num = col_to_num(col) + x
     new_col = num_to_col(new_col_num)
     return new_col + row
+
+def num_to_col(n):
+    """
+    helper func to convert
+    an int to excel col letter.
+    """
+    col_str = ''
+    while n > 0:
+        n, remainder = divmod(n - 1, 26)
+        col_str = chr(65 + remainder) + col_str
+    return col_str
+
+def update_column_headers(workbook, rebased_headers):
+    """
+    Loops through the rebase headers dictionary and applies the data
+    to the relevant sheet.
+    """
+    # iterate through question ids
+    for key, value in rebased_headers.items():
+        col = 2
+        # skip questions that have been trimmed off
+        try:
+            sheet = workbook[f'Question ID - {key}']
+        except KeyError:
+            print("This question does not exist in the trimmed data.")
+            continue
+        # Iterate through crossbreaks for each    
+        for k, v in value.items():
+            column = num_to_col(col)
+            # print(column, type(sheet[f'{column}3'].value))
+            if sheet[f'{column}3'].value == '' or sheet[f'{column}3'].value is None:
+                col += 1
+                column = num_to_col(col)
+            sheet[f'{column}3'].value = k
+            sheet[f'{column}4'].value = v[0]
+            sheet[f'{column}5'].value = v[1]
+            col += 1
+    return workbook
