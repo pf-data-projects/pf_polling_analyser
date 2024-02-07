@@ -1,12 +1,10 @@
-import os
+"""This file controls all the logic for the calculations of totals/crossbreaks/rebasing"""
+
+# import os
 import json
-import pandas as pd
+# import pandas as pd
 from django.core.cache import cache
 from .create_blank_table import create_blank_table
-from .helpers import (
-    col_with_substr,
-    col_with_substr_a
-    )
 from .age import iterate_age_brackets, iterate_age_rebase
 from .seg import iterate_seg, iterate_seg_rebase
 from .children_age import iterate_over_children_ages, rebase_children_ages
@@ -154,7 +152,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
         for crossbreak in non_standard_cb:
             rebase_crossbreak(
                 table, question_list, results, question_data, crossbreak)
-    
+
     rebased_header_data = rebase_headers(results, question_list, standard_cb, non_standard_cb)
     rebased_json = json.dumps(rebased_header_data)
     cache_key = 'rebase_json'

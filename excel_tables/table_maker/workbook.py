@@ -216,11 +216,11 @@ def create_workbook(
                     ['IDs', 'Types', 'Base Type', 'Rebase comment needed'],
                     axis=1
                 )
-                # add a new row for link back to contents page
-                new_row = {concat_sub_table.columns[0]: 'Back to contents'}
-                for col in concat_sub_table.columns[1:]:
-                    new_row[col] = ''
-                concat_sub_table.loc[len(concat_sub_table)] = new_row
+                # # add a new row for link back to contents page
+                # new_row = {concat_sub_table.columns[0]: 'Back to contents'}
+                # for col in concat_sub_table.columns[1:]:
+                #     new_row[col] = ''
+                # concat_sub_table.loc[len(concat_sub_table)] = new_row
 
                 # ensure blank cols remain blank
                 for col in concat_sub_table.columns:
@@ -332,14 +332,24 @@ def create_workbook(
     # create links to all the tables in the contents page.
     contents_sheet = wb['Contents']
     for cell in contents_sheet['C']:
-        qid = contents_sheet[f'B{cell.row}']
-        if cell.value is None:
-            continue
-        if 'Grid' and 'Question' not in cell.value:
-            # print(f"#'Question ID - {qid.value}'!A1")
-            cell.hyperlink = f"#'Question ID - {qid.value}'!A1"
-        if 'Grid' in cell.value:
-            cell.hyperlink = f"#'{cell.value}'!A1"
+        if id_column:
+            qid = contents_sheet[f'B{cell.row}']
+            if cell.value is None:
+                continue
+            if 'Grid' and 'Question' not in cell.value:
+                # print(f"#'Question ID - {qid.value}'!A1")
+                cell.hyperlink = f"#'Question ID - {qid.value}'!A1"
+            if 'Grid' in cell.value:
+                cell.hyperlink = f"#'{cell.value}'!A1"
+        else:
+            qid = contents_sheet[f'A{cell.row}']
+            if cell.value is None:
+                continue
+            if 'Grid' and 'Question' not in cell.value:
+                # print(f"#'Question ID - {qid.value}'!A1")
+                cell.hyperlink = f"#'Question ID - {qid.value}'!A1"
+            if 'Grid' in cell.value:
+                cell.hyperlink = f"#'{cell.value}'!A1"
 
     # remove any n/a values from the contents Full Results column
     # and remove id column if user has not chosen it.
