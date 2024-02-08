@@ -46,6 +46,7 @@ from . import weight as wgt
 
 from . import validation as vld
 
+
 class GuideView(View):
     """
     A view to handle the guide/instructions page.
@@ -55,6 +56,7 @@ class GuideView(View):
         Gets the guide page.
         """
         return render(request, "guide.html")
+
 
 def weight_data(request):
     """
@@ -93,11 +95,48 @@ def weight_data(request):
             # print(groups)
             # print(questions)
 
-            # Run ipf module
+            # ~~~~~~~~~~~~~~~~ Run ipf module for standard weights
             if apply and not custom:
-                weighted_data = wgt.run_weighting(survey_data, weight_proportions)
+                try:
+                    weighted_data = wgt.run_weighting(survey_data, weight_proportions)
+                except StopIteration:
+                    message="""
+                        An error occurred searching for the Socio-Economic Grade question.
+                        The code couldn't find it - Have you checked that this question exists in the data,
+                        or that the wording hasn't changed?
+                        """
+                    return HttpResponse(message)
+                except Exception as e:
+                    message=f"""
+                        There was an error in the weighting calculation.
+                        Please make sure the questions/columns in the data
+                        match the groups specified in the weight proportions.
+
+                        This is the error the code returned: {e}
+                        """
+                    return HttpResponse(message)
+
+            # ~~~~~~~~~~~~~~~~ Run ipf module for custom weights
             elif custom:
-                weighted_data = wgt.apply_custom_weight(survey_data, weight_proportions, questions, groups, standard_weights)
+                try:
+                    weighted_data = wgt.apply_custom_weight(survey_data, weight_proportions, questions, groups, standard_weights)
+                except StopIteration:
+                    message="""
+                        An error occurred searching for the Socio-Economic Grade question.
+                        The code couldn't find it - Have you checked that this question exists in the data,
+                        or that the wording hasn't changed?
+                        """
+                    return HttpResponse(message)
+                except Exception as e:
+                    message=f"""
+                        There was an error in the weighting calculation.
+                        Please make sure the questions/columns in the data
+                        match the groups specified in the weight proportions.
+
+                        This is the error the code returned: {e}
+                        """
+                    return HttpResponse(message)
+            # ~~~~~~~~~~~~~~~~ Run ipf module for no weights
             else:
                 weighted_data = wgt.apply_no_weight(survey_data)
 
@@ -132,6 +171,7 @@ def weight_data(request):
         'form': form,
         'formset': formset
     })
+
 
 def upload_csv(request):
     """
@@ -199,7 +239,20 @@ def upload_csv(request):
             #     "question_data.csv", index=False, encoding="utf-8-sig")
 
             # Run calculations
-            table = table_calculation(data, question_data, standard_cb, non_standard_cb)
+            try:
+                table = table_calculation(data, question_data, standard_cb, non_standard_cb)
+            except (KeyError, IndexError) as e:
+                message = f"""
+                    There was an error when running this code for crossbreaks.
+                    The most likely cause of this error is entering a crossbreak that
+                    doesn't exist in the data.
+
+                    It could also be caused by changes in the wording of standard crossbreak
+                    questions.
+
+                    Here is the content of the error message: {e}
+                    """
+                return HttpResponse(message)
 
             # Store results in cache
             csv_buffer = BytesIO()
@@ -229,6 +282,7 @@ def upload_csv(request):
         'formset': formset
     })
 
+
 def download_csv(request):
     """
     Handles retrieval of cached output table.
@@ -245,6 +299,7 @@ def download_csv(request):
             "No crossbreaks data found. Please run the calculations first."
         )
         return redirect('home')
+
 
 def download_weights(request):
     """
@@ -265,6 +320,7 @@ def download_weights(request):
             "No weighted data found. Please weight the data first."
         )
         return redirect('home')
+
 
 def download_headers(request):
     """

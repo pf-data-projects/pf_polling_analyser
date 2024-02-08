@@ -17,6 +17,7 @@ AGE_QUESTIONS = [
     "Yes - child/children over 18 years old",
 ]
 
+
 def iterate_over_children_ages(table, question_list, results, question_data):
     """
     Iterates over the different column
@@ -39,6 +40,7 @@ def iterate_over_children_ages(table, question_list, results, question_data):
             print("there was an encoding error.")
             continue
     return table
+
 
 def rebase_children_ages(table, question_list, results, question_data):
     """
