@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+    <div class="p-2 sign-in-card rounded">
+        <h1>Oops! Looks like the page you tried to access does not exist...</h1>
+        <p>Click the button below to return back to the home page.</p>
+        <a href="{% url 'home' %}" class="btn auth-btn">Return Home</a>
+    </div>
+</div>
+
+{% endblock %}

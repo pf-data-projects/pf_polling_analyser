@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from .views import handler404, handler500
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,3 +25,6 @@ urlpatterns = [
     path('', include('excel_tables.urls'), name="excel_table_urls"),
     path('', include('report.urls'), name="report_urls"),
 ]
+
+handler404 = handler404
+handler500 = handler500
