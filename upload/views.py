@@ -119,7 +119,9 @@ def weight_data(request):
             # ~~~~~~~~~~~~~~~~ Run ipf module for custom weights
             elif custom:
                 try:
-                    weighted_data = wgt.apply_custom_weight(survey_data, weight_proportions, questions, groups, standard_weights)
+                    weighted_data = wgt.apply_custom_weight(
+                        survey_data, weight_proportions, questions, groups, standard_weights
+                    )
                 except StopIteration:
                     message="""
                         An error occurred searching for the Socio-Economic Grade question.

@@ -27,21 +27,26 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
                 if has_nan_rows:
                     header_data[question['qid']] = {} # Initialise data for qid
                     # rebased totals
-                    checkbox_cols = results[helpers.col_with_qid(results, question['qid'])]
-                    has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
-                    if has_nan_rows:
-                        non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
-                        sum1 = int(non_nan_count)
-                    qid_columns = helpers.col_with_qid(results, question['qid'])
-                    selected_columns = qid_columns + ['weighted_respondents']
-                    checkbox_cols = results[selected_columns]
-                    nan_check_cols = checkbox_cols.drop(columns=['weighted_respondents'])
-                    rows_with_all_nan = nan_check_cols.apply(lambda x: x.astype(str).eq('nan').all(), axis=1)
-                    non_nan_rows = ~rows_with_all_nan
-                    if has_nan_rows:
-                        sum2 = checkbox_cols.loc[non_nan_rows, 'weighted_respondents'].sum()
-                        sum2 = int(sum2)
-                        header_data[question['qid']]['Total'] = [sum1, sum2]
+
+                    # checkbox_cols = results[helpers.col_with_qid(results, question['qid'])]
+                    # has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
+                    # if has_nan_rows:
+                    #     non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
+                    #     sum1 = int(non_nan_count)
+                    # qid_columns = helpers.col_with_qid(results, question['qid'])
+                    # selected_columns = qid_columns + ['weighted_respondents']
+                    # checkbox_cols = results[selected_columns]
+                    # nan_check_cols = checkbox_cols.drop(columns=['weighted_respondents'])
+                    # rows_with_all_nan = nan_check_cols.apply(lambda x: x.astype(str).eq('nan').all(), axis=1)
+                    # non_nan_rows = ~rows_with_all_nan
+                    # if has_nan_rows:
+                    #     sum2 = checkbox_cols.loc[non_nan_rows, 'weighted_respondents'].sum()
+                    #     sum2 = int(sum2)
+                    #     header_data[question['qid']]['Total'] = [sum1, sum2]
+                    sum_figures = find_sums_for_multi(results, results, question['qid'])
+                    if sum_figures is not None:
+                        header_data[question['qid']]['Total'] = sum_figures
+
                     # Iterate through standard crossbreaks
                     for key, value in CROSSBREAKS.items():
                         cb_question = QUESTIONS[key]
@@ -50,21 +55,24 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
                                 for age_question in AGE_QUESTIONS:
                                     get_col = results[helpers.col_substr_partial(results, age_question)]
                                     filtered_df = results.loc[results[get_col.columns[0]] != 'nan']
-                                    checkbox_cols = filtered_df[helpers.col_with_qid(results, question['qid'])]
-                                    has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
-                                    if has_nan_rows:
-                                        non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
-                                        sum1 = int(non_nan_count)
-                                    qid_columns = helpers.col_with_qid(results, question['qid'])
-                                    selected_columns = qid_columns + ['weighted_respondents']
-                                    checkbox_cols = filtered_df[selected_columns]
-                                    nan_check_cols = checkbox_cols.drop(columns=['weighted_respondents'])
-                                    rows_with_all_nan = nan_check_cols.apply(lambda x: x.astype(str).eq('nan').all(), axis=1)
-                                    non_nan_rows = ~rows_with_all_nan
-                                    if has_nan_rows:
-                                        sum2 = checkbox_cols.loc[non_nan_rows, 'weighted_respondents'].sum()
-                                        sum2 = int(sum2)
-                                        header_data[question['qid']][age_question] = [sum1, sum2]
+                                    # checkbox_cols = filtered_df[helpers.col_with_qid(results, question['qid'])]
+                                    # has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
+                                    # if has_nan_rows:
+                                    #     non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
+                                    #     sum1 = int(non_nan_count)
+                                    # qid_columns = helpers.col_with_qid(results, question['qid'])
+                                    # selected_columns = qid_columns + ['weighted_respondents']
+                                    # checkbox_cols = filtered_df[selected_columns]
+                                    # nan_check_cols = checkbox_cols.drop(columns=['weighted_respondents'])
+                                    # rows_with_all_nan = nan_check_cols.apply(lambda x: x.astype(str).eq('nan').all(), axis=1)
+                                    # non_nan_rows = ~rows_with_all_nan
+                                    # if has_nan_rows:
+                                    #     sum2 = checkbox_cols.loc[non_nan_rows, 'weighted_respondents'].sum()
+                                    #     sum2 = int(sum2)
+                                    #     header_data[question['qid']][age_question] = [sum1, sum2]
+                                    sum_figures = find_sums_for_multi(filtered_df, results, question['qid'])
+                                    if sum_figures is not None:
+                                        header_data[question['qid']][age_question] = sum_figures
                             elif key == 'seg':
                                 segs = CROSSBREAKS['seg']
                                 iterations = []
@@ -79,21 +87,24 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
                                     get_seg = results[helpers.col_substr_partial(results, seg_q)]
                                     contains = get_seg.iloc[:, 0].isin(iteration['seg'])
                                     filtered_df = results[contains]
-                                    checkbox_cols = filtered_df[helpers.col_with_qid(results, question['qid'])]
-                                    has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
-                                    if has_nan_rows:
-                                        non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
-                                        sum1 = int(non_nan_count)
-                                    qid_columns = helpers.col_with_qid(results, question['qid'])
-                                    selected_columns = qid_columns + ['weighted_respondents']
-                                    checkbox_cols = filtered_df[selected_columns]
-                                    nan_check_cols = checkbox_cols.drop(columns=['weighted_respondents'])
-                                    rows_with_all_nan = nan_check_cols.apply(lambda x: x.astype(str).eq('nan').all(), axis=1)
-                                    non_nan_rows = ~rows_with_all_nan
-                                    if has_nan_rows:
-                                        sum2 = checkbox_cols.loc[non_nan_rows, 'weighted_respondents'].sum()
-                                        sum2 = int(sum2)
-                                        header_data[question['qid']][iteration['name']] = [sum1, sum2]
+                                    # checkbox_cols = filtered_df[helpers.col_with_qid(results, question['qid'])]
+                                    # has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
+                                    # if has_nan_rows:
+                                    #     non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
+                                    #     sum1 = int(non_nan_count)
+                                    # qid_columns = helpers.col_with_qid(results, question['qid'])
+                                    # selected_columns = qid_columns + ['weighted_respondents']
+                                    # checkbox_cols = filtered_df[selected_columns]
+                                    # nan_check_cols = checkbox_cols.drop(columns=['weighted_respondents'])
+                                    # rows_with_all_nan = nan_check_cols.apply(lambda x: x.astype(str).eq('nan').all(), axis=1)
+                                    # non_nan_rows = ~rows_with_all_nan
+                                    # if has_nan_rows:
+                                    #     sum2 = checkbox_cols.loc[non_nan_rows, 'weighted_respondents'].sum()
+                                    #     sum2 = int(sum2)
+                                    #     header_data[question['qid']][iteration['name']] = [sum1, sum2]
+                                    sum_figures = find_sums_for_multi(filtered_df, results, question['qid'])
+                                    if sum_figures is not None:
+                                        header_data[question['qid']][iteration['name']] = sum_figures
                             elif key == 'age':
                                 ages = CROSSBREAKS["age"]
                                 age_brackets = []
@@ -123,40 +134,46 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
                                         (results[get_age.columns[0]].astype(int) >= bracket['num1'])
                                         ]
                                     filtered_df = filtered_df.loc[(filtered_df[get_age.columns[0]].astype(int) <= bracket['num2'])]
-                                    checkbox_cols = filtered_df[helpers.col_with_qid(results, question['qid'])]
-                                    has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
-                                    if has_nan_rows:
-                                        non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
-                                        sum1 = int(non_nan_count)
-                                    qid_columns = helpers.col_with_qid(results, question['qid'])
-                                    selected_columns = qid_columns + ['weighted_respondents']
-                                    checkbox_cols = filtered_df[selected_columns]
-                                    nan_check_cols = checkbox_cols.drop(columns=['weighted_respondents'])
-                                    rows_with_all_nan = nan_check_cols.apply(lambda x: x.astype(str).eq('nan').all(), axis=1)
-                                    non_nan_rows = ~rows_with_all_nan
-                                    if has_nan_rows:
-                                        sum2 = checkbox_cols.loc[non_nan_rows, 'weighted_respondents'].sum()
-                                        sum2 = int(sum2)
-                                        header_data[question['qid']][bracket['name']] = [sum1, sum2]
+                                    # checkbox_cols = filtered_df[helpers.col_with_qid(results, question['qid'])]
+                                    # has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
+                                    # if has_nan_rows:
+                                    #     non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
+                                    #     sum1 = int(non_nan_count)
+                                    # qid_columns = helpers.col_with_qid(results, question['qid'])
+                                    # selected_columns = qid_columns + ['weighted_respondents']
+                                    # checkbox_cols = filtered_df[selected_columns]
+                                    # nan_check_cols = checkbox_cols.drop(columns=['weighted_respondents'])
+                                    # rows_with_all_nan = nan_check_cols.apply(lambda x: x.astype(str).eq('nan').all(), axis=1)
+                                    # non_nan_rows = ~rows_with_all_nan
+                                    # if has_nan_rows:
+                                    #     sum2 = checkbox_cols.loc[non_nan_rows, 'weighted_respondents'].sum()
+                                    #     sum2 = int(sum2)
+                                    #     header_data[question['qid']][bracket['name']] = [sum1, sum2]
+                                    sum_figures = find_sums_for_multi(filtered_df, results, question['qid'])
+                                    if sum_figures is not None:
+                                        header_data[question['qid']][bracket['name']] = sum_figures
                             else:
                                 for i in value:
                                     get_cb = results[helpers.col_with_substr_q(results, cb_question)]
                                     filtered_df = results.loc[(results[get_cb.columns[0]] == i)]
-                                    checkbox_cols = filtered_df[helpers.col_with_qid(results, question['qid'])]
-                                    has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
-                                    if has_nan_rows:
-                                        non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
-                                        sum1 = int(non_nan_count)
-                                    qid_columns = helpers.col_with_qid(results, question['qid'])
-                                    selected_columns = qid_columns + ['weighted_respondents']
-                                    checkbox_cols = filtered_df[selected_columns]
-                                    nan_check_cols = checkbox_cols.drop(columns=['weighted_respondents'])
-                                    rows_with_all_nan = nan_check_cols.apply(lambda x: x.astype(str).eq('nan').all(), axis=1)
-                                    non_nan_rows = ~rows_with_all_nan
-                                    if has_nan_rows:
-                                        sum2 = checkbox_cols.loc[non_nan_rows, 'weighted_respondents'].sum()
-                                        sum2 = int(sum2)
-                                        header_data[question['qid']][i] = [sum1, sum2]
+                                    # checkbox_cols = filtered_df[helpers.col_with_qid(results, question['qid'])]
+                                    # has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
+                                    # if has_nan_rows:
+                                    #     non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
+                                    #     sum1 = int(non_nan_count)
+                                    # qid_columns = helpers.col_with_qid(results, question['qid'])
+                                    # selected_columns = qid_columns + ['weighted_respondents']
+                                    # checkbox_cols = filtered_df[selected_columns]
+                                    # nan_check_cols = checkbox_cols.drop(columns=['weighted_respondents'])
+                                    # rows_with_all_nan = nan_check_cols.apply(lambda x: x.astype(str).eq('nan').all(), axis=1)
+                                    # non_nan_rows = ~rows_with_all_nan
+                                    # if has_nan_rows:
+                                    #     sum2 = checkbox_cols.loc[non_nan_rows, 'weighted_respondents'].sum()
+                                    #     sum2 = int(sum2)
+                                    #     header_data[question['qid']][i] = [sum1, sum2]
+                                    sum_figures = find_sums_for_multi(filtered_df, results, question['qid'])
+                                    if sum_figures is not None:
+                                        header_data[question['qid']][i] = sum_figures
                     # Iterate through non-standard crossbreaks
                     if len(non_standard_cb) > 0:
                         for cb in non_standard_cb:
@@ -164,21 +181,24 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
                             for answer in cb[2]:
                                 get_crossbreak = results[helpers.col_with_substr_q(results, crossbreak_q)]
                                 filtered_df = results.loc[(results[get_crossbreak.columns[0]] == answer)]
-                                checkbox_cols = filtered_df[helpers.col_with_qid(results, question['qid'])]
-                                has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
-                                if has_nan_rows:
-                                    non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
-                                    sum1 = int(non_nan_count)
-                                qid_columns = helpers.col_with_qid(results, question['qid'])
-                                selected_columns = qid_columns + ['weighted_respondents']
-                                checkbox_cols = filtered_df[selected_columns]
-                                nan_check_cols = checkbox_cols.drop(columns=['weighted_respondents'])
-                                rows_with_all_nan = nan_check_cols.apply(lambda x: x.astype(str).eq('nan').all(), axis=1)
-                                non_nan_rows = ~rows_with_all_nan
-                                if has_nan_rows:
-                                    sum2 = checkbox_cols.loc[non_nan_rows, 'weighted_respondents'].sum()
-                                    sum2 = int(sum2)
-                                    header_data[question['qid']][answer] = [sum1, sum2]
+                                # checkbox_cols = filtered_df[helpers.col_with_qid(results, question['qid'])]
+                                # has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
+                                # if has_nan_rows:
+                                #     non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
+                                #     sum1 = int(non_nan_count)
+                                # qid_columns = helpers.col_with_qid(results, question['qid'])
+                                # selected_columns = qid_columns + ['weighted_respondents']
+                                # checkbox_cols = filtered_df[selected_columns]
+                                # nan_check_cols = checkbox_cols.drop(columns=['weighted_respondents'])
+                                # rows_with_all_nan = nan_check_cols.apply(lambda x: x.astype(str).eq('nan').all(), axis=1)
+                                # non_nan_rows = ~rows_with_all_nan
+                                # if has_nan_rows:
+                                #     sum2 = checkbox_cols.loc[non_nan_rows, 'weighted_respondents'].sum()
+                                #     sum2 = int(sum2)
+                                #     header_data[question['qid']][answer] = [sum1, sum2]
+                                sum_figures = find_sums_for_multi(filtered_df, results, question['qid'])
+                                if sum_figures is not None:
+                                    header_data[question['qid']][answer] = sum_figures
                 checked.append(question['qid'])
 
         elif question['Base Type'] == 'Option' and question['type'] == 'CHECKBOX':
@@ -196,16 +216,19 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
                 if non_nan_count > 0:
                     header_data[question['qid']] = {} # Initialise data for qid
                     # Find rebased totals
-                    column = results[helpers.col_with_substr(results, question['qid'])]
-                    non_nan_count = column[column != 'nan'].count().iloc[0]
-                    column_name = helpers.col_with_substr(results, question['qid'])[0]  # Select the first column name
-                    column = results[column_name]
-                    non_nan_rows = column != 'nan'
-                    if non_nan_count > 0:
-                        sum1 = int(non_nan_count)
-                        sum2 = results.loc[non_nan_rows, 'weighted_respondents'].sum()
-                        sum2 = int(sum2)
-                        header_data[question['qid']]['Total'] = [sum1, sum2]
+                    # column = results[helpers.col_with_substr(results, question['qid'])]
+                    # non_nan_count = column[column != 'nan'].count().iloc[0]
+                    # column_name = helpers.col_with_substr(results, question['qid'])[0]  # Select the first column name
+                    # column = results[column_name]
+                    # non_nan_rows = column != 'nan'
+                    # if non_nan_count > 0:
+                    #     sum1 = int(non_nan_count)
+                    #     sum2 = results.loc[non_nan_rows, 'weighted_respondents'].sum()
+                    #     sum2 = int(sum2)
+                    #     header_data[question['qid']]['Total'] = [sum1, sum2]
+                    sum_figures = find_sums_for_single(results, results, question['qid'])
+                    if sum_figures is not None:
+                        header_data[question['qid']]['Total'] = sum_figures
                     # Iterate through standard crossbreaks
                     for key, value in CROSSBREAKS.items():
                         cb_question = QUESTIONS[key]
@@ -214,16 +237,19 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
                                 for age_question in AGE_QUESTIONS:
                                     get_col = results[helpers.col_substr_partial(results, age_question)]
                                     filtered_df = results.loc[results[get_col.columns[0]] != 'nan']
-                                    column = filtered_df[helpers.col_with_substr(results, question['qid'])]
-                                    non_nan_count = column[column != 'nan'].count().iloc[0]
-                                    column_name = helpers.col_with_substr(results, question['qid'])[0]  # Select the first column name
-                                    column = filtered_df[column_name]
-                                    non_nan_rows = column != 'nan'
-                                    if non_nan_count > 0:
-                                        sum1 = int(non_nan_count)
-                                        sum2 = filtered_df.loc[non_nan_rows, 'weighted_respondents'].sum()
-                                        sum2 = int(sum2)
-                                        header_data[question['qid']][age_question] = [sum1, sum2]
+                                    # column = filtered_df[helpers.col_with_substr(results, question['qid'])]
+                                    # non_nan_count = column[column != 'nan'].count().iloc[0]
+                                    # column_name = helpers.col_with_substr(results, question['qid'])[0]  # Select the first column name
+                                    # column = filtered_df[column_name]
+                                    # non_nan_rows = column != 'nan'
+                                    # if non_nan_count > 0:
+                                    #     sum1 = int(non_nan_count)
+                                    #     sum2 = filtered_df.loc[non_nan_rows, 'weighted_respondents'].sum()
+                                    #     sum2 = int(sum2)
+                                    #     header_data[question['qid']][age_question] = [sum1, sum2]
+                                    sum_figures = find_sums_for_single(filtered_df, results, question['qid'])
+                                    if sum_figures is not None:
+                                        header_data[question['qid']][age_question] = sum_figures
                             elif key == 'age':
                                 ages = CROSSBREAKS["age"]
                                 age_brackets = []
@@ -253,16 +279,19 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
                                         (results[get_age.columns[0]].astype(int) >= bracket['num1'])
                                         ]
                                     filtered_df = filtered_df.loc[(filtered_df[get_age.columns[0]].astype(int) <= bracket['num2'])]
-                                    column = filtered_df[helpers.col_with_substr(results, question['qid'])]
-                                    non_nan_count = column[column != 'nan'].count().iloc[0]
-                                    column_name = helpers.col_with_substr(results, question['qid'])[0]  # Select the first column name
-                                    column = filtered_df[column_name]
-                                    non_nan_rows = column != 'nan'
-                                    if non_nan_count > 0:
-                                        sum1 = int(non_nan_count)
-                                        sum2 = filtered_df.loc[non_nan_rows, 'weighted_respondents'].sum()
-                                        sum2 = int(sum2)
-                                        header_data[question['qid']][bracket['name']] = [sum1, sum2]
+                                    # column = filtered_df[helpers.col_with_substr(results, question['qid'])]
+                                    # non_nan_count = column[column != 'nan'].count().iloc[0]
+                                    # column_name = helpers.col_with_substr(results, question['qid'])[0]  # Select the first column name
+                                    # column = filtered_df[column_name]
+                                    # non_nan_rows = column != 'nan'
+                                    # if non_nan_count > 0:
+                                    #     sum1 = int(non_nan_count)
+                                    #     sum2 = filtered_df.loc[non_nan_rows, 'weighted_respondents'].sum()
+                                    #     sum2 = int(sum2)
+                                    #     header_data[question['qid']][bracket['name']] = [sum1, sum2]
+                                    sum_figures = find_sums_for_single(filtered_df, results, question['qid'])
+                                    if sum_figures is not None:
+                                        header_data[question['qid']][bracket['name']] = sum_figures  
                             elif key == 'seg':
                                 segs = CROSSBREAKS['seg']
                                 iterations = []
@@ -277,30 +306,37 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
                                     get_seg = results[helpers.col_substr_partial(results, seg_q)]
                                     contains = get_seg.iloc[:, 0].isin(iteration['seg'])
                                     filtered_df = results[contains]
-                                    column = filtered_df[helpers.col_with_substr(results, question['qid'])]
-                                    non_nan_count = column[column != 'nan'].count().iloc[0]
-                                    column_name = helpers.col_with_substr(results, question['qid'])[0]  # Select the first column name
-                                    column = filtered_df[column_name]
-                                    non_nan_rows = column != 'nan'
-                                    if non_nan_count > 0:
-                                        sum1 = int(non_nan_count)
-                                        sum2 = filtered_df.loc[non_nan_rows, 'weighted_respondents'].sum()
-                                        sum2 = int(sum2)
-                                        header_data[question['qid']][iteration['name']] = [sum1, sum2]
+                                    # column = filtered_df[helpers.col_with_substr(results, question['qid'])]
+                                    # non_nan_count = column[column != 'nan'].count().iloc[0]
+                                    # column_name = helpers.col_with_substr(results, question['qid'])[0]  # Select the first column name
+                                    # column = filtered_df[column_name]
+                                    # non_nan_rows = column != 'nan'
+                                    # if non_nan_count > 0:
+                                    #     sum1 = int(non_nan_count)
+                                    #     sum2 = filtered_df.loc[non_nan_rows, 'weighted_respondents'].sum()
+                                    #     sum2 = int(sum2)
+                                    #     header_data[question['qid']][iteration['name']] = [sum1, sum2]
+                                    sum_figures = find_sums_for_single(filtered_df, results, question['qid'])
+                                    if sum_figures is not None:
+                                        header_data[question['qid']][iteration['name']] = sum_figures                                    
                             else:
                                 for i in value:
                                     get_cb = results[helpers.col_with_substr_q(results, cb_question)]
                                     filtered_df = results.loc[(results[get_cb.columns[0]] == i)]
-                                    column = filtered_df[helpers.col_with_substr(results, question['qid'])]
-                                    non_nan_count = column[column != 'nan'].count().iloc[0]
-                                    column_name = helpers.col_with_substr(results, question['qid'])[0]  # Select the first column name
-                                    column = filtered_df[column_name]
-                                    non_nan_rows = column != 'nan'
-                                    if non_nan_count > 0:
-                                        sum1 = int(non_nan_count)
-                                        sum2 = filtered_df.loc[non_nan_rows, 'weighted_respondents'].sum()
-                                        sum2 = int(sum2)
-                                        header_data[question['qid']][i] = [sum1, sum2]
+                                    # column = filtered_df[helpers.col_with_substr(results, question['qid'])]
+                                    # non_nan_count = column[column != 'nan'].count().iloc[0]
+                                    # column_name = helpers.col_with_substr(results, question['qid'])[0]  # Select the first column name
+                                    # column = filtered_df[column_name]
+                                    # non_nan_rows = column != 'nan'
+                                    # if non_nan_count > 0:
+                                    #     sum1 = int(non_nan_count)
+                                    #     sum2 = filtered_df.loc[non_nan_rows, 'weighted_respondents'].sum()
+                                    #     sum2 = int(sum2)
+                                    #     header_data[question['qid']][i] = [sum1, sum2]
+                                    sum_figures = find_sums_for_single(filtered_df, results, question['qid'])
+                                    if sum_figures is not None:
+                                        header_data[question['qid']][i] = sum_figures
+                                    
                     # Iterate through non-standard crossbreaks
                     if len(non_standard_cb) > 0:
                         for cb in non_standard_cb:
@@ -308,19 +344,67 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
                             for answer in cb[2]:
                                 get_crossbreak = results[helpers.col_with_substr_q(results, crossbreak_q)]
                                 filtered_df = results.loc[(results[get_crossbreak.columns[0]] == answer)]
-                                column = filtered_df[helpers.col_with_substr(results, question['qid'])]
-                                non_nan_count = column[column != 'nan'].count().iloc[0]
-                                column_name = helpers.col_with_substr(results, question['qid'])[0]  # Select the first column name
-                                column = filtered_df[column_name]
-                                non_nan_rows = column != 'nan'
-                                if non_nan_count > 0:
-                                    sum1 = int(non_nan_count)
-                                    sum2 = filtered_df.loc[non_nan_rows, 'weighted_respondents'].sum()
-                                    sum2 = int(sum2)
-                                    header_data[question['qid']][answer] = [sum1, sum2]
+                                # column = filtered_df[helpers.col_with_substr(results, question['qid'])]
+                                # non_nan_count = column[column != 'nan'].count().iloc[0]
+                                # column_name = helpers.col_with_substr(results, question['qid'])[0]  # Select the first column name
+                                # column = filtered_df[column_name]
+                                # non_nan_rows = column != 'nan'
+                                # if non_nan_count > 0:
+                                #     sum1 = int(non_nan_count)
+                                #     sum2 = filtered_df.loc[non_nan_rows, 'weighted_respondents'].sum()
+                                #     sum2 = int(sum2)
+                                #     header_data[question['qid']][answer] = [sum1, sum2]
+                                sum_figures = find_sums_for_single(filtered_df, results, question['qid'])
+                                if sum_figures is not None:
+                                    header_data[question['qid']][answer] = sum_figures
+
                 checked.append(question['qid'])
         else:
             checked.append(question['qid'])
             continue
     # print(header_data)
     return header_data
+
+
+def find_sums_for_multi(filtered_df, results, question_id):
+    """
+    Logic for filtering the data
+    for multiselect questions
+    """
+    checkbox_cols = filtered_df[helpers.col_with_qid(results, question_id)]
+    has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
+    if has_nan_rows:
+        non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
+        sum1 = int(non_nan_count)
+    qid_columns = helpers.col_with_qid(results, question_id)
+    selected_columns = qid_columns + ['weighted_respondents']
+    checkbox_cols = filtered_df[selected_columns]
+    nan_check_cols = checkbox_cols.drop(columns=['weighted_respondents'])
+    rows_with_all_nan = nan_check_cols.apply(lambda x: x.astype(str).eq('nan').all(), axis=1)
+    non_nan_rows = ~rows_with_all_nan
+    if has_nan_rows:
+        sum2 = checkbox_cols.loc[non_nan_rows, 'weighted_respondents'].sum()
+        sum2 = int(sum2)
+    if has_nan_rows:
+        return [sum1, sum2]
+    else:
+        return None
+
+
+def find_sums_for_single(filtered_df, results, question_id):
+    """
+    Logic for filtering the data
+    for single select questions.
+    """
+    column = filtered_df[helpers.col_with_substr(results, question_id)]
+    non_nan_count = column[column != 'nan'].count().iloc[0]
+    column_name = helpers.col_with_substr(results, question_id)[0]
+    column = filtered_df[column_name]
+    non_nan_rows = column != 'nan'
+    if non_nan_count > 0:
+        sum1 = int(non_nan_count)
+        sum2 = filtered_df.loc[non_nan_rows, 'weighted_respondents'].sum()
+        sum2 = int(sum2)
+        return [sum1, sum2]
+    else:
+        return None
