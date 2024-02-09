@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+    <div class="p-2">
+        <h1>Oops! Looks like there was an error in the polling code...</h1>
+        <p>If this is unexpected, please make a note of what you were doing when the error occured 
+            (e.g. what you entered into a form) and let one of the team know. We'll look into it ASAP!</p>
+        <p>Click the button below to return back to the home page.</p>
+        <a href="{% url 'home' %}" class="">Return Home</a>
+    </div>
+</div>
+
+{% endblock %}

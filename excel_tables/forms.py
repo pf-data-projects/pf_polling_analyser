@@ -22,7 +22,12 @@ class TableUploadForm(forms.Form):
     """
     data_file = forms.FileField(
         label='Upload The Table',
-        validators=[]
+        validators=[],
+        required=True
+    )
+    rebased_header_file = forms.FileField(
+        label="Upload the data for the rebased headers. Download this from the home page if you haven't already.",
+        required=True
     )
     title = forms.CharField(
         label="Title you want to give to the survey",
