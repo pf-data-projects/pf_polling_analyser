@@ -47,6 +47,23 @@ def extract_data_from_question_objects(question_list):
         question_types.append(question['type'])
         question_titles.append(question['title']['English'])
 
+        # handle non-grid piped answers
+        if 'pipe_values_from' in question:
+            parent_id = int(question['pipe_values_from'])
+            for q in question_list:
+                if q['id'] == parent_id:
+                    parent = q
+            for option in parent['options']:
+                if option['title']['English'] in ["Don't Know", "Don’t know", "Don't know"]:
+                    continue
+                if 'None of the above' in option['title']['English']:
+                    continue
+                question_ids.append(question['id'])
+                question_texts.append('Option')
+                question_types.append(question['type'])
+                question_titles.append(option['title']['English'])
+                question_rebase.append(False)
+
         # checks if the question has options and
         # adds their data to the lists
         if question['options']:
@@ -97,9 +114,42 @@ def extract_data_from_question_objects(question_list):
 
         # Code to handle edge case where a table question relies on options
         # of a question immediately before it.
-        if question['type'] == 'TABLE' and 'sub_questions' not in question:
-            for sub_question in prev_question['options']:
+        # if question['type'] == 'TABLE' and 'sub_questions' not in question:
+        #     for sub_question in prev_question['options']:
+        #         if 'Don’t know' in sub_question['title']['English'] or 'None of the above' in sub_question['title']['English']:
+        #             continue
+        #         question_ids.append(question['id'])
+        #         question_texts.append('sub_Question')
+        #         question_titles.append(sub_question['title']['English'])
+        #         question_types.append(f"{question['type']} | RADIO")
+        #         question_rebase.append(False)
+        #         for option in question['options']:
+        #             question_ids.append(question['id'])
+        #             question_texts.append('sub_option')
+        #             question_types.append(f"{question['type']} | RADIO")
+        #             question_titles.append(option['title']['English'])
+        #             question_rebase.append(False)
+
+        # prev_question = question
+
+        # Rewrite the code above to get options by searching
+        # based on the piped_from attribute in the api response.
+
+        if question['type'] == 'TABLE' and 'piped_from' in question['properties']:
+            parent_id = int(question['properties']['piped_from'])
+            for q in question_list:
+                if q['id'] == parent_id:
+                    parent = q
+                    # print(parent)
+            for sub_question in parent['options']:
+                # don't pipe through 'don't know' and
+                # 'none of the above' to grid because
+                # it won't make sense.
                 if 'Don’t know' in sub_question['title']['English'] or 'None of the above' in sub_question['title']['English']:
+                    continue
+                if "Don't Know" in sub_question['title']['English']:
+                    continue
+                if "Don't know" in sub_question['title']['English']:
                     continue
                 question_ids.append(question['id'])
                 question_texts.append('sub_Question')
@@ -113,10 +163,8 @@ def extract_data_from_question_objects(question_list):
                     question_titles.append(option['title']['English'])
                     question_rebase.append(False)
 
-        prev_question = question
 
     # creates a dataframe from the lists and outputs to csv
-    # with correct encoding for windows: "utf-8-sig"
     question_dict = {
         'question_id': question_ids,
         'question_text': question_texts,
@@ -126,5 +174,5 @@ def extract_data_from_question_objects(question_list):
     }
     question_data = pd.DataFrame(question_dict)
 
-    # question_data.to_csv('question_data.csv', encoding='utf-8-sig')
+    question_data.to_csv('question_data.csv', encoding='utf-8-sig')
     return question_data
