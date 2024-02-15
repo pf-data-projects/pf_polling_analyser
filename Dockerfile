@@ -3,11 +3,29 @@ FROM python:3.9-alpine
 
 WORKDIR /app
 
+RUN pip install --upgrade pip
+
 # Install PostgreSQL development files
 RUN apk add --no-cache postgresql-dev gcc python3-dev musl-dev
 
 # Install build dependencies
 RUN apk add --no-cache build-base libffi-dev musl-dev linux-headers
+
+# Install build tools, Python dev files, and C++ compiler
+RUN apk add --no-cache \
+    build-base \
+    python3-dev \
+    musl-dev \
+    # C++ build tools
+    cmake \
+    make \
+    # Arrow dependencies
+    boost-dev \
+    # Additional dependencies for Arrow
+    autoconf \
+    zlib-dev \
+    flex \
+    bison
 
 # Install Redis
 RUN apk update && apk add redis
