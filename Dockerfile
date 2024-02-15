@@ -41,7 +41,7 @@ RUN apk add --no-cache \
     zstd-dev \
 
 # Download and install Apache Arrow
-RUN wget https://github.com/apache/arrow/archive/refs/tags/apache-arrow-5.0.0.tar.gz \
+RUN wget https://github.com/apache/arrow/archive/refs/tags/apache-arrow-15.0.0.tar.gz \
     && tar -xzf apache-arrow-5.0.0.tar.gz \
     && cd arrow-apache-arrow-5.0.0/cpp \
     && mkdir build && cd build \
