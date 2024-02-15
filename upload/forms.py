@@ -136,3 +136,26 @@ class CustomWeightForm(forms.Form):
     )
 
 CustomWeightFormSet = formset_factory(CustomWeightForm, extra=1)
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~ Temporary forms for testing celery tasks
+
+OPTIONS = (
+    ("the North", "the North"),
+    ("the North", "the North"),
+    ("the North", "the North"),
+    ("the North", "the North"),
+    ("the North", "the North"),
+)
+
+class CeleryForm(forms.Form):
+    choice_field = forms.MultipleChoiceField(
+        label="Where would you consider going on holiday?",
+        choices=OPTIONS,
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(CeleryForm, self).__init__(*args, **kwargs)
+        self.fields['choice_field'].initial = [choice[0] for choice in OPTIONS]

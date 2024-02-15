@@ -22,17 +22,19 @@ if not.
 5. GuideView handles logic to get the instructions page.
 """
 
-from io import BytesIO
+from io import BytesIO, StringIO
 import re
 import json
 import os
 
 import pandas as pd
 
+from celery.result import AsyncResult
+
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.contrib import messages
-from .forms import CSVUploadForm, WeightForm, CrossbreakFormSet, CustomWeightFormSet
+from .forms import CSVUploadForm, WeightForm, CrossbreakFormSet, CustomWeightFormSet, CeleryForm
 from django.core.cache import cache
 from django.http import HttpResponse
 
@@ -45,6 +47,9 @@ from queries.api_request.get_processed_questions import (
 from . import weight as wgt
 
 from . import validation as vld
+
+# ~~~~~~ Temporary imports for testing celery task
+from .tasks import task1, handle_weighting
 
 
 class GuideView(View):
@@ -81,87 +86,93 @@ def weight_data(request):
             apply = form.cleaned_data['apply_weights']
             custom = form.cleaned_data['custom_weights']
             standard_weights = form.cleaned_data['standard_weights']
+            groups = []
+            questions = []
             if custom and formset.is_valid():
                 if len(formset) < 1:
                     return HttpResponse(
                         "Error: Please specify your custom weights in the form."
                         )
-                groups = []
-                questions = []
                 for sub_form in formset:
                     groups.append(sub_form.cleaned_data['group'])
                     questions.append(sub_form.cleaned_data['question'])
 
-            # print(groups)
-            # print(questions)
+            user_id = request.user.id
+            # survey_data = survey_data.to_json(orient="split")
+            survey_data = survey_data.to_csv(index=None)
+            weight_proportions = weight_proportions.to_csv(index=None)
+
+            handle_weight = handle_weighting.delay(
+                user_id, survey_data, weight_proportions, apply, custom,
+                questions, groups, standard_weights
+            )
+
+
 
             # ~~~~~~~~~~~~~~~~ Run ipf module for standard weights
-            if apply and not custom:
-                try:
-                    weighted_data = wgt.run_weighting(survey_data, weight_proportions)
-                except StopIteration:
-                    message="""
-                        An error occurred searching for the Socio-Economic Grade question.
-                        The code couldn't find it - Have you checked that this question exists in the data,
-                        or that the wording hasn't changed?
-                        """
-                    return HttpResponse(message)
-                except Exception as e:
-                    message=f"""
-                        There was an error in the weighting calculation.
-                        Please make sure the questions/columns in the data
-                        match the groups specified in the weight proportions.
+            # if apply and not custom:
+            #     try:
+            #         weighted_data = wgt.run_weighting(survey_data, weight_proportions)
+            #     except StopIteration:
+            #         message="""
+            #             An error occurred searching for the Socio-Economic Grade question.
+            #             The code couldn't find it - Have you checked that this question exists in the data,
+            #             or that the wording hasn't changed?
+            #             """
+            #         return HttpResponse(message)
+            #     except Exception as e:
+            #         message=f"""
+            #             There was an error in the weighting calculation.
+            #             Please make sure the questions/columns in the data
+            #             match the groups specified in the weight proportions.
 
-                        This is the error the code returned: {e}
-                        """
-                    return HttpResponse(message)
+            #             This is the error the code returned: {e}
+            #             """
+            #         return HttpResponse(message)
 
-            # ~~~~~~~~~~~~~~~~ Run ipf module for custom weights
-            elif custom:
-                try:
-                    weighted_data = wgt.apply_custom_weight(
-                        survey_data, weight_proportions, questions, groups, standard_weights
-                    )
-                except StopIteration:
-                    message="""
-                        An error occurred searching for the Socio-Economic Grade question.
-                        The code couldn't find it - Have you checked that this question exists in the data,
-                        or that the wording hasn't changed?
-                        """
-                    return HttpResponse(message)
-                except Exception as e:
-                    message=f"""
-                        There was an error in the weighting calculation.
-                        Please make sure the questions/columns in the data
-                        match the groups specified in the weight proportions.
+            # # ~~~~~~~~~~~~~~~~ Run ipf module for custom weights
+            # elif custom:
+            #     try:
+            #         weighted_data = wgt.apply_custom_weight(
+            #             survey_data, weight_proportions, questions, groups, standard_weights
+            #         )
+            #     except StopIteration:
+            #         message="""
+            #             An error occurred searching for the Socio-Economic Grade question.
+            #             The code couldn't find it - Have you checked that this question exists in the data,
+            #             or that the wording hasn't changed?
+            #             """
+            #         return HttpResponse(message)
+            #     except Exception as e:
+            #         message=f"""
+            #             There was an error in the weighting calculation.
+            #             Please make sure the questions/columns in the data
+            #             match the groups specified in the weight proportions.
 
-                        This is the error the code returned: {e}
-                        """
-                    return HttpResponse(message)
-            # ~~~~~~~~~~~~~~~~ Run ipf module for no weights
-            else:
-                weighted_data = wgt.apply_no_weight(survey_data)
+            #             This is the error the code returned: {e}
+            #             """
+            #         return HttpResponse(message)
+            # # ~~~~~~~~~~~~~~~~ Run ipf module for no weights
+            # else:
+            #     weighted_data = wgt.apply_no_weight(survey_data)
 
-            response = HttpResponse(
-                weighted_data,
-                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
-            )
-            response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
+            # # Cache the weighted data to be downloaded by user later
+            # excel_buffer = BytesIO()
+            # weighted_data.to_excel(excel_buffer, index=False)
+            # excel_buffer.seek(0)
+            # unique_id = "weights_for_user_" + str(request.user.id)
+            # cache.set(unique_id, excel_buffer.getvalue(), 300)
 
-            # Cache the weighted data to be downloaded by user later
-            excel_buffer = BytesIO()
-            weighted_data.to_excel(excel_buffer, index=False)
-            excel_buffer.seek(0)
-            unique_id = "weights_for_user_" + str(request.user.id)
-            cache.set(unique_id, excel_buffer.getvalue(), 300)
-            # messages.success(request, "Data successfully weighted")
-            # return redirect(reverse('home'))
-            response = HttpResponse(
-                excel_buffer.getvalue(),
-                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
-            )
-            response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
-            return response
+            print(handle_weight.id)
+            cache.set('weight_task_id', handle_weight.id, 300)
+            messages.success(request, "Data processing underway")
+            return redirect(reverse('home'))
+            # response = HttpResponse(
+            #     excel_buffer.getvalue(),
+            #     content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
+            # )
+            # response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
+            # return response
         else:
             messages.error(request, "Invalid form submission. Please try again")
             return redirect(reverse('home'))
@@ -303,24 +314,52 @@ def download_csv(request):
         return redirect('home')
 
 
+# def download_weights(request):
+#     """
+#     Handles retrieval of cached weighted data.
+#     """
+#     unique_id = "weights_for_user_" + str(request.user.id)
+#     excel_data = cache.get(unique_id)
+#     if excel_data:
+#         response = HttpResponse(
+#             excel_data,
+#             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
+#         )
+#         response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
+#         return response
+#     else:
+#         messages.error(
+#             request,
+#             "No weighted data found. Please weight the data first."
+#         )
+#         return redirect('home')
+
 def download_weights(request):
     """
-    Handles retrieval of cached weighted data.
+    Handle retrieval of weights from celery worker and download.
     """
-    unique_id = "weights_for_user_" + str(request.user.id)
-    excel_data = cache.get(unique_id)
-    if excel_data:
+    task_id = cache.get("weight_task_id")
+    result = AsyncResult(task_id)
+
+    if result.ready():
+        data = result.get()
+        df = pd.read_csv(StringIO(data))
+        print(df.head(10))
+
+        excel_buffer = BytesIO()
+        with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
+            df.to_excel(writer, sheet_name='Sheet1')
+
+        excel_buffer.seek(0)
+        print(excel_buffer)
         response = HttpResponse(
-            excel_data,
+            excel_buffer.read(),
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
         )
         response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
         return response
     else:
-        messages.error(
-            request,
-            "No weighted data found. Please weight the data first."
-        )
+        print("the result is not ready yet")
         return redirect('home')
 
 
@@ -359,3 +398,21 @@ def preprocess_header(header):
     hyphen_minus = '\u002D'
     header = header.replace(en_dash, hyphen_minus)
     return header
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Temporary Views to test celery worker
+
+def run_celery_task(request):
+    """
+    Run test celery task
+    """
+    if request.method == 'POST':
+        form = CeleryForm(request.POST)
+        if form.is_valid():
+            result = task1.delay()
+            request.session['task_id'] = result.id
+            # Pass task_id as a query parameter
+            return redirect(f"{reverse('task')}?task_id={result.id}")
+    else:
+        form = CeleryForm()
+    return render(request, 'celery_form.html', {'form': form})
