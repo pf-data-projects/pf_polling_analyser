@@ -3,6 +3,9 @@ FROM python:3.9-alpine
 
 WORKDIR /app
 
+# Install PostgreSQL development files
+RUN apk add --no-cache postgresql-dev gcc python3-dev musl-dev
+
 # Install build dependencies
 RUN apk add --no-cache build-base libffi-dev musl-dev linux-headers
 
