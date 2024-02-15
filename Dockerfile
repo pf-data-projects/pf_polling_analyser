@@ -39,6 +39,7 @@ RUN apk add --no-cache \
     bzip2-dev \
     lz4-dev \
     zstd-dev \
+    wget
 
 # Download and extract Apache Arrow source code
 RUN wget https://github.com/apache/arrow/archive/refs/tags/apache-arrow-15.0.0.tar.gz -O arrow.tar.gz \
