@@ -4,7 +4,7 @@ FROM python:3.11.4-alpine
 WORKDIR /app
 
 # Install Redis
-RUN apt-get update && apt-get install -y redis-server
+RUN apk update && apk add redis
 
 RUN pip install uvicorn gunicorn httptools uvloop
 
