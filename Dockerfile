@@ -42,7 +42,7 @@ RUN apk add --no-cache \
     wget
 
 # Download and extract Apache Arrow source code
-RUN wget https://github.com/apache/arrow/archive/refs/tags/apache-arrow-15.0.0.tar.gz -O arrow.tar.gz \
+RUN wget https://github.com/apache/arrow/archive/refs/tags/apache-arrow-12.0.0.tar.gz -O arrow.tar.gz \
     && tar -xzf arrow.tar.gz \
     && rm arrow.tar.gz
 
