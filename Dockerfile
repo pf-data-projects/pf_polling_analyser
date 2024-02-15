@@ -40,13 +40,18 @@ RUN apk add --no-cache \
     lz4-dev \
     zstd-dev \
 
-# Download and install Apache Arrow
-RUN wget https://github.com/apache/arrow/archive/refs/tags/apache-arrow-15.0.0.tar.gz \
-    && tar -xzf apache-arrow-5.0.0.tar.gz \
-    && cd arrow-apache-arrow-5.0.0/cpp \
-    && mkdir build && cd build \
+# Download and extract Apache Arrow source code
+RUN wget https://github.com/apache/arrow/archive/refs/tags/apache-arrow-15.0.0.tar.gz -O arrow.tar.gz \
+    && tar -xzf arrow.tar.gz \
+    && rm arrow.tar.gz
+
+# Navigate to the Apache Arrow C++ source directory, build, and install
+RUN cd arrow-apache-arrow-15.0.0/cpp \
+    && mkdir build \
+    && cd build \
     && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-    && make && make install
+    && make \
+    && make install
 
 # Install Redis
 RUN apk update && apk add redis
