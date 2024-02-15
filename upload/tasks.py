@@ -111,3 +111,11 @@ def handle_weighting(
     result = weighted_data.to_csv(index=None)
     # print(f"this is the result: {result}")
     return result
+
+
+    @shared_task(bind=True)
+    def handle_crossbreaks(self):
+        """
+        This handles the crossbreak logic
+        in a separate celery worker.
+        """
