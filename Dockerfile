@@ -3,6 +3,9 @@ FROM python:3.9-alpine
 
 WORKDIR /app
 
+# Install build dependencies
+RUN apk add --no-cache build-base libffi-dev musl-dev linux-headers
+
 # Install Redis
 RUN apk update && apk add redis
 
