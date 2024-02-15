@@ -1,7 +1,10 @@
 
-FROM python:3.7
+FROM python:3.11.4-alpine
 
 WORKDIR /app
+
+# Install Redis
+RUN apt-get update && apt-get install -y redis-server
 
 RUN pip install uvicorn gunicorn httptools uvloop
 
@@ -28,4 +31,11 @@ RUN pip3 install -r requirements.txt
 
 RUN python manage.py collectstatic --noinput
 
-CMD gunicorn --bind 0.0.0.0:3000 --timeout 3600 polling_analyser.wsgi
+# Copy and make the run.sh script executable
+COPY run.sh /app/run.sh
+RUN chmod +x /app/run.sh
+
+# Start the application using the run.sh script
+CMD ["/app/run.sh"]
+
+# CMD gunicorn --bind 0.0.0.0:3000 --timeout 3600 polling_analyser.wsgi
