@@ -47,7 +47,7 @@ RUN wget https://github.com/apache/arrow/archive/refs/tags/apache-arrow-12.0.0.t
     && rm arrow.tar.gz
 
 # Navigate to the Apache Arrow C++ source directory, build, and install
-RUN cd arrow-apache-arrow-15.0.0/cpp \
+RUN cd arrow-apache-arrow-12.0.0/cpp \
     && mkdir build \
     && cd build \
     && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
