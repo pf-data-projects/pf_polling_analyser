@@ -110,7 +110,7 @@ def handle_weighting(
     # excel_buffer.seek(0)
     # unique_id = "weights_for_user_" + str(user_id)
     # cache.set(unique_id, excel_buffer.getvalue(), 300)
-    result = weighted_data.to_csv(index=None)
+    result = weighted_data.to_csv(index=False)
     # print(f"this is the result: {result}")
     return result
 
@@ -123,8 +123,15 @@ def handle_crossbreaks(
     in a separate celery worker.
     """
     print("processing crossbreaks")
+
+    data = pd.read_csv(StringIO(data))
+    question_data = pd.read_csv(StringIO(question_data))
+
     try:
         table = table_calculation(data, question_data, standard_cb, non_standard_cb)
+        print(table.head(10))
+
+        table = table.to_csv(index=None)
         return table
     except (KeyError, IndexError) as e:
         message = f"""

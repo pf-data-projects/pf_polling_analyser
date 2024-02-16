@@ -5,6 +5,9 @@ WORKDIR /app
 
 RUN pip install --upgrade pip
 
+# Install dos2unix and other dependencies
+RUN apk update && apk add --no-cache dos2unix
+
 # Install PostgreSQL development files
 RUN apk add --no-cache postgresql-dev gcc python3-dev musl-dev
 
@@ -30,33 +33,33 @@ RUN apk add --no-cache \
     # Additional dependencies for pyzmq
     zeromq-dev
 
-# Install build dependencies for Arrow and pyarrow
-RUN apk add --no-cache \
-    gcc \
-    g++ \
-    automake \
-    libtool \
-    bzip2-dev \
-    lz4-dev \
-    zstd-dev \
-    wget
+# # Install build dependencies for Arrow and pyarrow
+# RUN apk add --no-cache \
+#     gcc \
+#     g++ \
+#     automake \
+#     libtool \
+#     bzip2-dev \
+#     lz4-dev \
+#     zstd-dev \
+#     wget
 
-# Download and extract Apache Arrow source code
-RUN wget https://github.com/apache/arrow/archive/refs/tags/apache-arrow-12.0.0.tar.gz -O arrow.tar.gz \
-    && tar -xzf arrow.tar.gz \
-    && rm arrow.tar.gz
+# # Download and extract Apache Arrow source code
+# RUN wget https://github.com/apache/arrow/archive/refs/tags/apache-arrow-12.0.0.tar.gz -O arrow.tar.gz \
+#     && tar -xzf arrow.tar.gz \
+#     && rm arrow.tar.gz
 
-# Navigate to the Apache Arrow C++ source directory, build, and install
-RUN cd arrow-apache-arrow-12.0.0/cpp \
-    && mkdir build \
-    && cd build \
-    && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DARROW_CSV=ON -DARROW_JSON=ON -DARROW_FILESYSTEM=ON \
-    && make \
-    && make install
+# # Navigate to the Apache Arrow C++ source directory, build, and install
+# RUN cd arrow-apache-arrow-12.0.0/cpp \
+#     && mkdir build \
+#     && cd build \
+#     && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DARROW_CSV=ON -DARROW_JSON=ON -DARROW_FILESYSTEM=ON \
+#     && make \
+#     && make install
 
-ENV ARROW_HOME=/usr/local
-ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-ENV PYARROW_CMAKE_OPTIONS="-DCMAKE_PREFIX_PATH=/usr/local"
+# ENV ARROW_HOME=/usr/local
+# ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+# ENV PYARROW_CMAKE_OPTIONS="-DCMAKE_PREFIX_PATH=/usr/local"
 
 # Install Redis
 RUN apk update && apk add redis
@@ -88,9 +91,10 @@ RUN python manage.py collectstatic --noinput
 
 # Copy and make the run.sh script executable
 COPY run.sh /app/run.sh
+RUN dos2unix /app/run.sh
 RUN chmod +x /app/run.sh
 
 # Start the application using the run.sh script
-CMD ["/app/run.sh"]
+CMD ["/bin/sh", "/app/run.sh"]
 
 # CMD gunicorn --bind 0.0.0.0:3000 --timeout 3600 polling_analyser.wsgi

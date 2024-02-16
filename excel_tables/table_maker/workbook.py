@@ -175,7 +175,7 @@ def create_workbook(
             results_sheet.write(0, col_num, value, header_format)
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create individual tables.
-        # ~~~~~~ Apologies for how fiddly this bit of code is atm.
+        # ~~~~~~ Apologies for how cursed this bit of code is atm.
         non_header_data = data.iloc[2:]
         header = data.loc[0:1]
         ids = non_header_data['IDs'].tolist()
@@ -630,7 +630,7 @@ def update_column_headers(workbook, rebased_headers):
         except KeyError:
             print("This question does not exist in the trimmed data.")
             continue
-        # Iterate through crossbreaks for each    
+        # Iterate through crossbreaks
         for k, v in value.items():
             column = num_to_col(col)
             # print(column, type(sheet[f'{column}3'].value))

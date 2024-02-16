@@ -49,7 +49,7 @@ from . import weight as wgt
 from . import validation as vld
 
 # ~~~~~~ Temporary imports for testing celery task
-from .tasks import task1, handle_weighting
+from .tasks import task1, handle_weighting, handle_crossbreaks
 
 
 class GuideView(View):
@@ -251,35 +251,42 @@ def upload_csv(request):
             # question_data.to_csv(
             #     "question_data.csv", index=False, encoding="utf-8-sig")
 
-            # Run calculations
-            try:
-                table = table_calculation(data, question_data, standard_cb, non_standard_cb)
-            except (KeyError, IndexError) as e:
-                message = f"""
-                    There was an error when running this code for crossbreaks.
-                    The most likely cause of this error is entering a crossbreak that
-                    doesn't exist in the data.
+            data = data.to_csv(index=False)
+            question_data = question_data.to_csv(index=False)
 
-                    It could also be caused by changes in the wording of standard crossbreak
-                    questions.
+            table = handle_crossbreaks.delay(data, question_data, standard_cb, non_standard_cb)
 
-                    Here is the content of the error message: {e}
-                    """
-                return HttpResponse(message)
+            # # Run calculations
+            # try:
+            #     table = table_calculation(data, question_data, standard_cb, non_standard_cb)
+            # except (KeyError, IndexError) as e:
+            #     message = f"""
+            #         There was an error when running this code for crossbreaks.
+            #         The most likely cause of this error is entering a crossbreak that
+            #         doesn't exist in the data.
 
-            # Store results in cache
-            csv_buffer = BytesIO()
-            table.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
-            csv_buffer.seek(0)
-            unique_id = "csv_for_user_" + str(request.user.id)
-            cache.set(unique_id, csv_buffer.getvalue(), 300)
-            # messages.success(request, "Crossbreaks successfully calculated!")
-            # Redirect user to homepage.
-            # return redirect(reverse('home'))
+            #         It could also be caused by changes in the wording of standard crossbreak
+            #         questions.
 
-            response = HttpResponse(csv_buffer.getvalue(), content_type='text/csv')
-            response['Content-Disposition'] = 'attachment; filename="crossbreaks_data.csv"'
-            return response
+            #         Here is the content of the error message: {e}
+            #         """
+            #     return HttpResponse(message)
+
+            # # Store results in cache
+            # csv_buffer = BytesIO()
+            # table.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
+            # csv_buffer.seek(0)
+            # unique_id = "csv_for_user_" + str(request.user.id)
+            # cache.set(unique_id, csv_buffer.getvalue(), 300)
+
+            print(table.id)
+            cache.set('table_task_id', table.id, 300)
+            messages.success(request, "Crossbreaks processing successfully underway")
+            return redirect(reverse('home'))
+
+            # response = HttpResponse(csv_buffer.getvalue(), content_type='text/csv')
+            # response['Content-Disposition'] = 'attachment; filename="crossbreaks_data.csv"'
+            # return response
         else:
             messages.error(
                 request,
@@ -296,17 +303,49 @@ def upload_csv(request):
     })
 
 
+# def download_csv(request):
+#     """
+#     Handles retrieval of cached output table.
+#     """
+#     unique_id = "csv_for_user_" + str(request.user.id)
+#     csv_data = cache.get(unique_id)
+#     if csv_data:
+#         response = HttpResponse(csv_data, content_type='text/csv')
+#         response['Content-Disposition'] = 'attachment; filename="crossbreaks_data.csv"'
+#         return response
+#     else:
+#         messages.error(
+#             request,
+#             "No crossbreaks data found. Please run the calculations first."
+#         )
+#         return redirect('home')
+
+
 def download_csv(request):
     """
-    Handles retrieval of cached output table.
+    Handle retrieval of celery result
+    for crossbreak data.
     """
-    unique_id = "csv_for_user_" + str(request.user.id)
-    csv_data = cache.get(unique_id)
-    if csv_data:
-        response = HttpResponse(csv_data, content_type='text/csv')
+    task_id = cache.get('table_task_id')
+    result = AsyncResult(task_id)
+    print('getting your result')
+
+    if result.ready():
+        data = result.get()
+        df = pd.read_csv(StringIO(data))
+
+        csv_buffer = BytesIO()
+        df.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
+        csv_buffer.seek(0)
+
+        response = HttpResponse(
+            csv_buffer.getvalue(),
+            content_type='text/csv'  # noqa
+        )
         response['Content-Disposition'] = 'attachment; filename="crossbreaks_data.csv"'
         return response
     else:
+        print("the crossbreaks are not ready yet")
         messages.error(
             request,
             "No crossbreaks data found. Please run the calculations first."
@@ -344,14 +383,12 @@ def download_weights(request):
     if result.ready():
         data = result.get()
         df = pd.read_csv(StringIO(data))
-        print(df.head(10))
 
         excel_buffer = BytesIO()
         with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
             df.to_excel(writer, sheet_name='Sheet1')
 
         excel_buffer.seek(0)
-        print(excel_buffer)
         response = HttpResponse(
             excel_buffer.read(),
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
@@ -359,7 +396,7 @@ def download_weights(request):
         response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
         return response
     else:
-        print("the result is not ready yet")
+        print("the weighting is not ready yet")
         return redirect('home')
 
 
