@@ -14,6 +14,8 @@ import pandas as pd
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal
 from .logic import extra_logic
 from . import weight as wgt
+from queries.table_calculations.calculate_totals import table_calculation
+
 
 @shared_task(bind=True)
 def task1(self):
@@ -113,9 +115,27 @@ def handle_weighting(
     return result
 
 
-    @shared_task(bind=True)
-    def handle_crossbreaks(self):
-        """
-        This handles the crossbreak logic
-        in a separate celery worker.
-        """
+@shared_task(bind=True)
+def handle_crossbreaks(
+    self, data, question_data, standard_cb, non_standard_cb):
+    """
+    This handles the crossbreak logic
+    in a separate celery worker.
+    """
+    print("processing crossbreaks")
+    try:
+        table = table_calculation(data, question_data, standard_cb, non_standard_cb)
+        return table
+    except (KeyError, IndexError) as e:
+        message = f"""
+            There was an error when running this code for crossbreaks.
+            The most likely cause of this error is entering a crossbreak that
+            doesn't exist in the data.
+
+            It could also be caused by changes in the wording of standard crossbreak
+            questions.
+
+            Here is the content of the error message: {e}
+            """
+        print(message)
+        raise

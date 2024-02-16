@@ -50,9 +50,13 @@ RUN wget https://github.com/apache/arrow/archive/refs/tags/apache-arrow-12.0.0.t
 RUN cd arrow-apache-arrow-12.0.0/cpp \
     && mkdir build \
     && cd build \
-    && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+    && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DARROW_CSV=ON\
     && make \
     && make install
+
+ENV ARROW_HOME=/usr/local
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+ENV PYARROW_CMAKE_OPTIONS="-DCMAKE_PREFIX_PATH=/usr/local"
 
 # Install Redis
 RUN apk update && apk add redis
