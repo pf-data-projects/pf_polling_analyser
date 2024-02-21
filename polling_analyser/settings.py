@@ -40,8 +40,12 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
+    'localhost',
+    'localhost:8000',
     'pf-polling-analyser-h34v-main-irw7hkckaa-ew.a.run.app'
 ]
+
+# ALLOWED_HOSTS = ['*']
 
 CACHES = {
     'default': {
