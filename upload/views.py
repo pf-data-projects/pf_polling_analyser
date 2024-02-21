@@ -26,6 +26,7 @@ from io import BytesIO, StringIO
 import re
 import json
 import os
+from datetime import datetime
 
 import pandas as pd
 
@@ -98,16 +99,29 @@ def weight_data(request):
                     questions.append(sub_form.cleaned_data['question'])
 
             user_id = request.user.id
-            # survey_data = survey_data.to_json(orient="split")
+            
+            # shared_directory = '/upload'
+
+            # # Generate a unique identifier for the file
+            # timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+            # user_id_str = str(user_id)  # Assuming `user_id` is an integer or a string that's safe to use in filenames
+            # file_identifier = f"{user_id_str}_{timestamp}"
+            # survey_data_filename = f"survey_data_{file_identifier}.csv"
+            # weight_proportions_filename = f"weight_proportions_{file_identifier}.csv"
+
+            # # Full paths
+            # survey_data_filepath = os.path.join(shared_directory, survey_data_filename)
+            # weight_proportions_filepath = os.path.join(shared_directory, weight_proportions_filename)
+
+            # Save CSV files
             survey_data = survey_data.to_csv(index=None)
             weight_proportions = weight_proportions.to_csv(index=None)
 
+            print("Passing data to handle weighting func")
             handle_weight = handle_weighting.delay(
                 user_id, survey_data, weight_proportions, apply, custom,
                 questions, groups, standard_weights
             )
-
-
 
             # ~~~~~~~~~~~~~~~~ Run ipf module for standard weights
             # if apply and not custom:
@@ -206,6 +220,7 @@ def upload_csv(request):
         form = CSVUploadForm(request.POST, request.FILES)
         formset = CrossbreakFormSet(request.POST, prefix="crossbreaks")
         if form.is_valid() and formset.is_valid():
+            print("------------ the view has started running -----------")
             data_file = request.FILES['data_file']
             survey_id = form.cleaned_data['survey_id']
             standard_cb = form.cleaned_data['standard_cb']
@@ -254,6 +269,7 @@ def upload_csv(request):
             data = data.to_csv(index=False)
             question_data = question_data.to_csv(index=False)
 
+            print("---------- calling task ----------")
             table = handle_crossbreaks.delay(data, question_data, standard_cb, non_standard_cb)
 
             # # Run calculations
