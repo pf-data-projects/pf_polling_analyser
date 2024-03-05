@@ -104,16 +104,16 @@ class WeightForm(forms.Form):
         validators=[]
     )
     apply_weights = forms.BooleanField(
-        label="Weight the data?",
+        label="Weight the data with standard weighting:",
         required=False
     )
     custom_weights = forms.BooleanField(
-        label="Customise your weights?",
-        help_text="Leave this blank unless you're using custom weights and some standard weight categories",
+        label="Customise your weights:",
+        help_text="Don't check this unless you're using custom weights",
         required=False
     )
     standard_weights = forms.MultipleChoiceField(
-        label="Include any standard weights in the custom weighting process?",
+        label="Do you want to include any standard weights in the custom weighting process?",
         choices=STANDARD_WEIGHTS,
         widget=forms.CheckboxSelectMultiple,
         required=False

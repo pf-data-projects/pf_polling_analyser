@@ -64,6 +64,17 @@
     document.addEventListener('DOMContentLoaded', function() {
         localStorage.clear();
     });
+
+    function checkStatus() {
+        fetch(`/check_task/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => console.error("Error: ", error));
+    }
+    setTimeout(() => checkStatus(), 500);
+
 </script>
 
 {% endblock %}
