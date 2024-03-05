@@ -18,25 +18,6 @@ from queries.table_calculations.calculate_totals import table_calculation
 
 
 @shared_task(bind=True)
-def task1(self):
-    """
-    A test task.
-    """
-    j = 0
-    for i in range(1, 11):
-        print(i)
-        j = j + i
-        # if not self.request.called_directly:
-        #     self.update_state(
-        #         state='PROGRESS',
-        #         meta={'current': i, 'total': 10}
-        #     )
-        sleep(1)
-    j = extra_logic(j) # extra logic is a function that returns an integer
-    return j
-
-
-@shared_task(bind=True)
 def handle_weighting(
     self, user_id, survey_data, weight_proportions, apply, custom,
     questions=None, groups=None, standard_weights=None):
@@ -122,17 +103,16 @@ def handle_crossbreaks(
     This handles the crossbreak logic
     in a separate celery worker.
     """
-    print("processing crossbreaks")
 
     data = pd.read_csv(StringIO(data))
     question_data = pd.read_csv(StringIO(question_data))
 
     try:
-        table = table_calculation(data, question_data, standard_cb, non_standard_cb)
-        print(table.head(10))
+        table = table_calculation(self, data, question_data, standard_cb, non_standard_cb)
+        table[0] = table[0].to_csv(index=None)
+        # return table
+        return {"table": table[0], "json": table[1]}
 
-        table = table.to_csv(index=None)
-        return table
     except (KeyError, IndexError) as e:
         message = f"""
             There was an error when running this code for crossbreaks.
@@ -145,4 +125,8 @@ def handle_crossbreaks(
             Here is the content of the error message: {e}
             """
         print(message)
-        raise
+        self.update_state(
+            status="FAILURE",
+            meta={"Error message": message}
+        )
+        return message

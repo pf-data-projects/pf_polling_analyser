@@ -56,9 +56,9 @@ RUN python manage.py collectstatic --noinput
 COPY run.sh /app/run.sh
 RUN dos2unix /app/run.sh && chmod +x /app/run.sh
 
-# Start the application using the run.sh script
-CMD ["/bin/sh", "/app/run.sh"]
+# Uncomment to start the application using the run.sh script
+# CMD ["/bin/sh", "/app/run.sh"]
 
 # Uncomment to use gunicorn directly
-# CMD gunicorn --bind 0.0.0.0:3000 --timeout 3600 polling_analyser.wsgi
+CMD gunicorn --bind 0.0.0.0:3000 --timeout 3600 polling_analyser.wsgi
 

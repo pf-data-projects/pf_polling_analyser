@@ -14,6 +14,7 @@ from .calc import calc
 from .rebase import rebase
 from .rebase_headers import rebase_headers
 
+
 def table_calculation(results, question_data, standard_cb, non_standard_cb):
     """
     A function that controls the flow of logic for the
@@ -67,6 +68,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
         table = calc(results, 5, table, question, results, question_data, True)
 
     # calculations for standard crossbreaks
+    k = 0
     for key, value in CROSSBREAKS.items():
         question = QUESTIONS[key]
         if key in standard_cb:
@@ -94,11 +96,22 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
                 )
         else:
             continue
+        # self.update_state(
+        #     state='PROGRESS',
+        #     meta={'StandardCB': k, 'total': len(CROSSBREAKS)}
+        # )
+        k += 1
 
     # Run calc for any non standard crossbreaks.
+    k = 0
     if len(non_standard_cb) > 0:
         for crossbreak in non_standard_cb:
             calc_crossbreak(table, question_list, results, question_data, crossbreak)
+            # self.update_state(
+            #     state='PROGRESS',
+            #     meta={'Non-standardCB': k, 'total': len(non_standard_cb)}
+            # )
+            k += 1
 
     # # adjust weighted totals so that they are a proportion of actual total
     # adjustment_ratio = table.loc[0, 'Total'] / table.loc[1, 'Total']
@@ -118,7 +131,8 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
     table = rebase(question_data, results, question_list, table, 5)
     # print("main rebase done")
 
-    # calculations for standard crossbreaks
+    # rebase calculations for standard crossbreaks
+    k = 0
     for key, value in CROSSBREAKS.items():
         question = QUESTIONS[key]
         if key in standard_cb:
@@ -147,15 +161,31 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
                 )
         else:
             continue
+        # self.update_state(
+        #     state='PROGRESS',
+        #     meta={' Rebase standardCB': k, 'total': len(CROSSBREAKS)}
+        # )
+        k += 1
 
+    # rebase non-standard crossbreak calculations
+    k = 0
     if len(non_standard_cb) > 0:
         for crossbreak in non_standard_cb:
             rebase_crossbreak(
                 table, question_list, results, question_data, crossbreak)
+            # self.update_state(
+            #     state='PROGRESS',
+            #     meta={'Rebase non-standardCB': k, 'total': len(CROSSBREAKS)}
+            # )
+            k += 1
 
+    # self.update_state(
+    #     state='PROGRESS',
+    #     meta={'Creating headers': 'Creating rebased column headers...'}
+    # )
     rebased_header_data = rebase_headers(results, question_list, standard_cb, non_standard_cb)
     rebased_json = json.dumps(rebased_header_data)
     cache_key = 'rebase_json'
     cache.set(cache_key, rebased_json, 300)
 
-    return table
+    return [table, rebased_json]

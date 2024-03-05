@@ -14,5 +14,5 @@ urlpatterns = [
     path('weights_download/', views.download_weights, name='download_weights'),
     path('header_download/', views.download_headers, name='download_headers'),
     path('instructions/', views.GuideView.as_view(), name='instructions'),
-    path('run_task/', views.run_celery_task, name="task")
+    path('check_task/', views.check_task_status, name='check')
 ]

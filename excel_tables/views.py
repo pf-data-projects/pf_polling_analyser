@@ -34,6 +34,7 @@ from .forms import TableUploadForm, RebaseForm, TableScanForm
 from .table_maker.trim import trim_table
 from .table_maker.workbook import create_workbook
 
+
 def table_maker_form(request, arg1):
     """
     A view that:
@@ -119,6 +120,7 @@ def table_maker_form(request, arg1):
         'questions': rebase_questions[0]
     })
 
+
 def scan_table(request):
     """
     Handles the logic to scan and find which questions
@@ -157,9 +159,7 @@ def scan_table(request):
 
             rebase_questions = [rebase_questions, rebase_ids]
             unique_id = "rebase_questions_for_user_" + str(request.user.id)
-            cache.set(unique_id, rebase_questions, 300)
-
-            # request.session['rebase_questions'] = rebase_questions
+            cache.set(unique_id, rebase_questions, 3600)
 
             messages.success(
                 request,
@@ -178,6 +178,7 @@ def scan_table(request):
     return render(request, 'table_scan_form.html', {
         'form': form,
     })
+
 
 def download_tables(request):
     """
