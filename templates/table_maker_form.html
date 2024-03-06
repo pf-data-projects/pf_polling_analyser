@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container table-scan-card rounded">
     <h1>Upload the calculations here to generate polling tables</h1>
 
-    <form method="post" enctype="multipart/form-data">
+    <form id="table-form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="row form-row">
             <div class="col-md">
@@ -25,5 +26,6 @@
     </form>
     <p><a class="btn btn-dark btn-spacing" href="{% url 'home' %}">Back</a></p>
 </div>
+<script src="{% static 'js/addFormToStorage.js' %}"></script>
 
 {% endblock %}

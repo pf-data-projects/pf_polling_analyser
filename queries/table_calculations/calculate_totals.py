@@ -96,6 +96,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
                 )
         else:
             continue
+        # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
         # self.update_state(
         #     state='PROGRESS',
         #     meta={'StandardCB': k, 'total': len(CROSSBREAKS)}
@@ -107,6 +108,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
     if len(non_standard_cb) > 0:
         for crossbreak in non_standard_cb:
             calc_crossbreak(table, question_list, results, question_data, crossbreak)
+            # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
             # self.update_state(
             #     state='PROGRESS',
             #     meta={'Non-standardCB': k, 'total': len(non_standard_cb)}
@@ -161,6 +163,7 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
                 )
         else:
             continue
+        # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
         # self.update_state(
         #     state='PROGRESS',
         #     meta={' Rebase standardCB': k, 'total': len(CROSSBREAKS)}
@@ -173,12 +176,14 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
         for crossbreak in non_standard_cb:
             rebase_crossbreak(
                 table, question_list, results, question_data, crossbreak)
+            # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
             # self.update_state(
             #     state='PROGRESS',
             #     meta={'Rebase non-standardCB': k, 'total': len(CROSSBREAKS)}
             # )
             k += 1
 
+    # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
     # self.update_state(
     #     state='PROGRESS',
     #     meta={'Creating headers': 'Creating rebased column headers...'}
