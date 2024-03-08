@@ -6,7 +6,15 @@ This is the alpha release of a cloud-based application to allow Public First to 
 
 <details>
 <summary>Logging in</summary>
-*This section is still being written*
+
+When you access the application for the first time, you will need to create an account or log in with an existing account.
+
+Select the relevant option in the navbar.
+
+If you are creating an account for the first time you will need to get an admin to approve your account/profile before you can access certain features of the site.
+
+Once logged in you can log out at any time by clicking the log out button in the navbar.
+
 </details>
 
 <details>
@@ -18,9 +26,9 @@ In order to weight survey data click on the link that says 'click here to weight
 
 Please note that both of these files should be .xlsx files. Uploading a CSV here will result in a 500 error.
 
-Please note that using a different set of weight proportions will also result in inaccurate weights or a 500 error.
+If you select the 'Customise your weights checkbox' option, you can use the remaining form fields to add any custom or standard weighting categories. If using this feature, please make sure that your weight proportions file matches the categories selected in your form.
 
-Upon successful completion of weighting, users will be redirected to the home page from where you selected the weighting option.
+Upon successful completion of weighting, the weights will be auto-downloaded to the user's machine. users will also be automatically redirected to the home page from where you selected the weighting option.
 
 To download your weighted data, click on the link near the bottom of the home page entitled 'DOWNLOAD WEIGHTED DATA'. If all has gone well, the data will be downloaded to your machine. You may then open the file and scroll to the furthest column to the right and see a new column called 'weighted_respondents' which should contain the weights for each person who answered the survey.
 
@@ -47,11 +55,11 @@ You may add as many non-standard crossbreaks as you like using the buttons, but 
 
 When you're happy with your query, click the 'upload' button to run the calculations.
 
-When the calculations are complete you will be redirected to the home page, and the data will be cached for you to download. Currently you will have 5 minutes until the cached data is wiped from the memory. 
+When the calculations are complete, the data will be automatically downloaded. You will be redirected to the home page, and the data will be cached for you to download. You also need to download a second file by clicking on the 'download table headers'. This file will be necessary in the next step. Currently you will have 5 minutes until these cached files are wiped from the memory. 
 
 Please also note that refreshing the browser / leaving the app untouched for too long may result in the cached data being cleared as well. If this happens you will need to restart the process again.
 
-Cick 'DOWNLOAD CROSSBREAKS DATA' to save the data for the next step.
+Make sure you have TWO files downloaded before moving to the next step.
 
 **NOTE: please refrain from submitting this form multiple times in quick succession as it relies upon a 3rd party API with limits on the number of requests that can be made per minute. If in doubt, give it 20 seconds or so after submitting to submit again.**
 </details>
@@ -65,7 +73,7 @@ This page will allow you to specify custom labels for questions that have a diff
 
 First, click on the link 'click here to scan the table for rebase comments'. This will take you to a page where you can upload the results you just downloaded from the previous step.
 
-You will then be taken to a general form where you'll need to reupload the data, specify a title for the tables, and select which questions to include in the tables.
+You will then be taken to a general form where you'll need to reupload the 2 files from the last step, specify a title for the tables, and select which questions to include in the tables.
 
 Underneath this there will be a form to specify the rebase comments for rebased questions. The app will still work if you do not fill these in but in most cases these will all need to be filled in so that the polling table's numbers make sense.
 
@@ -75,6 +83,35 @@ The tables themselves should have a 'cover page' worksheet, contents worksheet, 
 </details>
 
 ## Technical Design
+
+### Project architecture
+
+This project is made up of several components/services. User auth data is hosted in an external postgres database. Static files are hosted on a separate platform.
+
+The core part of the application is hosted on google cloud run in a single container. This container is currently running three services:
+1. Django web application
+2. Celery worker for asynchronous processing of crossbreak data
+3. Redis instance for passing tasks and results between django and the celery worker.
+
+The benefit of this more complex set up are:
+1. The application does not 'hang' for several minutes while waiting for backend processing to be completed.
+2. This allows django's front end to query the progress of the data processing in real time.
+
+It is NOT best practice to run several services in a single container, however since it is for such a small user-base, it is functional for now
+
+#### Future plans for cloud architecture
+
+The current roadmap for making improvements to this application's cloud configuration is to:
+1. Adopt an IaC approach such as Terraform to specify cloud services in declarative code.
+2. Replace the celery worker (essentially a cloned django web service) with a more lightweight cloud function
+3. Replace redis with google pub/sub
+
+This would have the following benefits:
+* The application would run more optimally with proper separation of concerns; saving resources.
+* The application would scale more easily if we needed it to.
+* It would be easier to onboard more collaborators/maintainers to this project in future.
+* It would avoid the large maintenance and cost sink of hosting this setup on a Kubernetes cluster.
+* It would potentially avoid the costs/config/performance/compatibility issues of hosting multiple cloud run instances alongside a cloud memorystore redis instance.
 
 ### Database Schema
 
@@ -90,13 +127,13 @@ This database schema may be expanded in future as features are added to this app
 
 This application uses caching to store data processed in the instance's memory for quick retrieval and download by the user.
 
-Currently this is handled using django's default caching system. This works OK for our current use-case but has some potential drawbacks if the application was ever scaled to cater for more users.
+Currently this is handled using django's default caching system. This works OK for our current use-case but has some potential drawbacks if the application was ever scaled to cater for many more users.
 1. There is limited configuration/features for more advanced caching.
 2. Caching using django's built-in caching system does not easily allow you to profile the impact on performance.
 3. More critically, Django uses the application instance's own memory to store cached data. If the application were to be scaled up, the cloud computing cost of running would increase significantly, as cloud run instances are billed according to memory/CPU usage.
 4. Given that the cache occupies memory, it also means that there are fewer resources in a cloud run instance that can be devoted to processing data.
 
-Longer-term, it would be better to set up a dedicated, specialised caching database with a service like Redis (or an equivalent provision from Google Cloud). This would ideally allow us to see more analytics on caching usage, and performance, as well as limiting runaway memory usage in the application.
+There may be more efficient storage options if scaling up is necessary.
 
 ### Data processing
 
