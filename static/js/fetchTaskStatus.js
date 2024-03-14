@@ -72,10 +72,10 @@ function fetchTaskStatus() {
             }
             else if (data.status === "PENDING") {
               progressElement.textContent = "Waiting for processing to start..."
-              // console.log("WAITING")
+              console.log(data)
             }
             else if (data.status === "PROGRESS" && "CreatingHeaders" in data.details) {
-              progressElement.textContent = "Waiting for processing to start..."
+              progressElement.textContent = "Creating rebase headers, preparing files for download."
               // console.log("WAITING")
             }
             else if (data.status === "SUCCESS") {
