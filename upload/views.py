@@ -49,8 +49,7 @@ from . import weight as wgt
 
 from . import validation as vld
 
-# ~~~~~~ Temporary imports for testing celery task
-from .tasks import handle_weighting, handle_crossbreaks
+from .tasks import handle_crossbreaks
 
 
 class GuideView(View):
@@ -254,44 +253,43 @@ def upload_csv(request):
             # question_data.to_csv(
             #     "question_data.csv", index=False, encoding="utf-8-sig")
 
-            # # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
-            # data = data.to_csv(index=False)
-            # question_data = question_data.to_csv(index=False)
-            # print("---------- calling task ----------")
-            # table = handle_crossbreaks.delay(data, question_data, standard_cb, non_standard_cb)
+            # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
+            data = data.to_csv(index=False)
+            question_data = question_data.to_csv(index=False)
+            table = handle_crossbreaks.delay(data, question_data, standard_cb, non_standard_cb)
 
-            # Run calculations
-            try:
-                table = table_calculation(data, question_data, standard_cb, non_standard_cb)
-            except (KeyError, IndexError) as e:
-                message = f"""
-                    There was an error when running this code for crossbreaks.
-                    The most likely cause of this error is entering a crossbreak that
-                    doesn't exist in the data.
+            # # Run calculations
+            # try:
+            #     table = table_calculation(data, question_data, standard_cb, non_standard_cb)
+            # except (KeyError, IndexError) as e:
+            #     message = f"""
+            #         There was an error when running this code for crossbreaks.
+            #         The most likely cause of this error is entering a crossbreak that
+            #         doesn't exist in the data.
 
-                    It could also be caused by changes in the wording of standard crossbreak
-                    questions.
+            #         It could also be caused by changes in the wording of standard crossbreak
+            #         questions.
 
-                    Here is the content of the error message: {e}
-                    """
-                return HttpResponse(message)
+            #         Here is the content of the error message: {e}
+            #         """
+            #     return HttpResponse(message)
 
-            # Store results in cache
-            csv_buffer = BytesIO()
-            table[0].to_csv(csv_buffer, index=False, encoding="utf-8-sig")
-            csv_buffer.seek(0)
-            unique_id = "csv_for_user_" + str(request.user.id)
-            cache.set(unique_id, csv_buffer.getvalue(), 300)
+            # # Store results in cache
+            # csv_buffer = BytesIO()
+            # table[0].to_csv(csv_buffer, index=False, encoding="utf-8-sig")
+            # csv_buffer.seek(0)
+            # unique_id = "csv_for_user_" + str(request.user.id)
+            # cache.set(unique_id, csv_buffer.getvalue(), 300)
 
-            response = HttpResponse(csv_buffer.getvalue(), content_type='text/csv')
-            response['Content-Disposition'] = 'attachment; filename="crossbreaks_data.csv"'
-            return response
+            # response = HttpResponse(csv_buffer.getvalue(), content_type='text/csv')
+            # response['Content-Disposition'] = 'attachment; filename="crossbreaks_data.csv"'
+            # return response
 
-            # # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
-            # print(table.id)
-            # cache.set('table_task_id', table.id, 300)
-            # messages.success(request, "Crossbreaks processing successfully underway")
-            # return redirect(reverse('home'))
+            # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
+            print(table.id)
+            cache.set('table_task_id', table.id, 300)
+            messages.success(request, "Crossbreaks processing successfully underway")
+            return redirect(reverse('home'))
         else:
             messages.error(
                 request,
@@ -308,55 +306,55 @@ def upload_csv(request):
     })
 
 
-def download_csv(request):
-    """
-    Handles retrieval of cached output table.
-    """
-    unique_id = "csv_for_user_" + str(request.user.id)
-    csv_data = cache.get(unique_id)
-    if csv_data:
-        response = HttpResponse(csv_data, content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="crossbreaks_data.csv"'
-        return response
-    else:
-        messages.error(
-            request,
-            "No crossbreaks data found. Please run the calculations first."
-        )
-        return redirect('home')
-
-# # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
 # def download_csv(request):
 #     """
-#     Handle retrieval of celery result
-#     for crossbreak data.
+#     Handles retrieval of cached output table.
 #     """
-#     task_id = cache.get('table_task_id')
-#     result = AsyncResult(task_id)
-#     print('getting your result')
-
-#     if result.ready():
-#         data = result.get()
-#         data = data['table']
-#         df = pd.read_csv(StringIO(data))
-
-#         csv_buffer = BytesIO()
-#         df.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
-#         csv_buffer.seek(0)
-
-#         response = HttpResponse(
-#             csv_buffer.getvalue(),
-#             content_type='text/csv'  # noqa
-#         )
+#     unique_id = "csv_for_user_" + str(request.user.id)
+#     csv_data = cache.get(unique_id)
+#     if csv_data:
+#         response = HttpResponse(csv_data, content_type='text/csv')
 #         response['Content-Disposition'] = 'attachment; filename="crossbreaks_data.csv"'
 #         return response
 #     else:
-#         print("the crossbreaks are not ready yet")
 #         messages.error(
 #             request,
 #             "No crossbreaks data found. Please run the calculations first."
 #         )
 #         return redirect('home')
+
+# ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
+def download_csv(request):
+    """
+    Handle retrieval of celery result
+    for crossbreak data.
+    """
+    task_id = cache.get('table_task_id')
+    result = AsyncResult(task_id)
+    print('getting your result')
+
+    if result.ready():
+        data = result.get()
+        data = data['table']
+        df = pd.read_csv(StringIO(data))
+
+        csv_buffer = BytesIO()
+        df.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
+        csv_buffer.seek(0)
+
+        response = HttpResponse(
+            csv_buffer.getvalue(),
+            content_type='text/csv'  # noqa
+        )
+        response['Content-Disposition'] = 'attachment; filename="crossbreaks_data.csv"'
+        return response
+    else:
+        print("the crossbreaks are not ready yet")
+        messages.error(
+            request,
+            "No crossbreaks data found. Please run the calculations first."
+        )
+        return redirect('home')
 
 
 def download_weights(request):
@@ -408,52 +406,52 @@ def download_weights(request):
 #         return redirect('home')
 
 
-def download_headers(request):
-    """
-    Handles downloading cached rebased header data.
-    """
-    unique_id = 'rebase_json'
-    json_data = cache.get(unique_id)
-    if json_data:
-        response = HttpResponse(
-            json_data,
-            content_type='application/json'
-        )
-        response['Content-Disposition'] = 'attachment; filename="table_headers.json"'
-        return response
-    else:
-        messages.error(
-            request,
-            "No JSON file was found for your table's headers."
-        )
-        return redirect('home')
-
-# # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
 # def download_headers(request):
 #     """
-#     Handle retrieval of celery result
-#     for crossbreak data.
+#     Handles downloading cached rebased header data.
 #     """
-#     task_id = cache.get('table_task_id')
-#     result = AsyncResult(task_id)
-#     print('getting your result')
-
-#     if result.ready():
-#         data = result.get()
-#         data = data['json']
+#     unique_id = 'rebase_json'
+#     json_data = cache.get(unique_id)
+#     if json_data:
 #         response = HttpResponse(
-#             data,
+#             json_data,
 #             content_type='application/json'
 #         )
 #         response['Content-Disposition'] = 'attachment; filename="table_headers.json"'
 #         return response
 #     else:
-#         print("the crossbreaks are not ready yet")
 #         messages.error(
 #             request,
-#             "No crossbreaks data found. Please run the calculations first."
+#             "No JSON file was found for your table's headers."
 #         )
 #         return redirect('home')
+
+# ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
+def download_headers(request):
+    """
+    Handle retrieval of celery result
+    for crossbreak data.
+    """
+    task_id = cache.get('table_task_id')
+    result = AsyncResult(task_id)
+    print('getting your result')
+
+    if result.ready():
+        data = result.get()
+        data = data['json']
+        response = HttpResponse(
+            data,
+            content_type='application/json'
+        )
+        response['Content-Disposition'] = 'attachment; filename="table_headers.json"'
+        return response
+    else:
+        print("the crossbreaks are not ready yet")
+        messages.error(
+            request,
+            "No crossbreaks data found. Please run the calculations first."
+        )
+        return redirect('home')
 
 
 def preprocess_header(header):
@@ -494,6 +492,6 @@ def check_task_status(request):
 
     return JsonResponse({
         'status': task_result.state,
-        'details': task_result.info,
-        'result': task_result.result if task_result.ready() else "still working..."
+        'details': 'Result ready to download' if task_result.ready() else task_result.info,
+        'result': 'Result ready to download' if task_result.ready() else "still working..."
     })
