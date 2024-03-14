@@ -29,7 +29,10 @@
         <!--~~~~~~~~~~~~~~~~~~~Navigation~~~~~~~~~~~~~~~~~~~-->
         <header class="sticky-top">
             <nav class="navbar navbar-expand-lg navbar-light header-footer-bg">
-              <a id="logo" class="navbar-brand" href="{% url 'home' %}">Polling Analyser</a>
+              <a id="logo" class="navbar-brand" href="{% url 'home' %}">
+                Polling Analyser
+                <img src="{% static 'assets/logo.png' %}" alt="Public First Logo">
+              </a>
               <button
                 class="navbar-toggler" 
                 type="button" 

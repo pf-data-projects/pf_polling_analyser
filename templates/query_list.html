@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+{% load static %}
 
 {% if user.is_authenticated %}
 {% for profile in profiles %}
@@ -43,6 +44,20 @@
             </div>
         </div>
     </div>
+    <div class="row m-3 p-3">
+        <div class="col">
+            <div class="Container">
+                <div id="progress"></div>
+                <div class="rounded" id="bar-1-wrapper" style="width: 100%; border: solid 0px black;">
+                    <div class="rounded" id="bar-1" style="background-color: lightblue;"></div>
+                </div>
+                <div style="height: 30px;"></div>
+                <div class="rounded" id="bar-2-wrapper" style="width: 100%; border: solid 0px black;">
+                    <div class="rounded" id="bar-2" style="background-color: lightblue;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% else %}
@@ -76,5 +91,6 @@
     setTimeout(() => checkStatus(), 500);
 
 </script>
+<script src="{% static 'js/fetchTaskStatus.js' %}"></script>
 
 {% endblock %}

@@ -15,7 +15,7 @@ from .rebase import rebase
 from .rebase_headers import rebase_headers
 
 
-def table_calculation(results, question_data, standard_cb, non_standard_cb):
+def table_calculation(self, results, question_data, standard_cb, non_standard_cb):
     """
     A function that controls the flow of logic for the
     creation of the table.
@@ -65,24 +65,47 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
         table.iat[1, 5] = results['weighted_respondents'].astype(float).sum()
 
         # ~~~~~~~~~~~~~ Calculates responses for checkbox/multiselect questions
+        self.update_state(
+            state='PROGRESS',
+            meta={'Totals': 'Calculating totals'}
+        )
         table = calc(results, 5, table, question, results, question_data, True)
 
     # calculations for standard crossbreaks
     k = 0
+    self.update_state(
+        state='PROGRESS',
+        meta={'StandardCB': k, 'total': len(standard_cb)}
+    )
     for key, value in CROSSBREAKS.items():
         question = QUESTIONS[key]
         if key in standard_cb:
             if key == 'age':
                 table = iterate_age_brackets(
                     table, question_list, results, question_data)
+                self.update_state(
+                    state='PROGRESS',
+                    meta={'StandardCB': k + 1, 'total': len(standard_cb)}
+                )
+                k += 1
                 continue
             if key == 'seg':
                 table = iterate_seg(table, question_list, results, question_data)
+                self.update_state(
+                    state='PROGRESS',
+                    meta={'StandardCB': k + 1, 'total': len(standard_cb)}
+                )
+                k += 1
                 continue
             if key == 'children(updated)':
                 table = iterate_over_children_ages(
                     table, question_list, results, question_data
                 )
+                self.update_state(
+                    state='PROGRESS',
+                    meta={'StandardCB': k + 1, 'total': len(standard_cb)}
+                )
+                k += 1
                 continue
             for i in value:
                 table = calc_standard(
@@ -96,21 +119,27 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
                 )
         else:
             continue
-        # self.update_state(
-        #     state='PROGRESS',
-        #     meta={'StandardCB': k, 'total': len(CROSSBREAKS)}
-        # )
+        # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
+        self.update_state(
+            state='PROGRESS',
+            meta={'StandardCB': k + 1, 'total': len(standard_cb)}
+        )
         k += 1
 
     # Run calc for any non standard crossbreaks.
     k = 0
     if len(non_standard_cb) > 0:
+        self.update_state(
+            state='PROGRESS',
+            meta={'nonStandardCB': k, 'total': len(non_standard_cb)}
+        )
         for crossbreak in non_standard_cb:
             calc_crossbreak(table, question_list, results, question_data, crossbreak)
-            # self.update_state(
-            #     state='PROGRESS',
-            #     meta={'Non-standardCB': k, 'total': len(non_standard_cb)}
-            # )
+            # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
+            self.update_state(
+                state='PROGRESS',
+                meta={'nonStandardCB': k + 1, 'total': len(non_standard_cb)}
+            )
             k += 1
 
     # # adjust weighted totals so that they are a proportion of actual total
@@ -133,20 +162,36 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
 
     # rebase calculations for standard crossbreaks
     k = 0
+    self.update_state(
+        state='PROGRESS',
+        meta={'rebaseStandardCB': k, 'total': len(standard_cb)}
+    )
     for key, value in CROSSBREAKS.items():
         question = QUESTIONS[key]
         if key in standard_cb:
             if key == 'age':
                 table = iterate_age_rebase(
                     table, question_list, results, question_data)
+                self.update_state(
+                    state='PROGRESS',
+                    meta={'rebaseStandardCB': k + 1, 'total': len(standard_cb)}
+                )
                 continue
             if key == 'seg':
                 table = iterate_seg_rebase(
                     table, question_list, results, question_data)
+                self.update_state(
+                    state='PROGRESS',
+                    meta={'rebaseStandardCB': k + 1, 'total': len(standard_cb)}
+                )
                 continue
             if key == 'children(updated)':
                 table = rebase_children_ages(
                     table, question_list, results, question_data
+                )
+                self.update_state(
+                    state='PROGRESS',
+                    meta={'rebaseStandardCB': k + 1, 'total': len(standard_cb)}
                 )
                 continue
             for i in value:
@@ -161,28 +206,35 @@ def table_calculation(results, question_data, standard_cb, non_standard_cb):
                 )
         else:
             continue
-        # self.update_state(
-        #     state='PROGRESS',
-        #     meta={' Rebase standardCB': k, 'total': len(CROSSBREAKS)}
-        # )
+        # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
+        self.update_state(
+            state='PROGRESS',
+            meta={'rebaseStandardCB': k + 1, 'total': len(standard_cb)}
+        )
         k += 1
 
     # rebase non-standard crossbreak calculations
     k = 0
     if len(non_standard_cb) > 0:
+        self.update_state(
+            state='PROGRESS',
+            meta={'rebaseNonStandardCB': k, 'total': len(non_standard_cb)}
+        )
         for crossbreak in non_standard_cb:
             rebase_crossbreak(
                 table, question_list, results, question_data, crossbreak)
-            # self.update_state(
-            #     state='PROGRESS',
-            #     meta={'Rebase non-standardCB': k, 'total': len(CROSSBREAKS)}
-            # )
+            # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
+            self.update_state(
+                state='PROGRESS',
+                meta={'rebaseNonStandardCB': k + 1, 'total': len(non_standard_cb)}
+            )
             k += 1
 
-    # self.update_state(
-    #     state='PROGRESS',
-    #     meta={'Creating headers': 'Creating rebased column headers...'}
-    # )
+    # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
+    self.update_state(
+        state='PROGRESS',
+        meta={'CreatingHeaders': 'Creating rebased column headers...'}
+    )
     rebased_header_data = rebase_headers(results, question_list, standard_cb, non_standard_cb)
     rebased_json = json.dumps(rebased_header_data)
     cache_key = 'rebase_json'
