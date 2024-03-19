@@ -42,6 +42,11 @@ CROSSBREAKS = {
         "Remain",
         "I did not vote"
     ],
+    "voting_intention":[
+        "Conservative",
+        "Labour",
+        "Liberal Democrats",
+    ],
 }
 
 QUESTIONS = {
@@ -53,7 +58,8 @@ QUESTIONS = {
     "children(updated)": "Do you have any children? If so, how old are they?",
     "education": "What is the highest level of education you have achieved?",
     "vote2019": "Do you remember how you voted in the 2019 General Election, if you were able to vote?This was the most recent General Election in which Boris Johnson was the leader of the Conservative Party, and Jeremy Corbyn was the leader of the Labour Party",
-    "eu2016": "How did you vote in the 2016 referendum on whether to Leave or Remain in the EU, if you were able to vote?"
+    "eu2016": "How did you vote in the 2016 referendum on whether to Leave or Remain in the EU, if you were able to vote?",
+    "voting_intention": "And, if a general election was called tomorrow, which party would you vote for?"
 }
 
 

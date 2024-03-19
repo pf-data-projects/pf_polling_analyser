@@ -30,6 +30,7 @@ CB_OPTIONS = (
     ('education', 'Education'),
     ('vote2019', 'Vote 2019'),
     ('eu2016', 'EU 2016 Vote'),
+    ('voting_intention', 'Voting Intention')
 )
 
 STANDARD_WEIGHTS = (
