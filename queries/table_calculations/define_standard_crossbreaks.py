@@ -31,10 +31,10 @@ CROSSBREAKS = {
         "Doctorate (PhD/DPHil)"
     ],
     "vote2019": [
+        "The Brexit Party",
         "Conservative",
         "Labour",
         "Liberal Democrat",
-        "The Brexit Party",
         "I did not vote",
     ],
     "eu2016": [

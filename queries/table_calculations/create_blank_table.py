@@ -36,9 +36,20 @@ def create_blank_table(question_data, standard_cb, non_standard_cb):
 
     for crossbreak in standard_cb:
         if crossbreak in cb.CROSSBREAKS:
-            for i in cb.CROSSBREAKS[crossbreak]:
-                table[i] = [0, 0,]
-            table[f"blank_{crossbreak}"] = " "
+            # condition to ensure voting intention cols don't overwrite 2019 cols
+            if crossbreak == "voting_intention":
+                for i in cb.CROSSBREAKS[crossbreak]:
+                    table[f'intention_{i}'] = [0, 0,]
+                table[f"blank_{crossbreak}"] = " "
+            # condition to ensure brexit vote cols don't overwrite 2019 cols
+            if crossbreak == "eu2016":
+                for i in cb.CROSSBREAKS[crossbreak]:
+                    table[f'brexit_{i}'] = [0, 0,]
+                table[f"blank_{crossbreak}"] = " "
+            else:
+                for i in cb.CROSSBREAKS[crossbreak]:
+                    table[i] = [0, 0,]
+                table[f"blank_{crossbreak}"] = " "
 
     if len(non_standard_cb) > 0:
         for crossbreak in non_standard_cb:
