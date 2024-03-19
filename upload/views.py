@@ -35,7 +35,7 @@ from celery.result import AsyncResult
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.contrib import messages
-from .forms import CSVUploadForm, WeightForm, CrossbreakFormSet, CustomWeightFormSet, CeleryForm
+from .forms import CSVUploadForm, WeightForm, CrossbreakFormSet, CustomWeightFormSet
 from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
 
