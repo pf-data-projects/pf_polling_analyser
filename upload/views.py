@@ -487,8 +487,15 @@ def check_task_status(request):
             "result": "No results yet..."
         })
     task_result = AsyncResult(task_id)
-    print(task_result.status)
-    print(task_result.info)
+    # print(task_result.status)
+    # print(task_result.info)
+
+    if task_result.state == 'FAILURE':
+        return JsonResponse({
+            'status': 'FAILURE',
+            'details': str(task_result.result),  # Error message
+            'traceback': task_result.traceback,  # Traceback of the error
+        })
 
     return JsonResponse({
         'status': task_result.state,
