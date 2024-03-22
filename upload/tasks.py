@@ -107,26 +107,26 @@ def handle_crossbreaks(
     data = pd.read_csv(StringIO(data))
     question_data = pd.read_csv(StringIO(question_data))
 
-    try:
-        table = table_calculation(self, data, question_data, standard_cb, non_standard_cb)
-        table[0] = table[0].to_csv(index=None)
-        # return table
-        return {"table": table[0], "json": table[1]}
+    # try:
+    table = table_calculation(self, data, question_data, standard_cb, non_standard_cb)
+    table[0] = table[0].to_csv(index=None)
+    # return table
+    return {"table": table[0], "json": table[1]}
 
-    except (KeyError, IndexError) as e:
-        message = f"""
-            There was an error when running this code for crossbreaks.
-            The most likely cause of this error is entering a crossbreak that
-            doesn't exist in the data.
+    # except (KeyError, IndexError) as e:
+    #     message = f"""
+    #         There was an error when running this code for crossbreaks.
+    #         The most likely cause of this error is entering a crossbreak that
+    #         doesn't exist in the data.
 
-            It could also be caused by changes in the wording of standard crossbreak
-            questions.
+    #         It could also be caused by changes in the wording of standard crossbreak
+    #         questions.
 
-            Here is the content of the error message: {e}
-            """
-        print(message)
-        self.update_state(
-            status="FAILURE",
-            meta={"Error message": message}
-        )
-        return message
+    #         Here is the content of the error message: {e}
+    #         """
+    #     print(message)
+    #     self.update_state(
+    #         status="FAILURE",
+    #         meta={"Error message": message}
+    #     )
+    #     return message

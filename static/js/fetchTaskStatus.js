@@ -86,6 +86,24 @@ function fetchTaskStatus() {
               secondWrapper.style.border = "none"
               console.log("COMPLETED")
             }
+            else if (data.status === "FAILURE") {
+              console.log(data)
+              html = `<p><strong>There was an error when running this code for crossbreaks.
+                      The most likely cause of this error is entering a crossbreak that
+                      doesn't exist in the data.
+          
+                      It could also be caused by changes in the wording of standard crossbreak
+                      questions.
+          
+                      Here is the content of the error message:</strong></p>
+                      <p>${data.traceback}</p>`
+              progressElement.innerHTML = html
+              progressElement.style.color = "darkred"
+              progressElement.style.backgroundColor = "#ffcccb"
+              progressElement.style.padding = "20px"
+              progressElement.classList.add('rounded')
+
+            }
             else {
               console.log("This one is always triggering")
               progressElement.textContent = JSON.stringify(data, null, 2);

@@ -21,20 +21,24 @@ from django import forms
 from django.forms import formset_factory
 
 CB_OPTIONS = (
-        ('gender', 'Gender'),
-        ('age', 'Age'),
-        ('region', 'Region'),
-        ('seg', 'Socio-economic Grade'),
-        ('children', 'Children'),
-        ('children(updated)', "Children (Age breakdown)"),
-        ('education', 'Education'),
-    )
+    ('gender', 'Gender'),
+    ('age', 'Age'),
+    ('region', 'Region'),
+    ('seg', 'Socio-economic Grade'),
+    ('children', 'Children'),
+    ('children(updated)', "Children (Age breakdown)"),
+    ('education', 'Education'),
+    ('vote2019', 'Vote 2019'),
+    ('eu2016', 'EU 2016 Vote'),
+    ('voting_intention', 'Voting Intention')
+)
 
 STANDARD_WEIGHTS = (
     ('seg', 'Socio-economic Grade'),
     ('region', 'Region'),
     ('genderage', 'Interlocking Gender and Age')
 )
+
 
 class CSVUploadForm(forms.Form):
     """
@@ -136,26 +140,3 @@ class CustomWeightForm(forms.Form):
     )
 
 CustomWeightFormSet = formset_factory(CustomWeightForm, extra=1)
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~ Temporary forms for testing celery tasks
-
-OPTIONS = (
-    ("the North", "the North"),
-    ("the North", "the North"),
-    ("the North", "the North"),
-    ("the North", "the North"),
-    ("the North", "the North"),
-)
-
-class CeleryForm(forms.Form):
-    choice_field = forms.MultipleChoiceField(
-        label="Where would you consider going on holiday?",
-        choices=OPTIONS,
-        widget=forms.CheckboxSelectMultiple,
-        required=False
-    )
-
-    def __init__(self, *args, **kwargs):
-        super(CeleryForm, self).__init__(*args, **kwargs)
-        self.fields['choice_field'].initial = [choice[0] for choice in OPTIONS]

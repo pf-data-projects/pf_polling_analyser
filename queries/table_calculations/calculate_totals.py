@@ -108,9 +108,15 @@ def table_calculation(self, results, question_data, standard_cb, non_standard_cb
                 k += 1
                 continue
             for i in value:
+                if key == "eu2016":
+                    j = f"brexit_{i}"
+                elif key == "voting_intention":
+                    j = f"intention_{i}"
+                else:
+                    j = i
                 table = calc_standard(
                     i,
-                    table.columns.get_loc(i),
+                    table.columns.get_loc(j),
                     question,
                     table,
                     question_list,
@@ -195,9 +201,15 @@ def table_calculation(self, results, question_data, standard_cb, non_standard_cb
                 )
                 continue
             for i in value:
+                if key == "eu2016":
+                    j = f"brexit_{i}"
+                elif key == "voting_intention":
+                    j = f"intention_{i}"
+                else:
+                    j = i
                 table = rebase_standard(
                     i,
-                    table.columns.get_loc(i),
+                    table.columns.get_loc(j),
                     question,
                     table,
                     question_list,

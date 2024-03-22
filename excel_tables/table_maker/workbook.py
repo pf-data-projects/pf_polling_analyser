@@ -429,6 +429,22 @@ def create_workbook(
                 excel_coord2 = get_header_coords("Doctorate (PhD/DPHil)", trimmed_data)
                 ws[excel_coord] = "Highest Level of Education"
                 ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+            if "The Brexit Party" in cols:
+                excel_coord = get_header_coords("The Brexit Party", trimmed_data)
+                excel_coord2 = get_header_coords("Liberal Democrat", trimmed_data)
+                ws[excel_coord] = "2019"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+            if "brexit_Leave" in cols:
+                excel_coord = get_header_coords("brexit_Leave", trimmed_data)
+                excel_coord2 = get_header_coords("brexit_I did not vote", trimmed_data)
+                ws[excel_coord] = "EU 2016 Vote"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+            if "intention_Conservative" in cols:
+                excel_coord = get_header_coords("intention_Conservative", trimmed_data)
+                excel_coord2 = get_header_coords("intention_Liberal Democrats", trimmed_data)
+                ws[excel_coord] = "Voting Intention"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+
 
     # Add headers for non-standard crossbreaks
 
@@ -470,6 +486,14 @@ def create_workbook(
                 cell.fill = fill
                 cell.font = font
                 cell.alignment = alignment
+            # remove brexit and intention prefixes in final table
+            for cell in ws['3']:
+                if 'brexit_' in str(cell.value):
+                    cleaned_value = str(cell.value).replace('brexit_', "")
+                    cell.value = cleaned_value
+                if 'intention_' in str(cell.value):
+                    cleaned_value = str(cell.value).replace('intention_', "")
+                    cell.value = cleaned_value
         if 'Grid' in sheet:
             ws = wb[sheet]
             for cell in ws['2']:
@@ -530,7 +554,7 @@ def create_workbook(
     cache.set(cache_key, output.getvalue(), timeout=300)
     return cache_key
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ EXTRA HELPER FUNCTIONS HERE FOR CONVENIENCE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ EXTRA HELPER FUNCTIONS HERE
 
 def format_percentages(data, sheet, cell_format):
     """

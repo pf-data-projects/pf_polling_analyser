@@ -29,7 +29,24 @@ CROSSBREAKS = {
         "University Undergraduate Degree (BA/BSc)",
         "University Postgraduate Degree (MA/MSc/MPhil)",
         "Doctorate (PhD/DPHil)"
-    ]
+    ],
+    "vote2019": [
+        "The Brexit Party",
+        "Conservative",
+        "Labour",
+        "Liberal Democrat",
+        "I did not vote",
+    ],
+    "eu2016": [
+        "Leave",
+        "Remain",
+        "I did not vote"
+    ],
+    "voting_intention":[
+        "Conservative",
+        "Labour",
+        "Liberal Democrats",
+    ],
 }
 
 QUESTIONS = {
@@ -40,7 +57,11 @@ QUESTIONS = {
     "children": "Do you have any children under the age of 18 living at home?",
     "children(updated)": "Do you have any children? If so, how old are they?",
     "education": "What is the highest level of education you have achieved?",
+    "vote2019": "Do you remember how you voted in the 2019 General Election, if you were able to vote?This was the most recent General Election in which Boris Johnson was the leader of the Conservative Party, and Jeremy Corbyn was the leader of the Labour Party",
+    "eu2016": "How did you vote in the 2016 referendum on whether to Leave or Remain in the EU, if you were able to vote?",
+    "voting_intention": "And, if a general election was called tomorrow, which party would you vote for?"
 }
+
 
 def calc_standard(value, col_index, cb_question, table, question_list, results, question_data):
     """
