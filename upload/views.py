@@ -331,7 +331,13 @@ def download_csv(request):
     for crossbreak data.
     """
     task_id = cache.get('table_task_id')
-    result = AsyncResult(task_id)
+    try:
+        result = AsyncResult(task_id)
+    except ValueError as e:
+        print(e)
+        messages.error(request, e)
+        return redirect('home')
+
     print('getting your result')
 
     if result.ready():
@@ -434,7 +440,13 @@ def download_headers(request):
     for crossbreak data.
     """
     task_id = cache.get('table_task_id')
-    result = AsyncResult(task_id)
+    try:
+        result = AsyncResult(task_id)
+    except ValueError as e:
+        print("THIS IS THE ERROR", str(e))
+        messages.error(request, e)
+        return redirect('home')
+
     print('getting your result')
 
     if result.ready():
