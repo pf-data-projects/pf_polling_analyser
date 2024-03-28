@@ -62,28 +62,18 @@ def calc(filtered_df, col_index, table, question, results, question_data, is_tot
         options_list = options_df['question_title'].tolist()
         options = list(dict.fromkeys(options_list))
 
-        # print(question['qid'])
         for sub_question in sub_questions:
-            # sub_question = sub_question.strip()
+            sub_question = sub_question.strip()
             table_filtered_df = filtered_df[helpers.col_with_substr_a(results, sub_question, question['qid']) + ['weighted_respondents']]
-            if "Britain stood up to evil in the world" in sub_question:
-                amended_sub_q = sub_question.strip()
-                table_filtered_df = filtered_df[helpers.col_with_substr_a(results, amended_sub_q, question['qid']) + ['weighted_respondents']]
-                # table_filtered_df.to_csv("testytestycsv.csv")
             i = 1
             for option in options:
-                # if "Britain stood up to evil in the world" in sub_question:
-                #     # print(option)
                 if is_total:
                     responses_df = (table_filtered_df == option).sum()
                     responses = int(responses_df.iloc[0])
-                    # if "Britain stood up to evil in the world" in sub_question:
-                    #     # print(responses_df)
                 else:
                     responses_df = table_filtered_df[table_filtered_df.iloc[:, 0] == option]
                     responses_df.loc[:, 'weighted_respondents'] = responses_df['weighted_respondents'].astype(float)
                     responses = responses_df['weighted_respondents'].sum()
-                    # print(responses)
                 sub_question_position = table[(
                     table['Answers'] == sub_question
                 ) & (

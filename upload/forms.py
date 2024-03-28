@@ -105,7 +105,8 @@ class WeightForm(forms.Form):
     )
     weights = forms.FileField(
         label='Weight Proportions Data',
-        validators=[]
+        validators=[],
+        required=False
     )
     apply_weights = forms.BooleanField(
         label="Weight the data with standard weighting:",

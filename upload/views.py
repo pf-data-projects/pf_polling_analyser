@@ -81,8 +81,9 @@ def weight_data(request):
             survey_data = request.FILES['results']
             survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
             survey_data.columns = [preprocess_header(col) for col in survey_data.columns]
-            weight_proportions = request.FILES['weights']
-            weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
+            if 'weights' in request.FILES:
+                weight_proportions = request.FILES['weights']
+                weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
             apply = form.cleaned_data['apply_weights']
             custom = form.cleaned_data['custom_weights']
             standard_weights = form.cleaned_data['standard_weights']
@@ -330,7 +331,18 @@ def download_csv(request):
     for crossbreak data.
     """
     task_id = cache.get('table_task_id')
-    result = AsyncResult(task_id)
+    try:
+        result = AsyncResult(task_id)
+    except ValueError as e:
+        print(e)
+        messages.error(
+            request,
+            """No data found. 
+            Either calculations have not yet been completed, 
+            or too much time has elapsed since they were run."""
+        )
+        return redirect('home')
+
     print('getting your result')
 
     if result.ready():
@@ -433,7 +445,18 @@ def download_headers(request):
     for crossbreak data.
     """
     task_id = cache.get('table_task_id')
-    result = AsyncResult(task_id)
+    try:
+        result = AsyncResult(task_id)
+    except ValueError as e:
+        print("THIS IS THE ERROR", str(e))
+        messages.error(
+            request,
+            """No data found. 
+            Either calculations have not yet been completed, 
+            or too much time has elapsed since they were run."""
+        )
+        return redirect('home')
+
     print('getting your result')
 
     if result.ready():

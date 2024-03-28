@@ -96,5 +96,7 @@ def create_blank_table(question_data, standard_cb, non_standard_cb):
         if 'blank_' in col:
             dataframe = dataframe.rename(columns={col: ' '})
 
+    dataframe['Answers'] = dataframe['Answers'].str.strip()
+
     dataframe.to_csv('blank_table.csv')
     return dataframe

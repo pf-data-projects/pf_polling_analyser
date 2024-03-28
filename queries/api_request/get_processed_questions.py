@@ -174,5 +174,7 @@ def extract_data_from_question_objects(question_list):
     }
     question_data = pd.DataFrame(question_dict)
 
+    question_data['question_title'] = question_data['question_title'].str.strip()
+
     question_data.to_csv('question_data.csv', encoding='utf-8-sig')
     return question_data
