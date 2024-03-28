@@ -335,7 +335,12 @@ def download_csv(request):
         result = AsyncResult(task_id)
     except ValueError as e:
         print(e)
-        messages.error(request, e)
+        messages.error(
+            request,
+            """No data found. 
+            Either calculations have not yet been completed, 
+            or too much time has elapsed since they were run."""
+        )
         return redirect('home')
 
     print('getting your result')
@@ -444,7 +449,12 @@ def download_headers(request):
         result = AsyncResult(task_id)
     except ValueError as e:
         print("THIS IS THE ERROR", str(e))
-        messages.error(request, e)
+        messages.error(
+            request,
+            """No data found. 
+            Either calculations have not yet been completed, 
+            or too much time has elapsed since they were run."""
+        )
         return redirect('home')
 
     print('getting your result')
