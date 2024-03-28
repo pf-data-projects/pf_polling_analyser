@@ -81,8 +81,9 @@ def weight_data(request):
             survey_data = request.FILES['results']
             survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
             survey_data.columns = [preprocess_header(col) for col in survey_data.columns]
-            weight_proportions = request.FILES['weights']
-            weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
+            if 'weights' in request.FILES:
+                weight_proportions = request.FILES['weights']
+                weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
             apply = form.cleaned_data['apply_weights']
             custom = form.cleaned_data['custom_weights']
             standard_weights = form.cleaned_data['standard_weights']
