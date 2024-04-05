@@ -59,3 +59,50 @@ class TestWeighting(TestCase):
         df = pd.read_excel(data)
         self.assertTrue('weighted_respondents' in df.columns)
         self.assertTrue((df['weighted_respondents'] == 1).all())
+
+
+    def test_standard_weights(self):
+        """
+        This test checks that when you submit data
+        to be processed with standard weighting
+        1. the data appears in the cache.
+        2. the data contains a column 'weighted_respondents'. 
+        with not '1' for all values.
+        """
+        # test login works correctly
+        login = self.client.login(username='testuser', password='testpassword')
+        self.assertTrue(login)
+
+        # test the submission of the weight form and cache key existence.
+        data_file_path = os.path.join(os.path.dirname(__file__), 'data2.xlsx')
+        with open(data_file_path, 'rb') as file:
+            xlsx_file = SimpleUploadedFile(
+                'data2.xlsx',
+                file.read(),
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+
+        props_file_path = os.path.join(os.path.dirname(__file__), 'Weight_Proportions.xlsx')
+        with open(props_file_path, 'rb') as file:
+            props_file = SimpleUploadedFile(
+                'Weight_Proportions.xlsx',
+                file.read(),
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+
+        form_data = {
+            'results': xlsx_file,
+            'weights': props_file,
+            'apply_weights': True,
+            'custom_weights': False,
+        }
+
+        response = self.client.post(reverse('weight_data'), form_data, format='multipart')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(cache.has_key(f"weights_for_user_{self.test_user_id}"))
+
+        # test the weighted file has the correct column
+        data = cache.get(f"weights_for_user_{self.test_user_id}")
+        df = pd.read_excel(data)
+        self.assertTrue('weighted_respondents' in df.columns)
+        self.assertTrue((df['weighted_respondents'] != 1).all())
