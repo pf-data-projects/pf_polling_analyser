@@ -57,27 +57,19 @@ def create_blank_table(question_data, standard_cb, non_standard_cb):
                 table[f'{crossbreak[0]}: {answer}'] = [0, 0,]
             table[f"blank_{crossbreak[1]}_{crossbreak[2]}"] = " "
 
-    for i in range(len(questions.index)):
-        table['Answers'].append(
-            f'{questions.iloc[i, 3]}'
-        )
-
     for j in range(len(questions.index)):
+        table['Answers'].append(
+            f'{questions.iloc[j, 3]}'
+        )
         table['Rebase comment needed'].append(
             f'{questions.iloc[j, 4]}'
         )
-
-    for j in range(len(questions.index)):
         table['Types'].append(
             f'{questions.iloc[j, 2]}'
         )
-
-    for j in range(len(questions.index)):
         table['Base Type'].append(
             f'{questions.iloc[j, 1]}'
         )
-
-    for j in range(len(questions.index)):
         table['IDs'].append(
             f'{questions.iloc[j, 0]}'
         )
