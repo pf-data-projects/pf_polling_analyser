@@ -55,20 +55,20 @@ function fetchTaskStatus() {
               total = Number(data.details.total)
               progressElement.textContent = `${progress} / ${total} standard crossbreaks rebased`
               // console.log(progress, total)
-              secondBar.style.height = "100%"
-              secondWrapper.style.height = "20px"
-              secondWrapper.style.border = "solid 2px black"
-              secondBar.style.width = `${progress/total * 100}%`
+              firstBar.style.height = "100%"
+              firstWrapper.style.height = "20px"
+              firstWrapper.style.border = "solid 2px black"
+              firstBar.style.width = `${progress/total * 100}%`
             }
             else if (data.status === "PROGRESS" && "rebaseNonStandardCB" in data.details) {
               progress = Number(data.details.rebaseNonStandardCB)
               total = Number(data.details.total)
               progressElement.textContent = `${progress} / ${total} non-standard crossbreaks rebased`
               // console.log(progress, total)
-              secondBar.style.height = "100%"
-              secondWrapper.style.height = "20px"
-              secondWrapper.style.border = "solid 2px black"
-              secondBar.style.width = `${progress/total * 100}%`
+              firstBar.style.height = "100%"
+              firstWrapper.style.height = "20px"
+              firstWrapper.style.border = "solid 2px black"
+              firstBar.style.width = `${progress/total * 100}%`
             }
             else if (data.status === "PENDING") {
               progressElement.textContent = "Waiting for processing to start..."
@@ -80,6 +80,11 @@ function fetchTaskStatus() {
             }
             else if (data.status === "SUCCESS") {
               progressElement.textContent = "Data processing complete. Please download your files!"
+              progressElement.style.color = "darkgreen"
+              progressElement.style.fontWeight = "700"
+              progressElement.style.backgroundColor = "#c0fcd0"
+              progressElement.style.padding = "20px"
+              progressElement.classList.add('rounded')
               firstWrapper.style.height = "0px"
               firstWrapper.style.border = "none"
               secondWrapper.style.height = "0px"

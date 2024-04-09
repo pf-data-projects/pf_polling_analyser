@@ -8,7 +8,7 @@ function messageTimeout() {
         if (message != null) {
             message.remove();
         }
-    }, 2000);
+    }, 3000);
 }
 
 document.addEventListener('DOMContentLoaded', function(){

@@ -49,7 +49,7 @@ class CSVUploadForm(forms.Form):
     """
 
     data_file = forms.FileField(
-        label='Survey Response Data (data file)',
+        label='Survey Response Data (weighted_data.xlsx)',
         validators=[]
     )
     survey_id = forms.IntegerField(
@@ -81,7 +81,11 @@ class CrossbreakForm(forms.Form):
     )
     non_standard_cb_question = forms.CharField(
         label="Question text",
-        help_text="Please put the exact text of the question that determines this crossbreak here.",
+        help_text="""
+            Please put the exact text of the question
+            that determines this crossbreak here
+            (and don't include the question id number).
+            """,
         required=False
     )
     non_standard_cb_answers = forms.CharField(
