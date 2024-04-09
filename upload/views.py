@@ -224,6 +224,9 @@ def upload_csv(request):
                     cb_answer = sub_form.cleaned_data['non_standard_cb_answers']
                     if "|" in cb_answer:
                         cb_answer = cb_answer.split("|")
+                    else:
+                        cb_answer = [cb_answer]
+                        
                     cb_data = [cb_name, cb_question, cb_answer]
                     non_standard_cb.append(cb_data)
 

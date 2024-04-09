@@ -78,6 +78,6 @@ class TableScanForm(forms.Form):
     and a TRUE rebase comment value.
     """
     data_file = forms.FileField(
-        label='Upload the results',
+        label='Upload the results (crossbreaks_data.csv)',
         required=True
     )
