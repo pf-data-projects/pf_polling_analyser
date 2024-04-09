@@ -49,7 +49,7 @@ class CSVUploadForm(forms.Form):
     """
 
     data_file = forms.FileField(
-        label='Survey Response Data (data file)',
+        label='Survey Response Data (weighted_data.xlsx)',
         validators=[]
     )
     survey_id = forms.IntegerField(

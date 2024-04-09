@@ -288,7 +288,7 @@ def upload_csv(request):
 
             # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
             print(table.id)
-            cache.set('table_task_id', table.id, 300)
+            cache.set('table_task_id', table.id, 3600)
             messages.success(request, "Crossbreaks processing successfully underway")
             return redirect(reverse('home'))
         else:

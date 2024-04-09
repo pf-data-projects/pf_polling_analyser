@@ -106,3 +106,11 @@ class TestWeighting(TestCase):
         df = pd.read_excel(data)
         self.assertTrue('weighted_respondents' in df.columns)
         self.assertTrue((df['weighted_respondents'] != 1).all())
+
+
+    def test_custom_weights(self):
+        """
+        A test to check that entering custom weightings
+        and running the weight module returns weighted
+        data with non-1 values.
+        """
