@@ -75,8 +75,9 @@ def weight_data(request):
     """
     if request.method == 'POST':
         form = WeightForm(request.POST, request.FILES)
-        formset = CustomWeightFormSet(request.POST, prefix="weights") 
+        formset = CustomWeightFormSet(request.POST, prefix="weights")
         if form.is_valid():
+            print(form.cleaned_data)
             # Handles all the form data
             survey_data = request.FILES['results']
             survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
@@ -208,7 +209,6 @@ def upload_csv(request):
                         cb_answer = cb_answer.split("|")
                     else:
                         cb_answer = [cb_answer]
-                        
                     cb_data = [cb_name, cb_question, cb_answer]
                     non_standard_cb.append(cb_data)
 
