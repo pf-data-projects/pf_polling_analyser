@@ -429,6 +429,11 @@ def create_workbook(
                 excel_coord2 = get_header_coords("Doctorate (PhD/DPHil)", trimmed_data)
                 ws[excel_coord] = "Highest Level of Education"
                 ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+            if "No annual income" in cols:
+                excel_coord = get_header_coords("No annual income", trimmed_data)
+                excel_coord2 = get_header_coords("£100,000 or more", trimmed_data)
+                ws[excel_coord] = "Income"
+                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
             if "The Brexit Party" in cols:
                 excel_coord = get_header_coords("The Brexit Party", trimmed_data)
                 excel_coord2 = get_header_coords("Liberal Democrat", trimmed_data)

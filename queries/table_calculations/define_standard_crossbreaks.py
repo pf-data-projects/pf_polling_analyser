@@ -42,11 +42,29 @@ CROSSBREAKS = {
         "Remain",
         "I did not vote"
     ],
-    "voting_intention":[
+    "voting_intention": [
         "Conservative",
         "Labour",
         "Liberal Democrats",
     ],
+    "income": [
+        "No annual income",
+        "Less than £10,000",
+        "£10,000 - £14,999",
+        "£15,000 - £19,999",
+        "£20,000 - £24,999",
+        "£25,000 - £29,999",
+        "£30,000 - £34,999",
+        "£35,000 - £39,999",
+        "£40,000 - £44,999",
+        "£45,000 - £49,999",
+        "£50,000 - £59,999",
+        "£60,000 - £69,999",
+        "£70,000 - £79,999",
+        "£80,000 - £89,999",
+        "£90,000 - £99,999",
+        "£100,000 or more",
+    ]
 }
 
 QUESTIONS = {
@@ -59,7 +77,8 @@ QUESTIONS = {
     "education": "What is the highest level of education you have achieved?",
     "vote2019": "Do you remember how you voted in the 2019 General Election, if you were able to vote?This was the most recent General Election in which Boris Johnson was the leader of the Conservative Party, and Jeremy Corbyn was the leader of the Labour Party",
     "eu2016": "How did you vote in the 2016 referendum on whether to Leave or Remain in the EU, if you were able to vote?",
-    "voting_intention": "And, if a general election was called tomorrow, which party would you vote for?"
+    "voting_intention": "And, if a general election was called tomorrow, which party would you vote for?",
+    "income": "What is the annual income of your household before tax?",
 }
 
 
