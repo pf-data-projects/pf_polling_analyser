@@ -75,8 +75,9 @@ def weight_data(request):
     """
     if request.method == 'POST':
         form = WeightForm(request.POST, request.FILES)
-        formset = CustomWeightFormSet(request.POST, prefix="weights") 
+        formset = CustomWeightFormSet(request.POST, prefix="weights")
         if form.is_valid():
+            print(form.cleaned_data)
             # Handles all the form data
             survey_data = request.FILES['results']
             survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
@@ -97,18 +98,6 @@ def weight_data(request):
                 for sub_form in formset:
                     groups.append(sub_form.cleaned_data['group'])
                     questions.append(sub_form.cleaned_data['question'])
-
-            # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
-            # user_id = request.user.id
-            # Save CSV files for celery
-            # survey_data = survey_data.to_csv(index=None)
-            # weight_proportions = weight_proportions.to_csv(index=None)
-
-            # print("Passing data to handle weighting func")
-            # handle_weight = handle_weighting.delay(
-            #     user_id, survey_data, weight_proportions, apply, custom,
-            #     questions, groups, standard_weights
-            # )
 
             # ~~~~~~~~~~~~~~~~ Run ipf module for standard weights
             if apply and not custom:
@@ -170,12 +159,6 @@ def weight_data(request):
             )
             response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
             return response
-
-            # # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
-            # print(handle_weight.id)
-            # cache.set('weight_task_id', handle_weight.id, 300)
-            # messages.success(request, "Data processing underway")
-            # return redirect(reverse('home'))
         else:
             messages.error(request, "Invalid form submission. Please try again")
             return redirect(reverse('home'))
@@ -224,6 +207,8 @@ def upload_csv(request):
                     cb_answer = sub_form.cleaned_data['non_standard_cb_answers']
                     if "|" in cb_answer:
                         cb_answer = cb_answer.split("|")
+                    else:
+                        cb_answer = [cb_answer]
                     cb_data = [cb_name, cb_question, cb_answer]
                     non_standard_cb.append(cb_data)
 
@@ -390,34 +375,6 @@ def download_weights(request):
         return redirect('home')
 
 
-# # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
-# def download_weights(request):
-#     """
-#     Handle retrieval of weights from celery worker and download.
-#     """
-#     task_id = cache.get("weight_task_id")
-#     result = AsyncResult(task_id)
-
-#     if result.ready():
-#         data = result.get()
-#         df = pd.read_csv(StringIO(data))
-
-#         excel_buffer = BytesIO()
-#         with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
-#             df.to_excel(writer, sheet_name='Sheet1')
-
-#         excel_buffer.seek(0)
-#         response = HttpResponse(
-#             excel_buffer.read(),
-#             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
-#         )
-#         response['Content-Disposition'] = 'attachment; filename="weighted_data.xlsx"'
-#         return response
-#     else:
-#         print("the weighting is not ready yet")
-#         return redirect('home')
-
-
 # def download_headers(request):
 #     """
 #     Handles downloading cached rebased header data.
@@ -510,8 +467,6 @@ def check_task_status(request):
             "result": "No results yet..."
         })
     task_result = AsyncResult(task_id)
-    # print(task_result.status)
-    # print(task_result.info)
 
     if task_result.state == 'FAILURE':
         return JsonResponse({
