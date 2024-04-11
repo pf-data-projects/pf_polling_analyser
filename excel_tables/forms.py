@@ -71,6 +71,7 @@ class RebaseForm(forms.Form):
         if item_number is not None:
             self.fields['name'].label = 'base'
 
+
 class TableScanForm(forms.Form):
     """
     A class that takes just the table and scans it to find

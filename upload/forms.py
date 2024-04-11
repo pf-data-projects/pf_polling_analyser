@@ -29,6 +29,7 @@ CB_OPTIONS = (
     ('children(updated)', "Children (Age breakdown)"),
     ('education', 'Education'),
     ('income', 'Income'),
+    ('area', 'Area'),
     ('vote2019', 'Vote 2019'),
     ('eu2016', 'EU 2016 Vote'),
     ('voting_intention', 'Voting Intention')

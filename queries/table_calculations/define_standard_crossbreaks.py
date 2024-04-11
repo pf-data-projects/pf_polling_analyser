@@ -47,6 +47,14 @@ CROSSBREAKS = {
         "Labour",
         "Liberal Democrats",
     ],
+    'area': [
+        "Urban/City Centre",
+        "Suburbs",
+        "Large Town",
+        "Small Town",
+        "Village",
+        "Rural Area",
+    ],
     "income": [
         "No annual income",
         "Less than £10,000",
@@ -79,6 +87,7 @@ QUESTIONS = {
     "eu2016": "How did you vote in the 2016 referendum on whether to Leave or Remain in the EU, if you were able to vote?",
     "voting_intention": "And, if a general election was called tomorrow, which party would you vote for?",
     "income": "What is the annual income of your household before tax?",
+    "area": "Which of the following best describes the area where you live?",
 }
 
 
