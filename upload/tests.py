@@ -50,11 +50,15 @@ class TestWeighting(TestCase):
             'custom_weights': False,
         }
 
-        response = self.client.post(reverse('table_maker/104/'), form_data, format='multipart')
+        response = self.client.post(reverse('weight_data'), form_data, format='multipart')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(cache.has_key(f"title_for_user_{self.test_user_id}"))
+        self.assertTrue(cache.has_key(f"weights_for_user_{self.test_user_id}"))
 
         # test the weighted file has the correct column
+        data = cache.get(f"weights_for_user_{self.test_user_id}")
+        df = pd.read_excel(data)
+        self.assertTrue('weighted_respondents' in df.columns)
+        self.assertTrue((df['weighted_respondents'] == 1).all())
 
 
     def test_standard_weights(self):

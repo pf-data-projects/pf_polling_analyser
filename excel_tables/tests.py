@@ -20,7 +20,7 @@ class TestTableMaker(TestCase):
         self.test_user = User.objects.create_user(username='testuser', password="testpassword")
         self.test_user_id = self.test_user.id
 
-    
+
     def test_table_maker_form(self):
         """
         This test checks that when you submit data
@@ -34,26 +34,55 @@ class TestTableMaker(TestCase):
         self.assertTrue(login)
 
         # test the submission of the weight form and cache key existence.
-        file_path = os.path.join(os.path.dirname(__file__), 'data2.xlsx')
+        file_path = os.path.join(os.path.dirname(__file__), 'crossbreaks_data (33).csv')
         with open(file_path, 'rb') as file:
-            xlsx_file = SimpleUploadedFile(
-                'data2.xlsx',
+            csv_file = SimpleUploadedFile(
+                'crossbreaks_data (33).csv',
                 file.read(),
-                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                content_type='text/csv'
             )
 
         form_data = {
-            'results': xlsx_file,
-            'apply_weights': False,
-            'custom_weights': False,
+            'data_file': csv_file,
         }
 
-        response = self.client.post(reverse('weight_data'), form_data, format='multipart')
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(cache.has_key(f"weights_for_user_{self.test_user_id}"))
+        response = self.client.post(reverse('scan_table'), form_data, format='multipart')
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(cache.has_key(f"rebase_questions_for_user_{self.test_user_id}"))
+        file_path = os.path.join(os.path.dirname(__file__), 'table_headers (30).json')
+        with open(file_path, 'rb') as file:
+            json_file = SimpleUploadedFile(
+                'table_headers (30).json',
+                file.read(),
+                content_type='application/json'
+            )
+        file_path = os.path.join(os.path.dirname(__file__), 'crossbreaks_data (33).csv')
+        with open(file_path, 'rb') as file:
+            csv_file = SimpleUploadedFile(
+                'crossbreaks_data (33).csv',
+                file.read(),
+                content_type='text/csv'
+            )
 
-        # test the weighted file has the correct column
-        data = cache.get(f"weights_for_user_{self.test_user_id}")
-        df = pd.read_excel(data)
-        self.assertTrue('weighted_respondents' in df.columns)
-        self.assertTrue((df['weighted_respondents'] == 1).all())
+        form_data = {
+            'data_file': csv_file,
+            'rebased_header_file': json_file,
+            'title': "test",
+            "dates": "test",
+            "start": 38,
+            "end": 356,
+            "id_column": True,
+        }
+
+        formset_data = {
+            "form-TOTAL_FORMS": "104",
+            "form-INITIAL_FORMS": "104",
+            "form-MIN_NUM_FORMS": "0",
+            "form-MAX_NUM_FORMS": "1000",
+        }
+
+        data = {**form_data, **formset_data}
+
+        response = self.client.post(reverse('table_maker', args=[104]), data, format='multipart')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(cache.has_key(f"tables_for_user_{self.test_user_id}"))
