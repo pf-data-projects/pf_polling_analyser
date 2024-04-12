@@ -37,6 +37,7 @@ from django.views import View
 from django.contrib import messages
 from .forms import CSVUploadForm, WeightForm, CrossbreakFormSet, CustomWeightFormSet
 from django.core.cache import cache
+from django.core.mail import send_mail
 from django.http import HttpResponse, JsonResponse
 
 from queries.table_calculations.calculate_totals import table_calculation
@@ -152,7 +153,7 @@ def weight_data(request):
             excel_buffer.seek(0)
             unique_id = "weights_for_user_" + str(request.user.id)
             cache.set(unique_id, excel_buffer.getvalue(), 300)
-            
+
             response = HttpResponse(
                 excel_buffer.getvalue(),
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
@@ -242,7 +243,8 @@ def upload_csv(request):
             # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
             data = data.to_csv(index=False)
             question_data = question_data.to_csv(index=False)
-            table = handle_crossbreaks.delay(data, question_data, standard_cb, non_standard_cb)
+            email = request.user.email
+            table = handle_crossbreaks.delay(email, data, question_data, standard_cb, non_standard_cb)
 
             # # Run calculations
             # try:
@@ -272,7 +274,6 @@ def upload_csv(request):
             # return response
 
             # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
-            print(table.id)
             cache.set('table_task_id', table.id, 3600)
             messages.success(request, "Crossbreaks processing successfully underway")
             return redirect(reverse('home'))

@@ -372,10 +372,16 @@ def find_sums_for_multi(filtered_df, results, question_id):
     for multiselect questions
     """
     checkbox_cols = filtered_df[helpers.col_with_qid(results, question_id)]
+    if question_id == "90":
+        checkbox_cols.to_csv("rebase_header_debug.csv")
     has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
     if has_nan_rows:
         non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
+        print("question", question_id, int(non_nan_count))
         sum1 = int(non_nan_count)
+        # all_nan_count = (checkbox_cols == 'nan').all(axis=1).sum()
+        # print("question", question_id, int(all_nan_count))
+        # sum1 = int(all_nan_count)
     qid_columns = helpers.col_with_qid(results, question_id)
     selected_columns = qid_columns + ['weighted_respondents']
     checkbox_cols = filtered_df[selected_columns]

@@ -46,6 +46,8 @@ def table_maker_form(request, arg1):
         form = TableUploadForm(request.POST, request.FILES)
         RebaseFormSet = formset_factory(RebaseForm)
         formset = RebaseFormSet(request.POST)
+        if not form.is_valid():
+            cache.set("test", form.errors, 300)
         if form.is_valid() and formset.is_valid():
             # Fetches data from form & converts them to df
             table_data = request.FILES['data_file']
@@ -96,7 +98,6 @@ def table_maker_form(request, arg1):
 
             # cache title for use with download button
             unique_id = "title_for_user_" + str(request.user.id)
-            cache.set(unique_id, title, 300)
 
             # auto-download for the excel tables.
             excel_data = cache.get(cache_key)
@@ -109,6 +110,13 @@ def table_maker_form(request, arg1):
             return response
 
             # return redirect(reverse('home'))
+        else:
+            # cache.set("test", form, 300)
+            messages.error(
+                request,
+                "Invalid form data was submitted. please try again"
+            )
+            return redirect('home')
     else:
         form = TableUploadForm()
         RebaseFormSet = formset_factory(RebaseForm, extra=0)

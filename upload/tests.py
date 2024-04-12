@@ -4,7 +4,7 @@ from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.contrib.auth.models import User
-from .views import weight_data
+from .views import weight_data, upload_csv
 
 import pandas as pd
 
@@ -28,7 +28,7 @@ class TestWeighting(TestCase):
         This test checks that when you submit data
         to be processed without weighting
         1. the data appears in the cache
-        2. the data contains a column 'weighted_respondents' 
+        2. the data contains a column 'weighted_respondents'
         with '1' for all values.
         """
         # test login works correctly
@@ -39,7 +39,7 @@ class TestWeighting(TestCase):
         file_path = os.path.join(os.path.dirname(__file__), 'data2.xlsx')
         with open(file_path, 'rb') as file:
             xlsx_file = SimpleUploadedFile(
-                'data2.xlsx', 
+                'data2.xlsx',
                 file.read(),
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
@@ -66,7 +66,7 @@ class TestWeighting(TestCase):
         This test checks that when you submit data
         to be processed with standard weighting
         1. the data appears in the cache.
-        2. the data contains a column 'weighted_respondents'. 
+        2. the data contains a column 'weighted_respondents'.
         with not '1' for all values.
         """
         # test login works correctly
@@ -170,3 +170,57 @@ class TestWeighting(TestCase):
         df = pd.read_excel(data)
         self.assertTrue('weighted_respondents' in df.columns)
         self.assertTrue((df['weighted_respondents'] != 1).all())
+
+
+class TestCrossbreaks(TestCase):
+    """
+    A test suite to mock the data processing handled by celery.
+
+    WARNING: make sure you have changed the celery settings in settings.py
+    before running this testcase or it will probably do something
+    strange and fail.
+    """
+
+    def setUp(self):
+        """
+        Creates test user for test suite
+        """
+        self.test_user = User.objects.create_user(username='testuser', password="testpassword")
+
+
+    def test_standard_cb(self):
+        """
+        Tests a user's submission which only opts for standard
+        crossbreaks.
+        """
+        login = self.client.login(username='testuser', password='testpassword')
+        self.assertTrue(login)
+
+        data_file_path = os.path.join(os.path.dirname(__file__), 'weighted_data (18).xlsx')
+        with open(data_file_path, 'rb') as file:
+            xlsx_file = SimpleUploadedFile(
+                'weighted_data (18).xlsx',
+                file.read(),
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+
+        form_data = {
+            'data_file': xlsx_file,
+            'survey_id': 7387003,
+            'standard_cb': ['gender', 'age', 'region'],
+        }
+
+        formset_data = {
+            'crossbreaks-TOTAL_FORMS': '1',
+            'crossbreaks-INITIAL_FORMS': '0',
+            'crossbreaks-MIN_NUM_FORMS': '0',
+            'crossbreaks-MAX_NUM_FORMS': '1000',
+        }
+
+        data = {**form_data, **formset_data}
+
+        response = self.client.post(reverse('upload_data'), data, format='multipart', follow=True)
+        # print(response.redirect_chain)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(cache.has_key(f"table_task_id"))
+        # self.assertTrue(cache.has_key(f"Helloword"))
