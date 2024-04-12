@@ -127,5 +127,5 @@ function fetchTaskStatus() {
       });
   }
   // Start polling the endpoint every half second (500 milliseconds)
-  const pollingInterval = setInterval(fetchTaskStatus, 10000);  
+  const pollingInterval = setInterval(fetchTaskStatus, 100);  
 })
