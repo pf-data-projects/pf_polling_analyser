@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 
 from .forms import BotCheckForm
-
+from .helpers import get_questions
 
 
 def upload_bots(request):
@@ -22,5 +22,15 @@ def upload_bots(request):
             survey_data = request.FILES['data_file']
             survey_id = form.cleaned_data['survey_id']
             data = pd.read_excel(survey_data, header=0, sheet_name="Sheet1")
-            
-
+            # get questions from API
+            essay_list = get_questions(survey_id)
+        else:
+            print("form submission invalid")
+            return redirect(reverse('home'))
+    else:
+        form = BotCheckForm()
+    return render(
+        request,
+        'bot_check_form.html',
+        {'form': form}
+    )
