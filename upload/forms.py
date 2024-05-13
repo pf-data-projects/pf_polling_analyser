@@ -58,7 +58,7 @@ class CSVUploadForm(forms.Form):
         label='Survey ID',
         help_text='This can be found on the first page of the survey legend',
         required=True
-        )
+    )
     standard_cb = forms.MultipleChoiceField(
         label="Select which standard crossbreaks to include",
         choices=CB_OPTIONS,
