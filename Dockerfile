@@ -10,6 +10,8 @@ RUN pip install --upgrade pip
 # Debian's package manager is `apt-get`. We'll update the package lists and install the necessary packages.
 # Note: Debian slim images include more out-of-the-box than Alpine, so some packages like python3-dev are not needed.
 RUN apt-get update && apt-get install -y \
+    wkhtmltopdf \
+    xvfb \
     dos2unix \
     postgresql-client libpq-dev gcc libffi-dev libssl-dev \
     build-essential cmake make \
