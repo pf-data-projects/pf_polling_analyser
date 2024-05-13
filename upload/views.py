@@ -198,11 +198,13 @@ def upload_csv(request):
             standard_cb = form.cleaned_data['standard_cb']
             non_standard_cb = []
             num_submitted_forms = 0
+            # handle formset
             for form in formset:
                 if form.has_changed():
                     num_submitted_forms += 1
             if num_submitted_forms > 0:
                 for sub_form in formset:
+                    # retrieve data from each formset
                     cb_name = sub_form.cleaned_data['non_standard_cb_name']
                     cb_question = sub_form.cleaned_data['non_standard_cb_question']
                     cb_answer = sub_form.cleaned_data['non_standard_cb_answers']
