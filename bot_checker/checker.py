@@ -12,12 +12,17 @@ to the OpenAI API to prompt with any number of checks
 answer based on how many words parse in English.
 """
 
+import os
+
 import pandas as pd
 import numpy as np
 
 import spacy
+from openai import OpenAI
 
 from queries.table_calculations.helpers import col_substr_partial
+
+CLIENT = OpenAI(api_key=os.environ['OPENAI'])
 
 
 def check_for_bots(essay_list, data, check):
@@ -79,5 +84,25 @@ def call_openai(answer, question):
     A function to evaluate each answer for each
     question using AI.
     """
-    print("Eyup world")
-    return "Eyup world"
+    prompt = f"""
+    Providing your answer as just an integer and nothing more, 
+    please give a score between 0 and 10 of how relevant the 
+    following answer is to an example question 
+    (where 0 is totally irrelevant and 10 is perfectly relevant):
+    question: {question}
+    answer: {answer}
+    """
+    messages = [{
+        "role": "user",
+        "content": prompt
+    }]
+    response = CLIENT.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        max_tokens=1000,
+        n=1,
+        stop=None,
+        temperature=0.5
+    )
+    response_text = response.choices[0].message.content
+    return response_text
