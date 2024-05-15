@@ -16,6 +16,7 @@ class BotCheckForm(forms.Form):
     """
     CHOICES = (
         ('is_word', 'Check for real words'),
+        ('sense', 'Check if answer makes sense'),
         ("test", "test option"),
     )
     data_file = forms.FileField(

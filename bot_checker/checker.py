@@ -37,9 +37,11 @@ def check_for_bots(essay_list, data, check):
         filtered = data[essay_col]
         if check == 'test':
             return data
-        # data[f'Sense score {essay}'] = filtered.apply(
-        #     lambda x: call_openai(x, essay) if isinstance(x, str) else "No answer"
-        # )
+        if check == 'sense':
+            data[f'Sense score {essay}'] = filtered.apply(
+                lambda x: call_openai(x, essay) if isinstance(x, str) else "No answer"
+            )
+            data = aggregate_score(data)
         if check == 'is_word':
             data[f'Word check score {essay}'] = filtered.apply(
                 lambda x: call_spacy_word_check(x) if isinstance(x, str) else "No answer"
