@@ -13,6 +13,7 @@ answer based on how many words parse in English.
 """
 
 import pandas as pd
+import numpy as np
 
 import spacy
 
@@ -38,6 +39,20 @@ def check_for_bots(essay_list, data, check):
             data[f'Word check score {essay}'] = filtered.apply(
                 lambda x: call_spacy_word_check(x) if isinstance(x, str) else "No answer"
             )
+            data = aggregate_score(data)
+    return data
+
+
+def aggregate_score(data):
+    """
+    A function to take the checks performed on data
+    and provide an average score for each respondent
+    based on how many open responses they answered.
+    """
+    filtered = data.filter(like="Word check score")
+    filtered = filtered.replace("No answer", np.nan)
+    filtered = filtered.apply(pd.to_numeric, errors='coerce')
+    data['Average score'] = filtered.mean(axis=1)
     return data
 
 
