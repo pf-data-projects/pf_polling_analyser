@@ -52,6 +52,9 @@
                   <li class="nav-item nav-option">
                     <a class="nav-link" href="{% url 'instructions' %}">Guide</a>
                   </li>
+                  <li class="nav-item nav-option">
+                    <a class="nav-link" href="{% url 'bot_check' %}">Check for bots</a>
+                  </li>
                   {% if user.is_authenticated %}
                   <li class="nav-item nav-option">
                     <a class="nav-link" href="{% url 'account_logout' %}">Log Out</a>

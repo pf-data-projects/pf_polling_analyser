@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'upload',
     'excel_tables',
     'report',
+    'bot_checker',
 ]
 
 SITE_ID = 1

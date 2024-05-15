@@ -26,6 +26,7 @@ urlpatterns = [
     path('', include('upload.urls'), name='upload_urls'),
     path('', include('excel_tables.urls'), name="excel_table_urls"),
     path('', include('report.urls'), name="report_urls"),
+    path('', include('bot_checker.urls'), name="bot_checker_urls")
 ]
 
 if settings.DEBUG:
