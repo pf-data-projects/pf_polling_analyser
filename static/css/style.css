@@ -208,6 +208,17 @@ main {
 }
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/* Bot check page styles */
+
+.bot-check-card {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #ECECEC;
+    background-color: darkred;
+    padding: 30px;
+}
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Report page styles */
 
 .report-card {

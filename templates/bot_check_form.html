@@ -1,5 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
+
+<div class="container rounded bot-check-card">
+    <div class="container">
+        <h1>WARNING:</h1>
+        <p>Some of these checks will run using PF's OpenAI API account, incurring costs.
+            Please ensure you are sure that you want to check the data before hitting submit.
+            Please <strong>DO NOT</strong> resubmit the form multiple times as this will incur significant unnecessary costs.
+        </p>
+    </div>
+</div>
+
 <div class="container rounded crossbreak-form-card">
     
     <form method="POST" enctype="multipart/form-data">

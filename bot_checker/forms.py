@@ -16,7 +16,7 @@ class BotCheckForm(forms.Form):
     """
     CHOICES = (
         ('is_word', 'Check for real words'),
-        ('sense', 'Check if answer makes sense'),
+        ('sense', 'Check if answer makes sense (Uses OpenAI API)'),
         ('duplicate', 'Check for duplicates'),
         ("test", "test option"),
     )
