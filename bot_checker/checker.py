@@ -47,6 +47,10 @@ def check_for_bots(essay_list, data, check):
                 lambda x: call_spacy_word_check(x) if isinstance(x, str) else "No answer"
             )
             data = aggregate_score(data, "Word check score")
+        if check == 'duplicate':
+            data = find_duplicates(data, essay_col)
+    if check == 'duplicate':
+        data = aggregate_score(data, "Duplicates")
     return data
 
 
@@ -79,6 +83,29 @@ def call_spacy_word_check(answer):
     score = round(score)
     print(score)
     return score
+
+
+def find_duplicates(data, column_name):
+    """
+    A function to find duplicates in answers columns.
+    """
+    occurrence_dict = {}
+    # First pass: Count occurrences of each string
+    for value in data[column_name]:
+        if value in occurrence_dict:
+            occurrence_dict[value] += 1
+        else:
+            occurrence_dict[value] = 1
+    # Second pass: Assign duplicate flag based on occurrences
+    duplicate_flags = []
+    for value in data[column_name]:
+        if occurrence_dict[value] > 1:
+            duplicate_flags.append(0)
+        else:
+            duplicate_flags.append(10)
+    # Add the new column to the dataframe
+    data[f'Duplicates {column_name}'] = duplicate_flags
+    return data
 
 
 def call_openai(answer, question):
