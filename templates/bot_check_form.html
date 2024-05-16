@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container rounded instructions">
+<div class="container rounded crossbreak-form-card">
     
     <form method="POST" enctype="multipart/form-data">
         <h1>Upload data to check for bots</h1>
@@ -8,7 +8,7 @@
         {{ form.as_p }}
         <button class="btn btn-dark" type="submit">Submit</button>
     </form>
-
+    <p><a class="btn btn-dark mt-3" href="{% url 'fetch_checks' %}">Download Checked Data</a></p>
 </div>
 
 {% endblock %}

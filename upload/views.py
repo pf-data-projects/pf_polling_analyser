@@ -399,6 +399,8 @@ def download_weights(request):
 #         return redirect('home')
 
 # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
+
+
 def download_headers(request):
     """
     Handle retrieval of celery result
@@ -432,7 +434,7 @@ def download_headers(request):
         print("the crossbreaks are not ready yet")
         messages.error(
             request,
-            "No crossbreaks data found. Please run the calculations first."
+            "The crossbreaks are still processing. Please wait"
         )
         return redirect('home')
 
@@ -451,6 +453,7 @@ def preprocess_header(header):
     hyphen_minus = '\u002D'
     header = header.replace(en_dash, hyphen_minus)
     return header
+
 
 def check_task_status(request):
     """
