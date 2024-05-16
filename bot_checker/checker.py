@@ -41,22 +41,22 @@ def check_for_bots(essay_list, data, check):
             data[f'Sense score {essay}'] = filtered.apply(
                 lambda x: call_openai(x, essay) if isinstance(x, str) else "No answer"
             )
-            data = aggregate_score(data)
+            data = aggregate_score(data, "Sense score")
         if check == 'is_word':
             data[f'Word check score {essay}'] = filtered.apply(
                 lambda x: call_spacy_word_check(x) if isinstance(x, str) else "No answer"
             )
-            data = aggregate_score(data)
+            data = aggregate_score(data, "Word check score")
     return data
 
 
-def aggregate_score(data):
+def aggregate_score(data, string):
     """
     A function to take the checks performed on data
     and provide an average score for each respondent
     based on how many open responses they answered.
     """
-    filtered = data.filter(like="Word check score")
+    filtered = data.filter(like=string)
     filtered = filtered.replace("No answer", np.nan)
     filtered = filtered.apply(pd.to_numeric, errors='coerce')
     data['Average score'] = filtered.mean(axis=1)
