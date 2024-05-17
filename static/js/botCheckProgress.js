@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Define the function to call the Django view without a task ID parameter
-  function fetchTaskStatus() {
+  function botCheckProgress() {
     // Construct the URL to your Django view. Replace `your-backend-url` and `endpoint` with your actual backend URL and the correct endpoint.
-    const url = `/check_task/`;
+    const url = `/task_status/`;
   
     // Use the fetch API to call your Django view
     fetch(url)
@@ -23,47 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (progressElement) {
             // Convert the JSON object to a string for display
-            if (data.status === "No tasks have been run yet...") {
+            if (data.status === "No bot checks have been run yet") {
               console.log("nope")
               progressElement.textContent = "No data is currently processing"
             }
-            else if (data.status === "PROGRESS" && data.details.Totals) {
-              progressElement.textContent = "Calculating the totals..."
-            }
-            else if (data.status === "PROGRESS" && "StandardCB" in data.details) {
-              progress = Number(data.details.StandardCB)
+            else if (data.status === "PROGRESS" && "question" in data.details) {
+              progress = Number(data.details.question)
               total = Number(data.details.total)
               progressElement.textContent = `${progress} / ${total} standard crossbreaks done`
-              // console.log(progress, total)
-              firstBar.style.height = "100%"
-              firstWrapper.style.height = "20px"
-              firstWrapper.style.border = "solid 2px black"
-              firstBar.style.width = `${progress/total * 100}%`
-            }
-            else if (data.status === "PROGRESS" && "nonStandardCB" in data.details) {
-              progress = Number(data.details.nonStandardCB)
-              total = Number(data.details.total)
-              progressElement.textContent = `${progress} / ${total} non-standard crossbreaks done`
-              // console.log(progress, total)
-              firstBar.style.height = "100%"
-              firstWrapper.style.height = "20px"
-              firstWrapper.style.border = "solid 2px black"
-              firstBar.style.width = `${progress/total * 100}%`
-            }
-            else if (data.status === "PROGRESS" && "rebaseStandardCB" in data.details) {
-              progress = Number(data.details.rebaseStandardCB)
-              total = Number(data.details.total)
-              progressElement.textContent = `${progress} / ${total} standard crossbreaks rebased`
-              // console.log(progress, total)
-              firstBar.style.height = "100%"
-              firstWrapper.style.height = "20px"
-              firstWrapper.style.border = "solid 2px black"
-              firstBar.style.width = `${progress/total * 100}%`
-            }
-            else if (data.status === "PROGRESS" && "rebaseNonStandardCB" in data.details) {
-              progress = Number(data.details.rebaseNonStandardCB)
-              total = Number(data.details.total)
-              progressElement.textContent = `${progress} / ${total} non-standard crossbreaks rebased`
               // console.log(progress, total)
               firstBar.style.height = "100%"
               firstWrapper.style.height = "20px"
@@ -73,10 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (data.status === "PENDING") {
               progressElement.textContent = "Waiting for processing to start..."
               console.log(data)
-            }
-            else if (data.status === "PROGRESS" && "CreatingHeaders" in data.details) {
-              progressElement.textContent = "Creating rebase headers, preparing files for download."
-              // console.log("WAITING")
             }
             else if (data.status === "SUCCESS") {
               progressElement.textContent = "Data processing complete. Please download your files!"
@@ -127,5 +90,5 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
   // Start polling the endpoint every half second (500 milliseconds)
-  const pollingInterval = setInterval(fetchTaskStatus, 100);  
+  const pollingInterval = setInterval(botCheckProgress, 100);  
 })

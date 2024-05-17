@@ -25,13 +25,18 @@ from queries.table_calculations.helpers import col_substr_partial
 CLIENT = OpenAI(api_key=os.environ['OPENAI'])
 
 
-def check_for_bots(essay_list, data, check):
+def check_for_bots(self, essay_list, data, check):
     """
     A function to handle logic for calling openAI
     for each answer to each essay question.
     """
     print("number of open response questions", len(essay_list))
     print("rows in data:", len(data))
+    k = 0
+    self.update_state(
+        state='PROGRESS',
+        meta={'question': k, 'total': len(essay_list)}
+    )
     for essay in essay_list:
         essay_col = col_substr_partial(data, essay)[0]
         filtered = data[essay_col]
@@ -49,6 +54,10 @@ def check_for_bots(essay_list, data, check):
             data = aggregate_score(data, "Word check score")
         if check == 'duplicate':
             data = find_duplicates(data, essay_col)
+        self.update_state(
+            state='PROGRESS',
+            meta={'question': k + 1, 'total': len(essay_list)}
+        )
     if check == 'duplicate':
         data = aggregate_score(data, "Duplicates")
     return data

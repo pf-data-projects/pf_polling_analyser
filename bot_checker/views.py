@@ -7,7 +7,7 @@ from celery.result import AsyncResult
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 from django.core.cache import cache
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 from .forms import BotCheckForm
 from .helpers import get_questions
@@ -40,7 +40,10 @@ def upload_bots(request):
 
             # cache task id to fetch later.
             cache.set('bot_task_id', data.id, 3600)
-            messages.success(request, "Bot check underway. PLEASE DO NOT RESUBMIT THE FORM OR YOU MAY MAKE JEREMY CRY")
+            messages.success(
+                request,
+                "Bot check underway. PLEASE DO NOT RESUBMIT THE FORM OR YOU MAY MAKE JEREMY CRY"
+            )
             return redirect(reverse('bot_check'))
         else:
             message = """
@@ -79,7 +82,6 @@ def fetch_checks(request):
         )
         return redirect('bot_check')
     print("fetching results")
-
     if result.ready():
         data = result.get()
         df = pd.read_csv(StringIO(data))
@@ -99,3 +101,37 @@ def fetch_checks(request):
             "Bot checks are still processing. Please wait."
         )
         return redirect('bot_check')
+
+
+def task_status(request):
+    """
+    A function to poll the bot checking celery worker
+    to log task progress.
+    """
+    task_id = cache.get('bot_task_id')
+
+    # handle no checks running.
+    if task_id is None:
+        return JsonResponse({
+            'status': 'No bot checks have been run yet',
+            'details': 'No bot checks have been run yet',
+            'result': "No results yet..."
+        })
+
+    # query task.
+    task_result = AsyncResult(task_id)
+
+    # handle error/failed task.
+    if task_result.state == 'FAILURE':
+        return JsonResponse({
+            'status': 'FAILURE',
+            'details': str(task_result.result),
+            'traceback': task_result.traceback,
+        })
+
+    # Return data about task.
+    return JsonResponse({
+        'status': task_result.state,
+        'details': 'Result ready to download' if task_result.ready() else task_result.info,
+        'result': 'Result ready to download' if task_result.ready() else "still working..."
+    })

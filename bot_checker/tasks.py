@@ -18,6 +18,6 @@ def check_for_bots_task(self, essay_list, data, check):
     """
     print("CELERY TASK STARTED")
     data = pd.read_csv(StringIO(data))
-    check_for_bots(essay_list, data, check)
+    check_for_bots(self, essay_list, data, check)
     data = data.to_csv(index=False)
     return data

@@ -477,8 +477,8 @@ def check_task_status(request):
     if task_result.state == 'FAILURE':
         return JsonResponse({
             'status': 'FAILURE',
-            'details': str(task_result.result),  # Error message
-            'traceback': task_result.traceback,  # Traceback of the error
+            'details': str(task_result.result),
+            'traceback': task_result.traceback,
         })
 
     return JsonResponse({
