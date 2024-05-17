@@ -26,7 +26,7 @@ import pandas as pd
 
 from django.shortcuts import render, reverse, redirect
 from django.core.cache import cache
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from django.forms import formset_factory
 from django.contrib import messages
 
@@ -105,7 +105,7 @@ def table_maker_form(request, arg1):
                 excel_data,
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
-            response['Content-Disposition'] = f'attachment; filename="Public First Poll For {title}.xlsx"'
+            response['Content-Disposition'] = f'attachment; filename="{title}.xlsx"'
             # messages.success(request, "Downloading tables...")
             return response
 
@@ -201,12 +201,33 @@ def download_tables(request):
             excel_data,
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response['Content-Disposition'] = f'attachment; filename="Public First Poll For {title}.xlsx"'
+        response['Content-Disposition'] = f'attachment; filename="{title}.xlsx"'
         messages.success(request, "Downloading tables...")
         return response
     else:
         messages.error(
             request,
             "No polling tables found. Please create them first."
+        )
+        return redirect('home')
+
+
+def download_pdf(request):
+    """
+    Handles retrieval of cached pdf.
+    """
+    unique_id = "pdf_for_user_" + str(request.user.id)
+    unique_title = "title_for_user_" + str(request.user.id)
+    pdf = cache.get(unique_id)
+    title = cache.get(unique_title)
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/force-download')
+        response['Content-Disposition'] = f'attachment; filename="{title}.html"'
+        messages.success(request, "Downloading pdf...")
+        return response
+    else:
+        messages.error(
+            request,
+            "No pdf found. Please create some tables first."
         )
         return redirect('home')

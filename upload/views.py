@@ -198,11 +198,13 @@ def upload_csv(request):
             standard_cb = form.cleaned_data['standard_cb']
             non_standard_cb = []
             num_submitted_forms = 0
+            # handle formset
             for form in formset:
                 if form.has_changed():
                     num_submitted_forms += 1
             if num_submitted_forms > 0:
                 for sub_form in formset:
+                    # retrieve data from each formset
                     cb_name = sub_form.cleaned_data['non_standard_cb_name']
                     cb_question = sub_form.cleaned_data['non_standard_cb_question']
                     cb_answer = sub_form.cleaned_data['non_standard_cb_answers']
@@ -397,6 +399,8 @@ def download_weights(request):
 #         return redirect('home')
 
 # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
+
+
 def download_headers(request):
     """
     Handle retrieval of celery result
@@ -430,7 +434,7 @@ def download_headers(request):
         print("the crossbreaks are not ready yet")
         messages.error(
             request,
-            "No crossbreaks data found. Please run the calculations first."
+            "The crossbreaks are still processing. Please wait"
         )
         return redirect('home')
 
@@ -449,6 +453,7 @@ def preprocess_header(header):
     hyphen_minus = '\u002D'
     header = header.replace(en_dash, hyphen_minus)
     return header
+
 
 def check_task_status(request):
     """
@@ -472,8 +477,8 @@ def check_task_status(request):
     if task_result.state == 'FAILURE':
         return JsonResponse({
             'status': 'FAILURE',
-            'details': str(task_result.result),  # Error message
-            'traceback': task_result.traceback,  # Traceback of the error
+            'details': str(task_result.result),
+            'traceback': task_result.traceback,
         })
 
     return JsonResponse({

@@ -6,6 +6,7 @@ __pycache__/
 *.py[cod]
 node_modules/
 .github/
+.venv/
 cloudinary_python.txt
 response_list.json
 response_data.csv

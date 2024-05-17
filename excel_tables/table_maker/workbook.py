@@ -28,6 +28,7 @@ from openpyxl import load_workbook
 from openpyxl.drawing.image import Image
 from openpyxl.styles import PatternFill, Font, Alignment, Border
 from django.core.cache import cache
+import pdfkit
 
 from .contents import create_contents_page
 from .cover import create_cover_page
@@ -562,6 +563,19 @@ def create_workbook(
     wb.save(output)
 
     cache.set(cache_key, output.getvalue(), timeout=300)
+
+    # Create PDF and save to cache
+    excel_file = cache.get(cache_key)
+    df = pd.read_excel(excel_file, sheet_name="Full Results")
+    html = df.to_html(header=False, na_rep="", index=None)
+
+    # pdf_bytes = pdfkit.from_string(html, output_path=False, options={'quiet': ''})
+    # pdf_stream = io.BytesIO(pdf_bytes)
+    # pdf_stream.seek(0)
+
+    pdf_key = "pdf_for_user_" + str(request.user.id)
+    cache.set(pdf_key, html, 300)
+
     return cache_key
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ EXTRA HELPER FUNCTIONS HERE
