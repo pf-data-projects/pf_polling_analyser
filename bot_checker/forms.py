@@ -18,7 +18,6 @@ class BotCheckForm(forms.Form):
         ('is_word', 'Check for real words'),
         ('sense', 'Check if answer makes sense (Uses OpenAI API)'),
         ('duplicate', 'Check for duplicates'),
-        ("test", "test option"),
     )
     data_file = forms.FileField(
         label="Raw survey data (.xlsx file)",

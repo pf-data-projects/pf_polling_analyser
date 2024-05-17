@@ -40,8 +40,6 @@ def check_for_bots(self, essay_list, data, check):
     for essay in essay_list:
         essay_col = col_substr_partial(data, essay)[0]
         filtered = data[essay_col]
-        if check == 'test':
-            return data
         if check == 'sense':
             data[f'Sense score {essay}'] = filtered.apply(
                 lambda x: call_openai(x, essay) if isinstance(x, str) else "No answer"
