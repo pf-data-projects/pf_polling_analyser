@@ -25,12 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Convert the JSON object to a string for display
             if (data.status === "No bot checks have been run yet") {
               console.log("nope")
-              progressElement.textContent = "No data is currently processing"
+              progressElement.textContent = "No checks are currently running"
             }
             else if (data.status === "PROGRESS" && "question" in data.details) {
               progress = Number(data.details.question)
               total = Number(data.details.total)
-              progressElement.textContent = `${progress} / ${total} standard crossbreaks done`
+              progressElement.textContent = `${progress} / ${total} open response questions checked.`
               // console.log(progress, total)
               firstBar.style.height = "100%"
               firstWrapper.style.height = "20px"
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
               firstBar.style.width = `${progress/total * 100}%`
             }
             else if (data.status === "PENDING") {
-              progressElement.textContent = "Waiting for processing to start..."
+              progressElement.textContent = "Waiting for checks to start..."
               console.log(data)
             }
             else if (data.status === "SUCCESS") {
