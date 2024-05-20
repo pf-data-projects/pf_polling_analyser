@@ -56,6 +56,7 @@ def check_for_bots(self, essay_list, data, check):
             state='PROGRESS',
             meta={'question': k + 1, 'total': len(essay_list)}
         )
+        k += 1
     if check == 'duplicate':
         data = aggregate_score(data, "Duplicates")
     return data
