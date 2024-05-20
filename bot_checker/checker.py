@@ -79,7 +79,7 @@ def call_spacy_word_check(answer):
     A function to handle checking if words
     in answers make sense.
     """
-    nlp = spacy.load("en_core_web_lg")
+    nlp = spacy.load("en_core_web_lg", disable=["parser", "ner"])
     sentence = nlp(answer)
     word_count = sum(1 for token in sentence if token.is_alpha)
     valid_words = sum(1 for token in sentence if token.is_alpha and not token.is_oov)
