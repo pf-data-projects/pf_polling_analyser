@@ -27,6 +27,7 @@ def upload_bots(request):
             return redirect(reverse('home'))
         form = BotCheckForm(request.POST, request.FILES)
         if form.is_valid():
+            email = request.user.email
             survey_data = request.FILES['data_file']
             survey_id = form.cleaned_data['survey_id']
             check = form.cleaned_data['check']
@@ -36,7 +37,7 @@ def upload_bots(request):
 
             # hand over to celery to do checks.
             data = data.to_csv(index=False)
-            data = check_for_bots_task.delay(essay_list, data, check)
+            data = check_for_bots_task.delay(email, essay_list, data, check)
 
             # cache task id to fetch later.
             cache.set('bot_task_id', data.id, 3600)
