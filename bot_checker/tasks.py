@@ -21,6 +21,8 @@ def check_for_bots_task(self, email, essay_list, data, check):
     data = pd.read_csv(StringIO(data))
     check_for_bots(self, essay_list, data, check)
     data = data.to_csv(index=False)
+
+    # email notification
     try:
         send_mail(
             'Your bot check has been completed',
