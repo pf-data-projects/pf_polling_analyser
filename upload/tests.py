@@ -220,7 +220,5 @@ class TestCrossbreaks(TestCase):
         data = {**form_data, **formset_data}
 
         response = self.client.post(reverse('upload_data'), data, format='multipart', follow=True)
-        # print(response.redirect_chain)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(cache.has_key(f"table_task_id"))
-        # self.assertTrue(cache.has_key(f"Helloword"))

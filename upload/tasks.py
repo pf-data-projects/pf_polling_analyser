@@ -11,7 +11,7 @@ from celery import shared_task
 import pandas as pd
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal
-from queries.table_calculations.calculate_totals import table_calculation
+from .table_calculations.calculate_totals import table_calculation
 
 
 @shared_task(bind=True)
@@ -24,10 +24,9 @@ def handle_crossbreaks(
 
     data = pd.read_csv(StringIO(data))
     question_data = pd.read_csv(StringIO(question_data))
-
-    # try:
     table = table_calculation(self, data, question_data, standard_cb, non_standard_cb)
     table[0] = table[0].to_csv(index=None)
+    # Attempt to send notification
     try:
         send_mail(
             'Your Crossbreaks Have Been Completed',
@@ -43,5 +42,4 @@ def handle_crossbreaks(
     except Exception as e:
         print("Sending mail failed:", {e})
 
-    # return table
     return {"table": table[0], "json": table[1]}

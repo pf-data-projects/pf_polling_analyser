@@ -1,7 +1,7 @@
 """ 
 This file contains validation functions that check user inputs will work 
 
-1. validate_cb_inputs takes standard cbs and data to check and ensure
+1. validate_cb_inputs: takes standard cbs and data to check and ensure
 users can't submit crossbreaks which don't exist in the data.
 """
 

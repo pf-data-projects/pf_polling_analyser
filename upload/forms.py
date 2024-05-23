@@ -92,7 +92,10 @@ class CrossbreakForm(forms.Form):
     )
     non_standard_cb_answers = forms.CharField(
         label="Answers",
-        help_text="Enter the answers for this question which you would like to check, separated by | e.g., Yes|No|Maybe ",
+        help_text="""
+        Enter the answers for this question which you would like to check,
+        separated by | e.g., Yes|No|Maybe
+        """,
         required=False
     )
 
@@ -124,7 +127,10 @@ class WeightForm(forms.Form):
         required=False
     )
     standard_weights = forms.MultipleChoiceField(
-        label="Do you want to include any standard weights in the custom weighting process?",
+        label="""
+        Do you want to include any standard weights 
+        in the custom weighting process?
+        """,
         choices=STANDARD_WEIGHTS,
         widget=forms.CheckboxSelectMultiple,
         required=False
@@ -137,8 +143,14 @@ class CustomWeightForm(forms.Form):
     the data will be weighted by the program.
     """
     group = forms.CharField(
-        label="The category you want to weight by: e.g., Region, Ethnicity, Income, etc...",
-        help_text="This needs to match the custom category in the 'group' column of the weight proportions file",
+        label="""
+        The category you want to weight by: e.g., 
+        Region, Ethnicity, Income, etc...
+        """,
+        help_text="""
+        This needs to match the custom category in the 
+        'group' column of the weight proportions file
+        """,
         required=False
     )
     question = forms.CharField(
