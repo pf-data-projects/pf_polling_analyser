@@ -1,3 +1,6 @@
+"""Class to handle profile config"""
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 3rd party
 from django.apps import AppConfig
 
 

@@ -8,6 +8,7 @@ automatic generation of profiles when a user instance is
 created and added to the database.
 """
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 3rd party
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
