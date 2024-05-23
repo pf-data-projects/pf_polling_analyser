@@ -10,18 +10,29 @@ to the OpenAI API to prompt with any number of checks
 
 3. call_spacy_word_check: a function to generate a score for each 
 answer based on how many words parse in English.
+
+4. aggregate_score: takes the individual checks and averages all
+the scores that have returned a number
+
+5. find_duplicates: searches each column of open responses
+and scores on a yes/no basis based on if they are duplicated
+elsewhere in the column.
 """
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Standard library
 import os
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 3rd party
 import pandas as pd
 import numpy as np
-
 import spacy
 from openai import OpenAI
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal
 from queries.table_calculations.helpers import col_substr_partial
 
+
+# Set up client to connect to API
 CLIENT = OpenAI(api_key=os.environ['OPENAI'])
 
 
@@ -30,8 +41,6 @@ def check_for_bots(self, essay_list, data, check):
     A function to handle logic for calling openAI
     for each answer to each essay question.
     """
-    print("number of open response questions", len(essay_list))
-    print("rows in data:", len(data))
     k = 0
     self.update_state(
         state='PROGRESS',
@@ -89,7 +98,6 @@ def call_spacy_word_check(answer):
         return 0
     score = valid_words / word_count * 10
     score = round(score)
-    print(score)
     return score
 
 

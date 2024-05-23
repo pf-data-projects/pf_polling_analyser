@@ -3,12 +3,15 @@ A module for handling the bot-checking loop in the background
 without leaving the application hanging.
 """
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Standard library
 from io import StringIO
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 3rd party
 from django.core.mail import send_mail
 from celery import shared_task
 import pandas as pd
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal
 from .checker import check_for_bots
 
 @shared_task(bind=True)

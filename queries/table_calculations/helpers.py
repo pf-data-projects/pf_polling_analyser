@@ -1,5 +1,6 @@
 """
-Extra functions that help 
+Extra functions to search for strings.
+This is abstracted here so that other modules can be kept cleaner.
 """
 
 import re

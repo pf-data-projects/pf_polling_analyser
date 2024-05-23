@@ -1,5 +1,22 @@
+"""
+Views to handle the http logic of the bot checker app.
+
+1) upload_bots: handles the upload of form data controls
+the celery task execution/task id caching.
+
+2) fetch_checks: queries celery worker using cached id
+to fetch results from redis. returns a http response
+with file attachment.
+
+3) task_status: queries the celery worker with task id
+and returns JSON response with the task's status
+(this reporting is handled within the task).
+"""
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Standard library
 from io import BytesIO, StringIO
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 3rd party
 import pandas as pd
 
 from celery.result import AsyncResult
@@ -9,9 +26,9 @@ from django.contrib import messages
 from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal
 from .forms import BotCheckForm
 from .helpers import get_questions
-from .checker import check_for_bots
 from .tasks import check_for_bots_task
 
 
@@ -71,8 +88,7 @@ def fetch_checks(request):
     task_id = cache.get('bot_task_id')
     try:
         result = AsyncResult(task_id)
-    except ValueError as e:
-        print(e)
+    except ValueError:
         messages.error(
             request,
             """ 
@@ -82,7 +98,6 @@ def fetch_checks(request):
             """
         )
         return redirect('bot_check')
-    print("fetching results")
     if result.ready():
         data = result.get()
         df = pd.read_csv(StringIO(data))
@@ -96,7 +111,6 @@ def fetch_checks(request):
         response['Content-Disposition'] = 'attachment; filename="checked.xlsx"'
         return response
     else:
-        print("Checks are still processing. Please wait.")
         messages.error(
             request,
             "Bot checks are still processing. Please wait."
