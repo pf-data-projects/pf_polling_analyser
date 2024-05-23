@@ -108,7 +108,8 @@ def weight_data(request):
             # ~~~~~~~~~~~~~~~~ Run ipf module for standard weights
             if apply and not custom:
                 try:
-                    weighted_data = wgt.run_weighting(survey_data, weight_proportions)
+                    weighted_data = wgt.run_weighting(
+                        survey_data, weight_proportions)
                 except StopIteration:
                     message="""
                         An error occurred searching for the 
@@ -132,7 +133,7 @@ def weight_data(request):
             elif custom:
                 try:
                     weighted_data = wgt.apply_custom_weight(
-                        survey_data, weight_proportions, 
+                        survey_data, weight_proportions,
                         questions, groups, standard_weights
                     )
                 except StopIteration:
@@ -181,6 +182,12 @@ def weight_data(request):
         'form': form,
         'formset': formset
     })
+
+
+def handle_weight_errors(function, ):
+    """ 
+    A helper function to control the 
+    """
 
 
 def upload_csv(request):

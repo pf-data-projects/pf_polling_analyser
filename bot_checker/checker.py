@@ -29,7 +29,7 @@ import spacy
 from openai import OpenAI
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal
-from queries.table_calculations.helpers import col_substr_partial
+from upload.table_calculations.helpers import col_substr_partial
 
 
 # Set up client to connect to API

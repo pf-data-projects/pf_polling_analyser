@@ -5,8 +5,8 @@ This file contains helper functions to keep views.py clean
 import re
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal
-from queries.api_request.get_survey_questions import get_questions_json
-from queries.api_request.get_processed_questions import (
+from upload.api_request.get_survey_questions import get_questions_json
+from upload.api_request.get_processed_questions import (
     extract_questions_from_pages,
     extract_data_from_question_objects
 )

@@ -72,7 +72,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     # my apps
     'profiles',
-    'queries',
+    # 'queries',
     'upload',
     'excel_tables',
     'report',
