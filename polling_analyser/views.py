@@ -1,3 +1,15 @@
+""" 
+Views to handle overal all application functions
+
+handler500: returns the 500 error page 
+and response code if a server error happens
+
+handler404: returns 404 error page
+and response code if the user tries to
+access a page that doesn't exist.
+"""
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Standard library
 from django.shortcuts import render
 from django.core.exceptions import PermissionDenied
 

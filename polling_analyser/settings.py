@@ -219,8 +219,8 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379"
 
 # Settings for SMTP email service for user notifications
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'mail.smtp2go.com'  # Use the SMTP server address provided by SendPulse
-EMAIL_PORT = 587  # Use the port number provided by SendPulse (usually 587 for TLS)
-EMAIL_USE_TLS = True  # SendPulse requires TLS encryption
-EMAIL_HOST_USER = os.environ.get('EMAIL_USER')  # Your SMTP username
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD') # Your SMTP password
+EMAIL_HOST = 'mail.smtp2go.com'
+EMAIL_PORT = 587  # Port number (usually 587 for TLS)
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
