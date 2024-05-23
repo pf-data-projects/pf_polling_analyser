@@ -29,7 +29,8 @@ at all because everyone has the same weight).
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 3rd party
 import pandas as pd
 
-def run_weighting(survey_data, weight_proportions):
+def run_weighting(survey_data, weight_proportions, 
+    questions=None, groups=None, standard_weights=None):
     """
     Runs IPF for datasets to add the weighting column.
     """

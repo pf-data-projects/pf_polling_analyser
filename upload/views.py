@@ -105,55 +105,21 @@ def weight_data(request):
                     groups.append(sub_form.cleaned_data['group'])
                     questions.append(sub_form.cleaned_data['question'])
 
-            # ~~~~~~~~~~~~~~~~ Run ipf module for standard weights
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for standard weights
             if apply and not custom:
-                try:
-                    weighted_data = wgt.run_weighting(
-                        survey_data, weight_proportions)
-                except StopIteration:
-                    message="""
-                        An error occurred searching for the 
-                        Socio-Economic Grade question.
-                        The code couldn't find it - 
-                        Have you checked that this question exists in the data,
-                        or that the wording hasn't changed?
-                        """
-                    return HttpResponse(message)
-                except Exception as e:
-                    message=f"""
-                        There was an error in the weighting calculation.
-                        Please make sure the questions/columns in the data
-                        match the groups specified in the weight proportions.
-
-                        This is the error the code returned: {e}
-                        """
-                    return HttpResponse(message)
+                weighted_data = handle_weight_errors(
+                    wgt.run_weighting, survey_data,
+                    weight_proportions
+                )
 
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for custom weights
             elif custom:
-                try:
-                    weighted_data = wgt.apply_custom_weight(
-                        survey_data, weight_proportions,
-                        questions, groups, standard_weights
-                    )
-                except StopIteration:
-                    message="""
-                        An error occurred searching for the 
-                        Socio-Economic Grade question.
-                        The code couldn't find it - 
-                        Have you checked that this question exists in the data,
-                        or that the wording hasn't changed?
-                        """
-                    return HttpResponse(message)
-                except Exception as e:
-                    message=f"""
-                        There was an error in the weighting calculation.
-                        Please make sure the questions/columns in the data
-                        match the groups specified in the weight proportions.
-
-                        This is the error the code returned: {e}
-                        """
-                    return HttpResponse(message)
+                weighted_data = handle_weight_errors(
+                    wgt.apply_custom_weight,
+                    survey_data, weight_proportions,
+                    questions=questions, groups=groups,
+                    standard_weights=standard_weights
+                )
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for no weights
             else:
                 weighted_data = wgt.apply_no_weight(survey_data)
@@ -164,7 +130,7 @@ def weight_data(request):
             excel_buffer.seek(0)
             unique_id = "weights_for_user_" + str(request.user.id)
             cache.set(unique_id, excel_buffer.getvalue(), 300)
-
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ handle returning file attachment
             response = HttpResponse(
                 excel_buffer.getvalue(),
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
@@ -184,10 +150,33 @@ def weight_data(request):
     })
 
 
-def handle_weight_errors(function, ):
+def handle_weight_errors(function, survey_data, weight_proportions,
+    groups=None, questions=None, standard_weights=None):
     """ 
     A helper function to control the 
     """
+    try:
+        weighted_data = function(
+            survey_data, weight_proportions, questions, groups, standard_weights)
+    except StopIteration:
+        message="""
+            An error occurred searching for the 
+            Socio-Economic Grade question.
+            The code couldn't find it - 
+            Have you checked that this question exists in the data,
+            or that the wording hasn't changed?
+            """
+        return HttpResponse(message)
+    except Exception as e:
+        message=f"""
+            There was an error in the weighting calculation.
+            Please make sure the questions/columns in the data
+            match the groups specified in the weight proportions.
+
+            This is the error the code returned: {e}
+            """
+        return HttpResponse(message)
+    return weighted_data
 
 
 def upload_csv(request):
@@ -206,7 +195,7 @@ def upload_csv(request):
     if request.method == 'POST':
         if not request.user.is_authenticated:
             messages.error(
-                request, 
+                request,
                 "You cannot access this feature until you are logged in"
             )
             return redirect(reverse('home'))
@@ -247,7 +236,6 @@ def upload_csv(request):
                 return HttpResponse(f"An error occured: {is_valid[1]}")
 
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ get question data from API
-            # JSON AND CSV OUTPUT CURRENTLY COMMENTED OUT FOR PERFORMANCE
             survey_questions = get_questions_json(survey_id)
             if survey_questions is None:
                 message = """
@@ -266,7 +254,10 @@ def upload_csv(request):
             data = data.to_csv(index=False)
             question_data = question_data.to_csv(index=False)
             email = request.user.email
-            table = handle_crossbreaks.delay(email, data, question_data, standard_cb, non_standard_cb)
+            table = handle_crossbreaks.delay(
+                email, data, question_data, 
+                standard_cb, non_standard_cb
+            )
 
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ cache celery task id
             cache.set('table_task_id', table.id, 3600)
@@ -356,8 +347,7 @@ def download_headers(request):
     task_id = cache.get('table_task_id')
     try:
         result = AsyncResult(task_id)
-    except ValueError as e:
-        print("THIS IS THE ERROR", str(e))
+    except ValueError:
         messages.error(
             request,
             """No data found. 
@@ -365,9 +355,6 @@ def download_headers(request):
             or too much time has elapsed since they were run."""
         )
         return redirect('home')
-
-    print('getting your result')
-
     if result.ready():
         data = result.get()
         data = data['json']
@@ -378,7 +365,6 @@ def download_headers(request):
         response['Content-Disposition'] = 'attachment; filename="table_headers.json"'
         return response
     else:
-        print("the crossbreaks are not ready yet")
         messages.error(
             request,
             "The crossbreaks are still processing. Please wait"
