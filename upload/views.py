@@ -45,9 +45,9 @@ from .api_request.get_processed_questions import (
 )
 
 from .forms import (
-    CSVUploadForm, 
-    WeightForm, 
-    CrossbreakFormSet, 
+    CSVUploadForm,
+    WeightForm,
+    CrossbreakFormSet,
     CustomWeightFormSet
 )
 from . import weight as wgt
@@ -104,14 +104,12 @@ def weight_data(request):
                 for sub_form in formset:
                     groups.append(sub_form.cleaned_data['group'])
                     questions.append(sub_form.cleaned_data['question'])
-
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for standard weights
             if apply and not custom:
                 weighted_data = handle_weight_errors(
                     wgt.run_weighting, survey_data,
                     weight_proportions
                 )
-
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for custom weights
             elif custom:
                 weighted_data = handle_weight_errors(
@@ -123,7 +121,6 @@ def weight_data(request):
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for no weights
             else:
                 weighted_data = wgt.apply_no_weight(survey_data)
-
             # ~~~~~~~~~ Cache the weighted data to be downloaded by user later
             excel_buffer = BytesIO()
             weighted_data.to_excel(excel_buffer, index=False)

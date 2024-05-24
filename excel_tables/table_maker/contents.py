@@ -12,14 +12,9 @@ def create_contents_page(data, questions_list, comments, grids, unique_ids, id_c
     """
     data = data[(data['Base Type'] == "Question")]
     question_list = data['Answers'].tolist()
-    # question_list = list(dict.fromkeys(question_list))
-
     id_list = data['IDs'].tolist()
-    # id_list = list(dict.fromkeys(id_list))
 
-    # data.to_csv("test_output_2.csv", encoding="utf-8-sig", index=False)
-
-    # create the df that will show individual tables/sheets
+    # ~~~~~~~~~~~~~~~~~ create the df that will show individual tables/sheets
     contents_list = []
     contents_list.append('Full Results')
     for item in question_list:
@@ -34,7 +29,6 @@ def create_contents_page(data, questions_list, comments, grids, unique_ids, id_c
             grid_indexes.append(len(id_column) - 1)
         if item != 'Total' and item != 'Weighted':
             id_column.append(item)
-
     for item in grid_indexes:
         contents_list.insert(int(item), f"Grid Summary - {id_column[int(item)]}")
         questions_list.insert(int(item), "n/a")

@@ -12,6 +12,7 @@ to upload their dataset so that the backend can find out
 which questions need a rebase comment form in the frontend.
 """
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 3rd party
 from django import forms
 
 
@@ -26,7 +27,10 @@ class TableUploadForm(forms.Form):
         required=True
     )
     rebased_header_file = forms.FileField(
-        label="Upload the data for the rebased headers. Download this from the home page if you haven't already.",
+        label="""
+        Upload the data for the rebased headers. 
+        Download this from the home page if you haven't already.
+        """,
         required=True
     )
     title = forms.CharField(
@@ -34,7 +38,10 @@ class TableUploadForm(forms.Form):
         required=True,
     )
     dates = forms.CharField(
-        label='Please specify the dates in which this survey was in the field.',
+        label="""
+        Please specify the dates in which this 
+        survey was in the field.
+        """,
         required=True
     )
     start = forms.IntegerField(
