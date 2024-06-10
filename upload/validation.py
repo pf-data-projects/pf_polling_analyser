@@ -23,6 +23,11 @@ def validate_cb_inputs(data, standard_cb):
                 "What is the highest level of education you have achieved?"
             ]
         ],
+        ["vote2019", "Do you remember how you voted in the 2019 General Election, if you were able to vote?"],
+        ["eu2016", "How did you vote in the 2016 referendum on whether to Leave or Remain in the EU"],
+        ["voting_intention", "And, if a general election was called tomorrow, which party would you vote for?"],
+        ["income", "What is the annual income of your household before tax?"],
+        ["area", "Which of the following best describes the area where you live?"],
     ]
 
     for cb in crossbreaks:
