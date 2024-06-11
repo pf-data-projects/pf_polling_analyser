@@ -1,6 +1,6 @@
 # Polling Analysis
 
-This is the alpha release of a cloud-based application to allow Public First to generate polling tables. Please be aware that this version does not yet have all the features that a full release will have and bugs are to be expected.
+This is the v1.0 release of a cloud-based application to allow Public First to generate polling tables.
 
 ## User Manual
 
@@ -9,7 +9,7 @@ This is the alpha release of a cloud-based application to allow Public First to 
 
 When you access the application for the first time, you will need to create an account or log in with an existing account.
 
-Select the relevant option in the navbar.
+Select the relevant option (login/signup) in the navbar.
 
 If you are creating an account for the first time you will need to get an admin to approve your account/profile before you can access certain features of the site.
 
@@ -53,13 +53,13 @@ Optionally, you can check or uncheck any standard crossbreaks that you would lik
 
 You may add as many non-standard crossbreaks as you like using the buttons, but note that the more you add, the longer it will take to process the whole batch.
 
-When you're happy with your query, click the 'upload' button to run the calculations.
+When you're happy with your query, click the 'upload' button to run the calculations. You will then be taken back to the home page and you can keep track of the progress of your data processing with the progress bar that appears. 
 
-When the calculations are complete, the data will be automatically downloaded. You will be redirected to the home page, and the data will be cached for you to download. You also need to download a second file by clicking on the 'download table headers'. This file will be necessary in the next step. Currently you will have 5 minutes until these cached files are wiped from the memory. 
+When your calculations have finished, you should receive an email notifying you that they are done, provided that you have supplied an email address when signing up. If you wish to add or update an email address, please contact someone with administrator privileges.
 
-Please also note that refreshing the browser / leaving the app untouched for too long may result in the cached data being cleared as well. If this happens you will need to restart the process again.
+When the calculations are complete, the data will be automatically cached in the browser awaiting download by the two buttons in the middle card on the home page. Currently you will have 5 minutes until these cached files are wiped and you will need to start again.
 
-Make sure you have TWO files downloaded before moving to the next step.
+Make sure you have downloaded both files from this step before moving to the next step.
 
 **NOTE: please refrain from submitting this form multiple times in quick succession as it relies upon a 3rd party API with limits on the number of requests that can be made per minute. If in doubt, give it 20 seconds or so after submitting to submit again.**
 </details>
@@ -80,6 +80,23 @@ Underneath this there will be a form to specify the rebase comments for rebased 
 Once you're happy with all the data in this form, click the 'run table-maker' button. After a few moments, you should be taken back to the home page. From here, you can click the 'Download polling tables button' to download your shiny new polling tables.
 
 The tables themselves should have a 'cover page' worksheet, contents worksheet, full results page (detailing all the questions and all the answers), and a sheet for each individual question.
+</details>
+
+<details>
+<summary>Polling Tables</summary>
+
+### Running bot checks
+
+From the navbar, if you select 'check for bots' you will be directed to a page where you can upload raw polling data and run one of three automated bot checks.
+
+Depending on the check you choose, the bot checker may take some time to run, however when it is finished you will receive an email notification similarly to when your crossbreaks are done.
+
+To run a bot check, simply upload the file you want to check, select the option and submit the form.
+
+If you are a Public First user, please note that using the check for whether answers make sense will use OpenAI credits. These are pay-per-use, so please ensure that you don't make more requests than you need to. This will ensure that we are not charged unnecessarily.
+
+A faster bot-checker is currently in design/development, but please submit any ideas you have for features to Jeremy or another member of the data/development team.
+
 </details>
 
 ## Technical Design
