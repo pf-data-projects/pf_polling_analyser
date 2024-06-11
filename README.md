@@ -83,7 +83,7 @@ The tables themselves should have a 'cover page' worksheet, contents worksheet, 
 </details>
 
 <details>
-<summary>Polling Tables</summary>
+<summary>Automated Bot Checks</summary>
 
 ### Running bot checks
 
@@ -99,6 +99,7 @@ A faster bot-checker is currently in design/development, but please submit any i
 
 </details>
 
+
 ## Technical Design
 
 ### Project architecture
@@ -106,15 +107,17 @@ A faster bot-checker is currently in design/development, but please submit any i
 This project is made up of several components/services. User auth data is hosted in an external postgres database. Static files are hosted on a separate platform.
 
 The core part of the application is hosted on google cloud run in a single container. This container is currently running three services:
-1. Django web application
-2. Celery worker for asynchronous processing of crossbreak data
+1. Django web application.
+2. Celery worker for asynchronous processing of crossbreak data.
 3. Redis instance for passing tasks and results between django and the celery worker.
 
 The benefit of this more complex set up are:
 1. The application does not 'hang' for several minutes while waiting for backend processing to be completed.
 2. This allows django's front end to query the progress of the data processing in real time.
 
-It is NOT best practice to run several services in a single container, however since it is for such a small user-base, it is functional for now
+This is the same process that the bot checking feature follows.
+
+It is NOT best practice to run several services in a single container, however since the app serves such a small number of users, it is functional for now.
 
 #### Future plans for cloud architecture
 
@@ -150,11 +153,11 @@ Currently this is handled using django's default caching system. This works OK f
 3. More critically, Django uses the application instance's own memory to store cached data. If the application were to be scaled up, the cloud computing cost of running would increase significantly, as cloud run instances are billed according to memory/CPU usage.
 4. Given that the cache occupies memory, it also means that there are fewer resources in a cloud run instance that can be devoted to processing data.
 
-There may be more efficient storage options if scaling up is necessary.
+There may be more efficient storage options if scaling up is necessary, e.g. Google Cloud's Memcached service.
 
 ### Data processing
 
-The Pandas library for python is currently used to do the heavy lifting of data processing in the backend.
+The Pandas library for python is currently used to do the heavy lifting of data processing.
 
 The following diagrams show the different processes that this project carries out on the survey data.
 
@@ -246,12 +249,12 @@ If you then would like to work on your fork locally, follow these steps:
 
 
 ### DEPLOYMENT PART 1: DATABASE
-If you want to get your own version of this project off the ground, you'll need to set up a postgres database instance. At the time of writing (DEC 2023), this can be done for free on a platform called [ElephantSQ](https://www.elephantsql.com/).
+If you want to get your own version of this project off the ground, you'll need to set up a postgreSQL database instance. At the time of writing (DEC 2023), this can be done for free on a platform called [Aiven](https://aiven.io/), using their Digital Ocean hosted postgres service.
 
 Follow these steps to create your ElephantSQL instance and connect it to your django project.
-1. Create an account with ElephantSQL. I recommend using GitHub SSO for convenience.
-2. Create an instance on the Tiny Turtle plan (free tier), selecting whichever data center is closest to your users.
-3. After creating your instance, click on it's name in the list of your instances to access the details.
+1. Create an account with Aiven.
+2. Create an instance on whichever plan suits you best, selecting whichever data center is closest to your users.
+3. After creating your instance access the database's details.
 4. Copy the database URL to your clipboard.
 5. Back in your IDE, make sure you have a file called env.py in your root directory. Make sure env.py is also in your .gitignore file before pushing anything to GitHub! If you forget to do this, unauthorised people might be able to access your database from your GitHub repo.
 6. Import os at the top of the file, and set a secret key for django to use so that it can run securely.
@@ -288,7 +291,7 @@ DATABASES = {
     'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
 }
 ```
-11. Run `python manage.py migrate` to first migrate the installed apps in settings.py as well as the database models to the production database. Please do this before creating a superuser. If you don't, you risk not getting a profile auto-created for your superuser account.
+11. In your terminal, run `python manage.py migrate` to first migrate the installed apps in settings.py as well as the database models to the production database. Please do this before creating a superuser. If you don't, you risk not getting a profile auto-created for your superuser account.
 12. Run `python manage.py createsuperuser`. You will be asked to provide a username, email, password, and password confirmation. It's optional to provide an email, but it may be useful if you decide in future to set up password reset via SMTP (password reset emails).
 13. Once your superuser is created, you will need to approve your own profile to access the features of the application with this account. The simplest way to do this is in your local development environment (while you're still connected to the production database). Therefore, run this command to launch the application on localhost: `python manage.py runserver`.
 14. If the app does not launch successfully and you get a django error message, you may need to adjust your ALLOWED_HOSTS variable in settings.py. If another error is the problem, consult django docs or chatgpt.
@@ -370,8 +373,8 @@ Here's how to get started with Zeet.
 15. Directly under the Networking sub-section, copy over all the environment variables you have set in your env.py file (your env file should only be saved in your local directory, not on GitHub!!!).
 16. DO NOT copy over the 'DEV' environment variable. That is ONLY to be used in the development environment and not in production. Having DEV here in production will open up security vulnerabilities among other things.
 17. In the 'organize' tab give your project/group/subgroup a name each. Up to you what they are.
-18. When you're ready, click 'Deploy'!
-19. You can also set Zeet to automatically deploy your main branch to GCP whenever you push changes to GitHub. How cool is that?!
+18. When you're ready, click 'Deploy'
+19. You can also set Zeet to automatically deploy your main branch to GCP whenever you push changes to GitHub.
 
 
 ### DEPLOYMENT PART 5: GOOGLE CLOUD RUN CONFIG
