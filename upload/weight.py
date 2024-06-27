@@ -26,15 +26,14 @@ the file applying a weight of '1' to each person (i.e., no weight
 at all because everyone has the same weight).
 """
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 3rd party
 import pandas as pd
 
-def run_weighting(survey_data, weight_proportions):
+def run_weighting(survey_data, weight_proportions, 
+    questions=None, groups=None, standard_weights=None):
     """
     Runs IPF for datasets to add the weighting column.
     """
-    # Load the weight proportions and survey data
-    # weight_proportions = pd.read_excel("Weight_Proportions.xlsx")
-    # survey_data = pd.read_excel("data2.xlsx", sheet_name="Worksheet")
 
     # Extract column names after the colon
     def extract_column_name(col_name):
@@ -45,9 +44,9 @@ def run_weighting(survey_data, weight_proportions):
     column_mapping = {col: extract_column_name(col) for col in survey_data.columns}
     survey_data_renamed = survey_data.rename(columns=column_mapping)
 
-    # Map answers to social grade codes
-    # Pls forgive the awfully long lines of strings here.
-    # I can't find a way to multi-line without breaking it :(
+    # ~~~~~~~~~~~ Map answers to social grade codes
+    # ~~~~~~~~~~~ Pls forgive the awfully long lines of strings here.
+    # ~~~~~~~~~~~ I can't find a way to multi-line without breaking it :(
     SEG_Lookup = pd.DataFrame({
         "Answers": [
             "Casual worker - not in permanent employment",
@@ -63,29 +62,47 @@ def run_weighting(survey_data, weight_proportions):
             "Supervisory or clerical/junior managerial/professional/administrative (e.g. Office worker, Student Doctor, Foreman with 25+ employees, salesperson, etc.)",
             "Unemployed or not working due to long-term sickness"
         ],
-        "Codes": ["E", "E", "A", "E", "B", "0", "E", "D", "C2", "C1", "C1", "E"]
+        "Codes": [
+            "E", "E", "A", "E", 
+            "B", "0", "E", "D", 
+            "C2", "C1", "C1", "E"
+        ]
     })
-    
-    seg_col_name = next(col for col in survey_data_renamed.columns if "Think about the Chief Income Earner in your household" in col)
-    survey_data_renamed['seg'] = survey_data_renamed[seg_col_name].map(SEG_Lookup.set_index('Answers')['Codes'])
+
+    seg_col_name = next(
+        col for col in survey_data_renamed.columns if 
+        "Think about the Chief Income Earner in your household" in col
+    )
+    survey_data_renamed['seg'] = survey_data_renamed[seg_col_name].map(
+        SEG_Lookup.set_index('Answers')['Codes']
+    )
 
     region_column = None
     for col in survey_data_renamed.columns:
         if 'In what region of the UK do you live?' in col:
             region_column = 'region'
             break
-    
+
     if region_column is None:
         raise KeyError('Region column not found in survey data.')
 
     # Prepare the survey data
-    survey_subset = survey_data_renamed[["How old are you?", "Which of the following best describes how you think of yourself?", "In what region of the UK do you live?", "seg"]]
+    survey_subset = survey_data_renamed[
+        [
+            "How old are you?", 
+            "Which of the following best describes how you think of yourself?", 
+            "In what region of the UK do you live?", 
+            "seg"
+        ]
+    ]
     survey_subset.columns = ["Age", "Gender", "region", "seg"]
     bins = [18, 24, 34, 44, 54, 64, 74, 84, 150]
     labels = ["18-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75-84", "85+"]
-    survey_subset["Age Group"] = pd.cut(survey_subset["Age"], bins=bins, labels=labels, right=True, include_lowest=True)
+    survey_subset["Age Group"] = pd.cut(
+        survey_subset["Age"], bins=bins, labels=labels, 
+        right=True, include_lowest=True
+    )
     survey_subset["genderage"] = survey_subset["Gender"] + " " + survey_subset["Age Group"].astype(str)
-    # survey_subset.to_csv("weight_data_prep.csv")
 
     def ipf(survey_data, weight_proportions, max_iterations=3, convergence_threshold=0.001):
         """
@@ -125,17 +142,10 @@ def run_weighting(survey_data, weight_proportions):
             if weight_change < convergence_threshold:
                 break
         return survey_data
-
-    # Apply IPF with region to the survey data
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Apply IPF with region to survey data
     ipf_result = ipf(survey_subset, weight_proportions)
-
-    # Join the weight column from ipf_result to the original survey_data
+    # ~~~~~~~~~~ Join weight column from ipf_result to the original survey_data
     survey_data['weighted_respondents'] = ipf_result['weight']
-
-    # # Save the dataset with appended weights to an output file
-    # survey_data.to_excel("merged_weighted_data.xlsx")
-    # ipf_result.to_csv("test_weight.csv", encoding="utf-8-sig")
-
     return survey_data
 
 
@@ -206,8 +216,13 @@ def apply_custom_weight(survey_data, weight_proportions, questions, groups, stan
         survey_subset.to_csv('custom_and_standard_weights.csv')
 
 
-
-    def custom_ipf(survey_data, weight_proportions, max_iterations=100, convergence_threshold=0.001):
+    def custom_ipf(
+        survey_data, weight_proportions,
+        max_iterations=100, convergence_threshold=0.001
+    ):
+        """
+        Function that handles iteration.
+        """
         survey_data['weight'] = 1.0
         for iteration in range(max_iterations):
             previous_weights = survey_data['weight'].copy()

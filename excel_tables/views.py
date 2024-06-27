@@ -19,17 +19,19 @@ and downloads tables from the cache if they exist and displays an
 error if not.
 """
 
-from io import BytesIO
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Standard library
 import json
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 3rd party
 import pandas as pd
 
-from django.shortcuts import render, reverse, redirect
+from django.shortcuts import render, redirect
 from django.core.cache import cache
-from django.http import HttpResponse, FileResponse
+from django.http import HttpResponse
 from django.forms import formset_factory
 from django.contrib import messages
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal
 from .forms import TableUploadForm, RebaseForm, TableScanForm
 from .table_maker.trim import trim_table
 from .table_maker.workbook import create_workbook
@@ -49,7 +51,7 @@ def table_maker_form(request, arg1):
         if not form.is_valid():
             cache.set("test", form.errors, 300)
         if form.is_valid() and formset.is_valid():
-            # Fetches data from form & converts them to df
+            # ~~~~~~~~~~~~~~~~~~~ Fetches data from form & converts them to df
             table_data = request.FILES['data_file']
             table_data = pd.read_csv(table_data)
             rebased_headers = request.FILES['rebased_header_file']
@@ -59,8 +61,7 @@ def table_maker_form(request, arg1):
             start = form.cleaned_data['start']
             end = form.cleaned_data['end']
             id_column = form.cleaned_data['id_column']
-
-            # Fetches data from formset and stores in 'edited_comments'
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fetches data from formset
             edited_comments = []
             j = 0
             for sub_form in formset:
@@ -72,46 +73,28 @@ def table_maker_form(request, arg1):
                 else:
                     edited_comments.append(comment_data)
                 j += 1
-
-            # Run table maker modules
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run table maker modules
             trimmed = trim_table(table_data, start, end, edited_comments)
             if trimmed is False:
                 return HttpResponse(
                     "Invalid start or end ID."
                 )
-
-            # create and cache excel tables.
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create and cache excel tables
             cache_key = create_workbook(
-                request,
-                trimmed[0],
-                trimmed[1],
-                trimmed[2],
-                trimmed[3],
-                title,
-                dates,
-                edited_comments,
-                start,
-                end,
-                id_column,
-                rebased_headers
+                request, trimmed[0], trimmed[1], trimmed[2], trimmed[3],
+                title, dates, edited_comments, start, end, 
+                id_column, rebased_headers
             )
-
-            # cache title for use with download button
             unique_id = "title_for_user_" + str(request.user.id)
-
-            # auto-download for the excel tables.
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ auto-download for the excel tables
             excel_data = cache.get(cache_key)
             response = HttpResponse(
                 excel_data,
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
             response['Content-Disposition'] = f'attachment; filename="{title}.xlsx"'
-            # messages.success(request, "Downloading tables...")
             return response
-
-            # return redirect(reverse('home'))
         else:
-            # cache.set("test", form, 300)
             messages.error(
                 request,
                 "Invalid form data was submitted. please try again"
@@ -137,32 +120,27 @@ def scan_table(request):
     if request.method == 'POST':
         form = TableScanForm(request.POST, request.FILES)
         if form.is_valid():
-            # Fetches data from form & converts them to df
+            # ~~~~~~~~~~~~~~~~~~~ Fetches data from form & converts them to df
             table_data = request.FILES['data_file']
             table_data = pd.read_csv(table_data, encoding="utf-8-sig")
-            # Filters the df to get only questions that have true rebase value
+            # ~~~ Filters df to get only questions that have true rebase value
             filtered_df = table_data[
                 (table_data['Base Type'] == 'Question')
             ]
             filtered_df = filtered_df[filtered_df['Rebase comment needed'].isin(['TRUE', 'True'])]
             filtered_df.set_index('IDs', inplace=True)
 
-            # remove html tags from questions for rebase form
+            # ~~~~~~~~~~~~~~~~ remove html tags from questions for rebase form
             filtered_df["Answers"] = filtered_df["Answers"].str.replace(
-                r'<[^>]+>',
-                '',
-                regex=True
+                r'<[^>]+>', '', regex=True
             )
-            # Add these questions to a dictionary
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Add these questions to a dictionary
             id_answer_dict = filtered_df['Answers'].to_dict()
             forms_needed = len(id_answer_dict)
-            # Add the questions to a list and save them
-            # to session storage for table maker view to use.
             rebase_questions = []
             for key, value in id_answer_dict.items():
                 pair = f"{key}: {value}"
                 rebase_questions.append(pair)
-
             rebase_ids = [key for key, value in id_answer_dict.items()]
 
             rebase_questions = [rebase_questions, rebase_ids]

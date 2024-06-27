@@ -22,12 +22,11 @@ if not.
 5. GuideView handles logic to get the instructions page.
 """
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Standard library
 from io import BytesIO, StringIO
 import re
-import json
-import os
-from datetime import datetime
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 3rd party
 import pandas as pd
 
 from celery.result import AsyncResult
@@ -35,21 +34,24 @@ from celery.result import AsyncResult
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.contrib import messages
-from .forms import CSVUploadForm, WeightForm, CrossbreakFormSet, CustomWeightFormSet
 from django.core.cache import cache
-from django.core.mail import send_mail
 from django.http import HttpResponse, JsonResponse
 
-from queries.table_calculations.calculate_totals import table_calculation
-from queries.api_request.get_survey_questions import get_questions_json
-from queries.api_request.get_processed_questions import (
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal
+from .api_request.get_survey_questions import get_questions_json
+from .api_request.get_processed_questions import (
     extract_questions_from_pages,
     extract_data_from_question_objects
 )
+
+from .forms import (
+    CSVUploadForm,
+    WeightForm,
+    CrossbreakFormSet,
+    CustomWeightFormSet
+)
 from . import weight as wgt
-
 from . import validation as vld
-
 from .tasks import handle_crossbreaks
 
 
@@ -78,14 +80,17 @@ def weight_data(request):
         form = WeightForm(request.POST, request.FILES)
         formset = CustomWeightFormSet(request.POST, prefix="weights")
         if form.is_valid():
-            print(form.cleaned_data)
             # Handles all the form data
             survey_data = request.FILES['results']
             survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
-            survey_data.columns = [preprocess_header(col) for col in survey_data.columns]
+            survey_data.columns = [
+                preprocess_header(col) for col in survey_data.columns
+            ]
             if 'weights' in request.FILES:
                 weight_proportions = request.FILES['weights']
-                weight_proportions = pd.read_excel(weight_proportions, header=0, sheet_name="Sheet1")
+                weight_proportions = pd.read_excel(
+                    weight_proportions, header=0, sheet_name="Sheet1"
+                )
             apply = form.cleaned_data['apply_weights']
             custom = form.cleaned_data['custom_weights']
             standard_weights = form.cleaned_data['standard_weights']
@@ -99,61 +104,30 @@ def weight_data(request):
                 for sub_form in formset:
                     groups.append(sub_form.cleaned_data['group'])
                     questions.append(sub_form.cleaned_data['question'])
-
-            # ~~~~~~~~~~~~~~~~ Run ipf module for standard weights
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for standard weights
             if apply and not custom:
-                try:
-                    weighted_data = wgt.run_weighting(survey_data, weight_proportions)
-                except StopIteration:
-                    message="""
-                        An error occurred searching for the Socio-Economic Grade question.
-                        The code couldn't find it - Have you checked that this question exists in the data,
-                        or that the wording hasn't changed?
-                        """
-                    return HttpResponse(message)
-                except Exception as e:
-                    message=f"""
-                        There was an error in the weighting calculation.
-                        Please make sure the questions/columns in the data
-                        match the groups specified in the weight proportions.
-
-                        This is the error the code returned: {e}
-                        """
-                    return HttpResponse(message)
-
-            # ~~~~~~~~~~~~~~~~ Run ipf module for custom weights
+                weighted_data = handle_weight_errors(
+                    wgt.run_weighting, survey_data,
+                    weight_proportions
+                )
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for custom weights
             elif custom:
-                try:
-                    weighted_data = wgt.apply_custom_weight(
-                        survey_data, weight_proportions, questions, groups, standard_weights
-                    )
-                except StopIteration:
-                    message="""
-                        An error occurred searching for the Socio-Economic Grade question.
-                        The code couldn't find it - Have you checked that this question exists in the data,
-                        or that the wording hasn't changed?
-                        """
-                    return HttpResponse(message)
-                except Exception as e:
-                    message=f"""
-                        There was an error in the weighting calculation.
-                        Please make sure the questions/columns in the data
-                        match the groups specified in the weight proportions.
-
-                        This is the error the code returned: {e}
-                        """
-                    return HttpResponse(message)
-            # ~~~~~~~~~~~~~~~~ Run ipf module for no weights
+                weighted_data = handle_weight_errors(
+                    wgt.apply_custom_weight,
+                    survey_data, weight_proportions,
+                    questions=questions, groups=groups,
+                    standard_weights=standard_weights
+                )
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for no weights
             else:
                 weighted_data = wgt.apply_no_weight(survey_data)
-
-            # Cache the weighted data to be downloaded by user later
+            # ~~~~~~~~~ Cache the weighted data to be downloaded by user later
             excel_buffer = BytesIO()
             weighted_data.to_excel(excel_buffer, index=False)
             excel_buffer.seek(0)
             unique_id = "weights_for_user_" + str(request.user.id)
             cache.set(unique_id, excel_buffer.getvalue(), 300)
-
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ handle returning file attachment
             response = HttpResponse(
                 excel_buffer.getvalue(),
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # noqa
@@ -173,6 +147,35 @@ def weight_data(request):
     })
 
 
+def handle_weight_errors(function, survey_data, weight_proportions,
+    groups=None, questions=None, standard_weights=None):
+    """ 
+    A helper function to control the 
+    """
+    try:
+        weighted_data = function(
+            survey_data, weight_proportions, questions, groups, standard_weights)
+    except StopIteration:
+        message="""
+            An error occurred searching for the 
+            Socio-Economic Grade question.
+            The code couldn't find it - 
+            Have you checked that this question exists in the data,
+            or that the wording hasn't changed?
+            """
+        return HttpResponse(message)
+    except Exception as e:
+        message=f"""
+            There was an error in the weighting calculation.
+            Please make sure the questions/columns in the data
+            match the groups specified in the weight proportions.
+
+            This is the error the code returned: {e}
+            """
+        return HttpResponse(message)
+    return weighted_data
+
+
 def upload_csv(request):
     """
     A view that:
@@ -188,7 +191,10 @@ def upload_csv(request):
     """
     if request.method == 'POST':
         if not request.user.is_authenticated:
-            messages.error(request, "You cannot access this feature until you are logged in")
+            messages.error(
+                request,
+                "You cannot access this feature until you are logged in"
+            )
             return redirect(reverse('home'))
         form = CSVUploadForm(request.POST, request.FILES)
         formset = CrossbreakFormSet(request.POST, prefix="crossbreaks")
@@ -198,13 +204,13 @@ def upload_csv(request):
             standard_cb = form.cleaned_data['standard_cb']
             non_standard_cb = []
             num_submitted_forms = 0
-            # handle formset
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ handle formset
             for form in formset:
                 if form.has_changed():
                     num_submitted_forms += 1
             if num_submitted_forms > 0:
                 for sub_form in formset:
-                    # retrieve data from each formset
+                    # ~~~~~~~~~~~~~~~~~~~~~~~~ retrieve data from each formset
                     cb_name = sub_form.cleaned_data['non_standard_cb_name']
                     cb_question = sub_form.cleaned_data['non_standard_cb_question']
                     cb_answer = sub_form.cleaned_data['non_standard_cb_answers']
@@ -215,19 +221,18 @@ def upload_csv(request):
                     cb_data = [cb_name, cb_question, cb_answer]
                     non_standard_cb.append(cb_data)
 
-            # convert the data to python-readable formats
+            # ~~~~~~~~~~~~~~~~~~~~~~~ convert data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Sheet1")
             data.columns = [preprocess_header(col) for col in data.columns]
             if 'weighted_respondents' not in data.columns:
                 return HttpResponse('No weights found. Please weight your data first.')
 
-            # validate the standard crossbreaks the the user selects.
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ validate the standard crossbreaks
             is_valid = vld.validate_cb_inputs(data, standard_cb)
             if not is_valid[0]:
                 return HttpResponse(f"An error occured: {is_valid[1]}")
 
-            # get question data from API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            # JSON AND CSV OUTPUT CURRENTLY COMMENTED OUT FOR PERFORMANCE
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ get question data from API
             survey_questions = get_questions_json(survey_id)
             if survey_questions is None:
                 message = """
@@ -242,40 +247,16 @@ def upload_csv(request):
             # question_data.to_csv(
             #     "question_data.csv", index=False, encoding="utf-8-sig")
 
-            # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run celery task
             data = data.to_csv(index=False)
             question_data = question_data.to_csv(index=False)
             email = request.user.email
-            table = handle_crossbreaks.delay(email, data, question_data, standard_cb, non_standard_cb)
+            table = handle_crossbreaks.delay(
+                email, data, question_data, 
+                standard_cb, non_standard_cb
+            )
 
-            # # Run calculations
-            # try:
-            #     table = table_calculation(data, question_data, standard_cb, non_standard_cb)
-            # except (KeyError, IndexError) as e:
-            #     message = f"""
-            #         There was an error when running this code for crossbreaks.
-            #         The most likely cause of this error is entering a crossbreak that
-            #         doesn't exist in the data.
-
-            #         It could also be caused by changes in the wording of standard crossbreak
-            #         questions.
-
-            #         Here is the content of the error message: {e}
-            #         """
-            #     return HttpResponse(message)
-
-            # # Store results in cache
-            # csv_buffer = BytesIO()
-            # table[0].to_csv(csv_buffer, index=False, encoding="utf-8-sig")
-            # csv_buffer.seek(0)
-            # unique_id = "csv_for_user_" + str(request.user.id)
-            # cache.set(unique_id, csv_buffer.getvalue(), 300)
-
-            # response = HttpResponse(csv_buffer.getvalue(), content_type='text/csv')
-            # response['Content-Disposition'] = 'attachment; filename="crossbreaks_data.csv"'
-            # return response
-
-            # ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ cache celery task id
             cache.set('table_task_id', table.id, 3600)
             messages.success(request, "Crossbreaks processing successfully underway")
             return redirect(reverse('home'))
@@ -295,24 +276,6 @@ def upload_csv(request):
     })
 
 
-# def download_csv(request):
-#     """
-#     Handles retrieval of cached output table.
-#     """
-#     unique_id = "csv_for_user_" + str(request.user.id)
-#     csv_data = cache.get(unique_id)
-#     if csv_data:
-#         response = HttpResponse(csv_data, content_type='text/csv')
-#         response['Content-Disposition'] = 'attachment; filename="crossbreaks_data.csv"'
-#         return response
-#     else:
-#         messages.error(
-#             request,
-#             "No crossbreaks data found. Please run the calculations first."
-#         )
-#         return redirect('home')
-
-# ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
 def download_csv(request):
     """
     Handle retrieval of celery result
@@ -321,8 +284,7 @@ def download_csv(request):
     task_id = cache.get('table_task_id')
     try:
         result = AsyncResult(task_id)
-    except ValueError as e:
-        print(e)
+    except ValueError:
         messages.error(
             request,
             """No data found. 
@@ -330,9 +292,6 @@ def download_csv(request):
             or too much time has elapsed since they were run."""
         )
         return redirect('home')
-
-    print('getting your result')
-
     if result.ready():
         data = result.get()
         data = data['table']
@@ -344,12 +303,11 @@ def download_csv(request):
 
         response = HttpResponse(
             csv_buffer.getvalue(),
-            content_type='text/csv'  # noqa
+            content_type='text/csv'
         )
         response['Content-Disposition'] = 'attachment; filename="crossbreaks_data.csv"'
         return response
     else:
-        print("the crossbreaks are not ready yet")
         messages.error(
             request,
             "No crossbreaks data found. Please run the calculations first."
@@ -378,29 +336,6 @@ def download_weights(request):
         return redirect('home')
 
 
-# def download_headers(request):
-#     """
-#     Handles downloading cached rebased header data.
-#     """
-#     unique_id = 'rebase_json'
-#     json_data = cache.get(unique_id)
-#     if json_data:
-#         response = HttpResponse(
-#             json_data,
-#             content_type='application/json'
-#         )
-#         response['Content-Disposition'] = 'attachment; filename="table_headers.json"'
-#         return response
-#     else:
-#         messages.error(
-#             request,
-#             "No JSON file was found for your table's headers."
-#         )
-#         return redirect('home')
-
-# ||||||||||||||||||||||||| CELERY ||||||||||||||||||||||||||||
-
-
 def download_headers(request):
     """
     Handle retrieval of celery result
@@ -409,8 +344,7 @@ def download_headers(request):
     task_id = cache.get('table_task_id')
     try:
         result = AsyncResult(task_id)
-    except ValueError as e:
-        print("THIS IS THE ERROR", str(e))
+    except ValueError:
         messages.error(
             request,
             """No data found. 
@@ -418,9 +352,6 @@ def download_headers(request):
             or too much time has elapsed since they were run."""
         )
         return redirect('home')
-
-    print('getting your result')
-
     if result.ready():
         data = result.get()
         data = data['json']
@@ -431,7 +362,6 @@ def download_headers(request):
         response['Content-Disposition'] = 'attachment; filename="table_headers.json"'
         return response
     else:
-        print("the crossbreaks are not ready yet")
         messages.error(
             request,
             "The crossbreaks are still processing. Please wait"

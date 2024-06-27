@@ -1,6 +1,6 @@
 # Polling Analysis
 
-This is the alpha release of a cloud-based application to allow Public First to generate polling tables. Please be aware that this version does not yet have all the features that a full release will have and bugs are to be expected.
+This is the v1.0 release of a cloud-based application to allow Public First to generate polling tables.
 
 ## User Manual
 
@@ -9,7 +9,7 @@ This is the alpha release of a cloud-based application to allow Public First to 
 
 When you access the application for the first time, you will need to create an account or log in with an existing account.
 
-Select the relevant option in the navbar.
+Select the relevant option (login/signup) in the navbar.
 
 If you are creating an account for the first time you will need to get an admin to approve your account/profile before you can access certain features of the site.
 
@@ -53,13 +53,13 @@ Optionally, you can check or uncheck any standard crossbreaks that you would lik
 
 You may add as many non-standard crossbreaks as you like using the buttons, but note that the more you add, the longer it will take to process the whole batch.
 
-When you're happy with your query, click the 'upload' button to run the calculations.
+When you're happy with your query, click the 'upload' button to run the calculations. You will then be taken back to the home page and you can keep track of the progress of your data processing with the progress bar that appears. 
 
-When the calculations are complete, the data will be automatically downloaded. You will be redirected to the home page, and the data will be cached for you to download. You also need to download a second file by clicking on the 'download table headers'. This file will be necessary in the next step. Currently you will have 5 minutes until these cached files are wiped from the memory. 
+When your calculations have finished, you should receive an email notifying you that they are done, provided that you have supplied an email address when signing up. If you wish to add or update an email address, please contact someone with administrator privileges.
 
-Please also note that refreshing the browser / leaving the app untouched for too long may result in the cached data being cleared as well. If this happens you will need to restart the process again.
+When the calculations are complete, the data will be automatically cached in the browser awaiting download by the two buttons in the middle card on the home page. Currently you will have 5 minutes until these cached files are wiped and you will need to start again.
 
-Make sure you have TWO files downloaded before moving to the next step.
+Make sure you have downloaded both files from this step before moving to the next step.
 
 **NOTE: please refrain from submitting this form multiple times in quick succession as it relies upon a 3rd party API with limits on the number of requests that can be made per minute. If in doubt, give it 20 seconds or so after submitting to submit again.**
 </details>
@@ -82,6 +82,24 @@ Once you're happy with all the data in this form, click the 'run table-maker' bu
 The tables themselves should have a 'cover page' worksheet, contents worksheet, full results page (detailing all the questions and all the answers), and a sheet for each individual question.
 </details>
 
+<details>
+<summary>Automated Bot Checks</summary>
+
+### Running bot checks
+
+From the navbar, if you select 'check for bots' you will be directed to a page where you can upload raw polling data and run one of three automated bot checks.
+
+Depending on the check you choose, the bot checker may take some time to run, however when it is finished you will receive an email notification similarly to when your crossbreaks are done.
+
+To run a bot check, simply upload the file you want to check, select the option and submit the form.
+
+If you are a Public First user, please note that using the check for whether answers make sense will use OpenAI credits. These are pay-per-use, so please ensure that you don't make more requests than you need to. This will ensure that we are not charged unnecessarily.
+
+A faster bot-checker is currently in design/development, but please submit any ideas you have for features to Jeremy or another member of the data/development team.
+
+</details>
+
+
 ## Technical Design
 
 ### Project architecture
@@ -89,15 +107,17 @@ The tables themselves should have a 'cover page' worksheet, contents worksheet, 
 This project is made up of several components/services. User auth data is hosted in an external postgres database. Static files are hosted on a separate platform.
 
 The core part of the application is hosted on google cloud run in a single container. This container is currently running three services:
-1. Django web application
-2. Celery worker for asynchronous processing of crossbreak data
+1. Django web application.
+2. Celery worker for asynchronous processing of crossbreak data.
 3. Redis instance for passing tasks and results between django and the celery worker.
 
 The benefit of this more complex set up are:
 1. The application does not 'hang' for several minutes while waiting for backend processing to be completed.
 2. This allows django's front end to query the progress of the data processing in real time.
 
-It is NOT best practice to run several services in a single container, however since it is for such a small user-base, it is functional for now
+This is the same process that the bot checking feature follows.
+
+It is NOT best practice to run several services in a single container, however since the app serves such a small number of users, it is functional for now.
 
 #### Future plans for cloud architecture
 
@@ -133,11 +153,11 @@ Currently this is handled using django's default caching system. This works OK f
 3. More critically, Django uses the application instance's own memory to store cached data. If the application were to be scaled up, the cloud computing cost of running would increase significantly, as cloud run instances are billed according to memory/CPU usage.
 4. Given that the cache occupies memory, it also means that there are fewer resources in a cloud run instance that can be devoted to processing data.
 
-There may be more efficient storage options if scaling up is necessary.
+There may be more efficient storage options if scaling up is necessary, e.g. Google Cloud's Memcached service.
 
 ### Data processing
 
-The Pandas library for python is currently used to do the heavy lifting of data processing in the backend.
+The Pandas library for python is currently used to do the heavy lifting of data processing.
 
 The following diagrams show the different processes that this project carries out on the survey data.
 
@@ -229,12 +249,13 @@ If you then would like to work on your fork locally, follow these steps:
 
 
 ### DEPLOYMENT PART 1: DATABASE
-If you want to get your own version of this project off the ground, you'll need to set up a postgres database instance. At the time of writing (DEC 2023), this can be done for free on a platform called [ElephantSQ](https://www.elephantsql.com/).
+
+If you want to get your own version of this project off the ground, you'll need to set up a postgreSQL database instance. At the time of writing (DEC 2023), this can be done for free on a platform called [Aiven](https://aiven.io/), using their Digital Ocean hosted postgres service.
 
 Follow these steps to create your ElephantSQL instance and connect it to your django project.
-1. Create an account with ElephantSQL. I recommend using GitHub SSO for convenience.
-2. Create an instance on the Tiny Turtle plan (free tier), selecting whichever data center is closest to your users.
-3. After creating your instance, click on it's name in the list of your instances to access the details.
+1. Create an account with Aiven.
+2. Create an instance on whichever plan suits you best, selecting whichever data center is closest to your users.
+3. After creating your instance access the database's details.
 4. Copy the database URL to your clipboard.
 5. Back in your IDE, make sure you have a file called env.py in your root directory. Make sure env.py is also in your .gitignore file before pushing anything to GitHub! If you forget to do this, unauthorised people might be able to access your database from your GitHub repo.
 6. Import os at the top of the file, and set a secret key for django to use so that it can run securely.
@@ -247,7 +268,7 @@ os.environ["SECRET_KEY"] = "my_super_secret_key"
 ```
 os.environ["DATABASE_URL"] = YOUR_DB_URL
 ```
-8. Next, add an environment variable called DEV and set it to any value. I have gone for a string; 'DEV'.
+8. Next, add an environment variable called DEV and set it to any value that will return True in boolean logic. I have gone for a string; 'DEV'. This will be used to set Django's Debug setting to True if DEV exists and false if not. This allows us to automate switching debug modes between development and production environments.
 ```
 os.environ["DEV"] = 'DEV'
 ```
@@ -271,7 +292,7 @@ DATABASES = {
     'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
 }
 ```
-11. Run `python manage.py migrate` to first migrate the installed apps in settings.py as well as the database models to the production database. Please do this before creating a superuser. If you don't, you risk not getting a profile auto-created for your superuser account.
+11. In your terminal, run `python manage.py migrate` to first migrate the installed apps in settings.py as well as the database models to the production database. Please do this before creating a superuser. If you don't, you risk not getting a profile auto-created for your superuser account.
 12. Run `python manage.py createsuperuser`. You will be asked to provide a username, email, password, and password confirmation. It's optional to provide an email, but it may be useful if you decide in future to set up password reset via SMTP (password reset emails).
 13. Once your superuser is created, you will need to approve your own profile to access the features of the application with this account. The simplest way to do this is in your local development environment (while you're still connected to the production database). Therefore, run this command to launch the application on localhost: `python manage.py runserver`.
 14. If the app does not launch successfully and you get a django error message, you may need to adjust your ALLOWED_HOSTS variable in settings.py. If another error is the problem, consult django docs or chatgpt.
@@ -328,10 +349,25 @@ os.environ.setdefault("API_SECRET", "YOUR SECRET HERE")
 os.environ.setdefault("API_TOKEN", "YOUR TOKEN HERE")
 ```
 
+### DEPLOYMENT PART 4a: THE DOCKERFILE...
 
-### DEPLOYMENT PART 4: AUTOMATING GOOGLE CLOUD DEPLOYMENTS WITH ZEET
+This project uses docker when deploying. If you're not familiar with docker, it would be worth reading about it and how it works so you can better understand what the dockerfile does in this project.
 
-Django is great because there is loads of documentation and support for deploying applications to the web. You can make use of PaaS (platform as a service) providers like Heroku, Render, etc. to deploy very easily. However, for *this* application it makes more sense to leverage the resources of IaaS (infrastructure as a service) providers like AWS, Azure, GCP since it is going to need to be affordably beefed up to crunch lots of numbers.
+The dockerfile in this project broadly does the following:
+* Specifies the python build to use from linux
+* Install linux packages needed to support third party python libraries.
+* Install redis server to handle running redis in the same container as the django application (not recommended usually but works for our use-case).
+
+* Sets build arguments that will map on to the environment variables as well as other arguments that zeet will need to build and deploy the application.
+* Install python dependencies
+* Run python manage.py collectstatic command
+* Run a third party script to ensure the file run.sh is compiled in a way that is compatibile with Linux.
+* Run the file run.sh to launch the application. This file contains extra commands to start the redis server, a celery worker, and the gunicorn server for the django application in this order.
+
+
+### DEPLOYMENT PART 4b: AUTOMATING GOOGLE CLOUD DEPLOYMENTS WITH ZEET
+
+Django is great because there is loads of documentation and support for deploying applications to the web. It also has a lot of security feature built in. You can make use of PaaS (platform as a service) providers like Heroku, Render, etc. to deploy very easily. However, for *this* application it makes more sense to leverage the resources of IaaS (infrastructure as a service) providers like AWS, Azure, GCP. These services give you far more control over resources and usage, especially if you go for a 'serverless' offering. You can assign more memory/processing power if needed and can choose to only pay for what you need.
 
 This brings it's own set of challenges, however since IaaS providers offer so many different products, services, microservices, etc. It can be difficult and time consuming to deploy to the cloud especially if you've never done it before. That's where a service like [Zeet](https://zeet.co/) comes in very handy. It makes deploying an app to the cloud as simple as a PaaS interface like Heroku or Render. What's more, the Zeet team are super friendly and happy to help with any questions you have about cloud deployment.
 
@@ -342,30 +378,31 @@ Here's how to get started with Zeet.
 4. Select the clouds tab and click on new cloud.
 5. Select the cloud provider you are going to use from the list.
 6. If you have chosen google cloud as I suggested, you'll first need to set up a service account in your cloud to give Zeet permission to perform actions in your cloud space. It's a security measure to ensure unauthorised apps don't do stuff that could get you billed a lot of money. Zeet has some helpful documentation to do this. Just follow their steps and provide them with the details of the service account.
-7. Once you've done this, you'll need to go back to your google cloud account and enable billing. You'll have to enter some card details to be allowed to host anything in order to prove you're not a robot. However, you shouldn't be charged anything in your first 3 months, or until your free credits run out.
+7. Once you've done this, you'll need to go back to your google cloud account and enable billing. You'll have to enter some card details to be allowed to host anything in order to prove you're not a robot. However, you shouldn't be charged anything in your first 3 months.
 8. Now that all this is done, it's time to deploy. In the Zeet projects tab, select 'New Project'.
-9. Select 'Google Cloud Run' as the blueprint
+9. Select 'Google Cloud Run' as the blueprint.
 10. You'll then be prompted to connect your GitHub account. If you used GitHub SSO, you might skip this step.
 11. Select the repository you want to deploy - this should be your fork of the project.
 12. In the 'target' section, select the region you want the application to be hosted in. Select one that's closest to most of your users.
-13. Next, in the inputs section, select 'Django' as your build template, use the auto-filled python version for now, make sure the gunicorn command port bind matches the Networking 'listen on port' option (i.e. make both 8000).
-14. Make sure to specify a custom timeout in your gunicorn run command: `--timeout 3600`. If you do not do this, the app will time out while you run large calculations.
-15. Directly under the Networking sub-section, copy over all the environment variables you have set in your env.py file (your env file should only be saved in your local directory, not on GitHub!!!).
-16. DO NOT copy over the 'DEV' environment variable. That is ONLY to be used in the development environment and not in production. Having DEV here in production will open up security vulnerabilities among other things.
-17. In the 'organize' tab give your project/group/subgroup a name each. Up to you what they are.
-18. When you're ready, click 'Deploy'!
-19. You can also set Zeet to automatically deploy your main branch to GCP whenever you push changes to GitHub. How cool is that?!
+13. Next, in the inputs section, select 'Dockerfile' as your build template/build method. Set the docker context to ./ (i.e. the root directory). You'll need to supply the file path to the dockerfile. If you're just cloning this project, you should just be able to put 'Dockerfile' in this field.
+14. The dockerfile that exists in this GitHub repository should define all the build and run commands that the container will need to be generated and to launch the web app (gunicorn in this case). Feel free to adjust this if needed but please be aware that if you make too many alterations you might cause unexpected behaviours in the building and running of the application.
+15. Directly under the 'Build & Run' section, copy over all the environment variables you have set in your env.py file (your env file should only be saved in your local directory, not on GitHub!!!).
+16. PLEASE DO NOT copy over the 'DEV' environment variable. This is ONLY to be used in the development environment and not in production. Having DEV here in production will open up security vulnerabilities and potentially break features. As mentioned earlier it will set Django's debug setting to true.
+17. Directly under the environment variables section, you'll see a section called Serverless Resources. Here you can specify how much memory and CPU you want your container instances to have. I usually set it to 8GB RAM and 2 CPU cores.
+18. In the 'organize' tab give your project/group/subgroup a name each. Up to you what they are.
+19. When you're ready, click 'Deploy'
+20. You can also set Zeet to automatically deploy your main branch to GCP whenever you push changes to GitHub.
+
+Bonus tip: once you have created your project in zeet and at least attempted a deployment, you can make adjustments to your zeet builder as needed. Select your project, and navigate to the settings tab. Here you can make any changes to the information you entered earlier. If you select the 'advanced' option in the inner side menu, it will take you to a form where you can add more resources to the zeet builder in case you're ever running out of memory to build docker images.
 
 
 ### DEPLOYMENT PART 5: GOOGLE CLOUD RUN CONFIG
 
-By now, if you've followed all the steps, you should have a fully deployed version of the application live on your chosen IaaS account. If you have used Google Cloud Run, this will be a serverless application (meaning you will only pay for what you use in terms of resources). Here are some steps to follow to make sure your instances run smoothly and without errors.
-1. In your Google Cloud Run dashboard, click the 'revisions' tab.
-2. Click on the option to 'Edit & Deploy a New Revision'
-3. Update the resource allocation to 16GiB and 4 Cores (the min cores you're allowed with 16GiB). Assigning the instance a greater amount of memory will often have greater impact on python code. By default it won't use multiple cores.
-4. Scroll down to where it says 'Request timeout'. The default will be set to 300 seconds. Set it to the max (3600 seconds). This will make sure, like we did with the gunicorn server, that the application won't be stopped halfway through crunching some numbers.
-5. You'll also need to set max instances to 12. Google doesn't like handing over that much computing power in one go...
-6. CURRENTLY, YOU'LL HAVE TO MANUALLY DO THIS EVERY TIME YOU DEPLOY. AT TIME OF WRITING ZEET DOES NOT YET HAVE A FEATURE TO AUTOMATE THIS.
+By now, if you've followed all the steps, you should have a fully deployed version of the application live on your chosen IaaS account. If you have used Google Cloud Run, this will be a serverless application (meaning you will only pay for what you use in terms of resources). Here are some steps to follow to make edits to the instances once it's deployed.
+1. In your Google Cloud account, select the project that you're working in.
+2. Find Google Cloud Run using the search bar or the side tab.
+3. In your Google Cloud Run dashboard for your project, click the 'revisions' tab.
+4. Click on the option to 'Edit & Deploy a New Revision'.
 
 
 ### DEPLOYMENT PART 6: OPTIMISING PERFORMANCE
