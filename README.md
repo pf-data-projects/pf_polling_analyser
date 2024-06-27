@@ -249,6 +249,7 @@ If you then would like to work on your fork locally, follow these steps:
 
 
 ### DEPLOYMENT PART 1: DATABASE
+
 If you want to get your own version of this project off the ground, you'll need to set up a postgreSQL database instance. At the time of writing (DEC 2023), this can be done for free on a platform called [Aiven](https://aiven.io/), using their Digital Ocean hosted postgres service.
 
 Follow these steps to create your ElephantSQL instance and connect it to your django project.
@@ -267,7 +268,7 @@ os.environ["SECRET_KEY"] = "my_super_secret_key"
 ```
 os.environ["DATABASE_URL"] = YOUR_DB_URL
 ```
-8. Next, add an environment variable called DEV and set it to any value. I have gone for a string; 'DEV'.
+8. Next, add an environment variable called DEV and set it to any value that will return True in boolean logic. I have gone for a string; 'DEV'. This will be used to set Django's Debug setting to True if DEV exists and false if not. This allows us to automate switching debug modes between development and production environments.
 ```
 os.environ["DEV"] = 'DEV'
 ```
@@ -348,10 +349,25 @@ os.environ.setdefault("API_SECRET", "YOUR SECRET HERE")
 os.environ.setdefault("API_TOKEN", "YOUR TOKEN HERE")
 ```
 
+### DEPLOYMENT PART 4a: THE DOCKERFILE...
 
-### DEPLOYMENT PART 4: AUTOMATING GOOGLE CLOUD DEPLOYMENTS WITH ZEET
+This project uses docker when deploying. If you're not familiar with docker, it would be worth reading about it and how it works so you can better understand what the dockerfile does in this project.
 
-Django is great because there is loads of documentation and support for deploying applications to the web. You can make use of PaaS (platform as a service) providers like Heroku, Render, etc. to deploy very easily. However, for *this* application it makes more sense to leverage the resources of IaaS (infrastructure as a service) providers like AWS, Azure, GCP since it is going to need to be affordably beefed up to crunch lots of numbers.
+The dockerfile in this project broadly does the following:
+* Specifies the python build to use from linux
+* Install linux packages needed to support third party python libraries.
+* Install redis server to handle running redis in the same container as the django application (not recommended usually but works for our use-case).
+
+* Sets build arguments that will map on to the environment variables as well as other arguments that zeet will need to build and deploy the application.
+* Install python dependencies
+* Run python manage.py collectstatic command
+* Run a third party script to ensure the file run.sh is compiled in a way that is compatibile with Linux.
+* Run the file run.sh to launch the application. This file contains extra commands to start the redis server, a celery worker, and the gunicorn server for the django application in this order.
+
+
+### DEPLOYMENT PART 4b: AUTOMATING GOOGLE CLOUD DEPLOYMENTS WITH ZEET
+
+Django is great because there is loads of documentation and support for deploying applications to the web. It also has a lot of security feature built in. You can make use of PaaS (platform as a service) providers like Heroku, Render, etc. to deploy very easily. However, for *this* application it makes more sense to leverage the resources of IaaS (infrastructure as a service) providers like AWS, Azure, GCP. These services give you far more control over resources and usage, especially if you go for a 'serverless' offering. You can assign more memory/processing power if needed and can choose to only pay for what you need.
 
 This brings it's own set of challenges, however since IaaS providers offer so many different products, services, microservices, etc. It can be difficult and time consuming to deploy to the cloud especially if you've never done it before. That's where a service like [Zeet](https://zeet.co/) comes in very handy. It makes deploying an app to the cloud as simple as a PaaS interface like Heroku or Render. What's more, the Zeet team are super friendly and happy to help with any questions you have about cloud deployment.
 
@@ -362,30 +378,31 @@ Here's how to get started with Zeet.
 4. Select the clouds tab and click on new cloud.
 5. Select the cloud provider you are going to use from the list.
 6. If you have chosen google cloud as I suggested, you'll first need to set up a service account in your cloud to give Zeet permission to perform actions in your cloud space. It's a security measure to ensure unauthorised apps don't do stuff that could get you billed a lot of money. Zeet has some helpful documentation to do this. Just follow their steps and provide them with the details of the service account.
-7. Once you've done this, you'll need to go back to your google cloud account and enable billing. You'll have to enter some card details to be allowed to host anything in order to prove you're not a robot. However, you shouldn't be charged anything in your first 3 months, or until your free credits run out.
+7. Once you've done this, you'll need to go back to your google cloud account and enable billing. You'll have to enter some card details to be allowed to host anything in order to prove you're not a robot. However, you shouldn't be charged anything in your first 3 months.
 8. Now that all this is done, it's time to deploy. In the Zeet projects tab, select 'New Project'.
-9. Select 'Google Cloud Run' as the blueprint
+9. Select 'Google Cloud Run' as the blueprint.
 10. You'll then be prompted to connect your GitHub account. If you used GitHub SSO, you might skip this step.
 11. Select the repository you want to deploy - this should be your fork of the project.
 12. In the 'target' section, select the region you want the application to be hosted in. Select one that's closest to most of your users.
-13. Next, in the inputs section, select 'Django' as your build template, use the auto-filled python version for now, make sure the gunicorn command port bind matches the Networking 'listen on port' option (i.e. make both 8000).
-14. Make sure to specify a custom timeout in your gunicorn run command: `--timeout 3600`. If you do not do this, the app will time out while you run large calculations.
-15. Directly under the Networking sub-section, copy over all the environment variables you have set in your env.py file (your env file should only be saved in your local directory, not on GitHub!!!).
-16. DO NOT copy over the 'DEV' environment variable. That is ONLY to be used in the development environment and not in production. Having DEV here in production will open up security vulnerabilities among other things.
-17. In the 'organize' tab give your project/group/subgroup a name each. Up to you what they are.
-18. When you're ready, click 'Deploy'
-19. You can also set Zeet to automatically deploy your main branch to GCP whenever you push changes to GitHub.
+13. Next, in the inputs section, select 'Dockerfile' as your build template/build method. Set the docker context to ./ (i.e. the root directory). You'll need to supply the file path to the dockerfile. If you're just cloning this project, you should just be able to put 'Dockerfile' in this field.
+14. The dockerfile that exists in this GitHub repository should define all the build and run commands that the container will need to be generated and to launch the web app (gunicorn in this case). Feel free to adjust this if needed but please be aware that if you make too many alterations you might cause unexpected behaviours in the building and running of the application.
+15. Directly under the 'Build & Run' section, copy over all the environment variables you have set in your env.py file (your env file should only be saved in your local directory, not on GitHub!!!).
+16. PLEASE DO NOT copy over the 'DEV' environment variable. This is ONLY to be used in the development environment and not in production. Having DEV here in production will open up security vulnerabilities and potentially break features. As mentioned earlier it will set Django's debug setting to true.
+17. Directly under the environment variables section, you'll see a section called Serverless Resources. Here you can specify how much memory and CPU you want your container instances to have. I usually set it to 8GB RAM and 2 CPU cores.
+18. In the 'organize' tab give your project/group/subgroup a name each. Up to you what they are.
+19. When you're ready, click 'Deploy'
+20. You can also set Zeet to automatically deploy your main branch to GCP whenever you push changes to GitHub.
+
+Bonus tip: once you have created your project in zeet and at least attempted a deployment, you can make adjustments to your zeet builder as needed. Select your project, and navigate to the settings tab. Here you can make any changes to the information you entered earlier. If you select the 'advanced' option in the inner side menu, it will take you to a form where you can add more resources to the zeet builder in case you're ever running out of memory to build docker images.
 
 
 ### DEPLOYMENT PART 5: GOOGLE CLOUD RUN CONFIG
 
-By now, if you've followed all the steps, you should have a fully deployed version of the application live on your chosen IaaS account. If you have used Google Cloud Run, this will be a serverless application (meaning you will only pay for what you use in terms of resources). Here are some steps to follow to make sure your instances run smoothly and without errors.
-1. In your Google Cloud Run dashboard, click the 'revisions' tab.
-2. Click on the option to 'Edit & Deploy a New Revision'
-3. Update the resource allocation to 16GiB and 4 Cores (the min cores you're allowed with 16GiB). Assigning the instance a greater amount of memory will often have greater impact on python code. By default it won't use multiple cores.
-4. Scroll down to where it says 'Request timeout'. The default will be set to 300 seconds. Set it to the max (3600 seconds). This will make sure, like we did with the gunicorn server, that the application won't be stopped halfway through crunching some numbers.
-5. You'll also need to set max instances to 12. Google doesn't like handing over that much computing power in one go...
-6. CURRENTLY, YOU'LL HAVE TO MANUALLY DO THIS EVERY TIME YOU DEPLOY. AT TIME OF WRITING ZEET DOES NOT YET HAVE A FEATURE TO AUTOMATE THIS.
+By now, if you've followed all the steps, you should have a fully deployed version of the application live on your chosen IaaS account. If you have used Google Cloud Run, this will be a serverless application (meaning you will only pay for what you use in terms of resources). Here are some steps to follow to make edits to the instances once it's deployed.
+1. In your Google Cloud account, select the project that you're working in.
+2. Find Google Cloud Run using the search bar or the side tab.
+3. In your Google Cloud Run dashboard for your project, click the 'revisions' tab.
+4. Click on the option to 'Edit & Deploy a New Revision'.
 
 
 ### DEPLOYMENT PART 6: OPTIMISING PERFORMANCE
