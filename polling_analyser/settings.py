@@ -210,12 +210,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CELERY_RESULT_BACKEND = os.environ['REDIS']
 
 # ||||||||||||||||| UN-COMMENT FOR NORMAL OPERATIONS ||||||||||||||||
-# CELERY_BROKER_URL = "redis://localhost:6379"
-# CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
 
 # ||||||||||||||||| UN-COMMENT FOR UNIT TEST |||||||||||||||||
-CELERY_TASK_ALWAYS_EAGER = True
-CELERY_TASK_EAGER_PROPAGATES = True
+# CELERY_TASK_ALWAYS_EAGER = True
+# CELERY_TASK_EAGER_PROPAGATES = True
 
 # Settings for SMTP email service for user notifications
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
