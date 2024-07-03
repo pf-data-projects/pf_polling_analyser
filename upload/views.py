@@ -224,6 +224,7 @@ def upload_csv(request):
             # ~~~~~~~~~~~~~~~~~~~~~~~ convert data to python-readable formats
             data = pd.read_excel(data_file, header=0, sheet_name="Sheet1")
             data.columns = [preprocess_header(col) for col in data.columns]
+            data = strip_whitespace(data)
             if 'weighted_respondents' not in data.columns:
                 return HttpResponse('No weights found. Please weight your data first.')
 
@@ -416,3 +417,10 @@ def check_task_status(request):
         'details': 'Result ready to download' if task_result.ready() else task_result.info,
         'result': 'Result ready to download' if task_result.ready() else "still working..."
     })
+
+
+def strip_whitespace(df):
+    """
+    A helper function to clear data of whitespace.
+    """
+    return df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
