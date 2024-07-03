@@ -410,3 +410,10 @@ By now, if you've followed all the steps, you should have a fully deployed versi
 Here are some things you can do to ensure that the cloud-hosted version runs as efficiently as possible.
 1. Remove any print statements from the application (print statements have negligible effect locally, but on GCP they can slow things down due to the platform's own logging feature recording printed data).
 2. Remove any pandas to_csv() statements that are not essential to the logic of the application.
+
+
+### Third party libraries and dependencies
+* Pandas
+* Numpy
+* Django
+

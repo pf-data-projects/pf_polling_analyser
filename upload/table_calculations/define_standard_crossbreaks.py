@@ -14,6 +14,11 @@ CROSSBREAKS = {
         "West Midlands", "East Midlands", "Yorkshire and the Humber",
         "North West", "North East", "Scotland", "Wales", "Northern Ireland"
     ],
+    "region_gb": [
+        "London", "South East", "South West", "East of England",
+        "West Midlands", "East Midlands", "Yorkshire and the Humber",
+        "North West", "North East", "Scotland", "Wales",
+    ],
     "seg": ['AB', 'C1', 'C2', 'DE'],
     "children": ["Yes", "No"],
     "children(updated)": [
@@ -79,6 +84,7 @@ QUESTIONS = {
     "gender": "Which of the following best describes how you think of yourself?",
     "age" : "How old are you?",
     "region": "In what region of the UK do you live?",
+    "region_gb": "In what region of the UK do you live?",
     "seg": "Think about the Chief Income Earner in your household",
     "children": "Do you have any children under the age of 18 living at home?",
     "children(updated)": "Do you have any children? If so, how old are they?",
