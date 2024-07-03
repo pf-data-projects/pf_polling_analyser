@@ -403,10 +403,16 @@ def create_workbook(
                 ws[excel_coord] = "Age"
                 ws.merge_cells(f"{excel_coord}:{excel_coord2}")
             if "London" in cols:
-                excel_coord = get_header_coords("London", trimmed_data)
-                excel_coord2 = get_header_coords("Northern Ireland", trimmed_data)
-                ws[excel_coord] = "Region"
-                ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+                if "Northern Ireland" in cols:
+                    excel_coord = get_header_coords("London", trimmed_data)
+                    excel_coord2 = get_header_coords("Northern Ireland", trimmed_data)
+                    ws[excel_coord] = "Region"
+                    ws.merge_cells(f"{excel_coord}:{excel_coord2}")
+                else:
+                    excel_coord = get_header_coords("London", trimmed_data)
+                    excel_coord2 = get_header_coords("Wales", trimmed_data)
+                    ws[excel_coord] = "Region"
+                    ws.merge_cells(f"{excel_coord}:{excel_coord2}")        
             if "AB" in cols:
                 excel_coord = get_header_coords("AB", trimmed_data)
                 excel_coord2 = get_header_coords("DE", trimmed_data)

@@ -38,8 +38,8 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
             has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
             if question['qid'] not in checked:
                 if has_nan_rows:
-                    header_data[question['qid']] = {} 
-                    
+                    header_data[question['qid']] = {}
+
                     sum_figures = find_sums_for_multi(results, results, question['qid'])
                     if sum_figures is not None:
                         header_data[question['qid']]['Total'] = sum_figures
@@ -239,7 +239,7 @@ def find_sums_for_multi(filtered_df, results, question_id):
     has_nan_rows = (checkbox_cols == 'nan').all(axis=1).any()
     if has_nan_rows:
         non_nan_count = (checkbox_cols != 'nan').any(axis=1).sum()
-        print("question", question_id, int(non_nan_count))
+        # print("question", question_id, int(non_nan_count))
         sum1 = int(non_nan_count)
 
     qid_columns = helpers.col_with_qid(results, question_id)

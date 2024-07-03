@@ -252,7 +252,7 @@ def upload_csv(request):
             question_data = question_data.to_csv(index=False)
             email = request.user.email
             table = handle_crossbreaks.delay(
-                email, data, question_data, 
+                email, data, question_data,
                 standard_cb, non_standard_cb
             )
 
