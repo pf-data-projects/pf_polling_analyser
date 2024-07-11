@@ -91,12 +91,13 @@ def weight_data(request):
                 weight_proportions = pd.read_excel(
                     weight_proportions, header=0, sheet_name="Sheet1"
                 )
-            apply = form.cleaned_data['apply_weights']
-            custom = form.cleaned_data['custom_weights']
+            process = form.cleaned_data['select_process']
+            # apply = form.cleaned_data['apply_weights']
+            # custom = form.cleaned_data['custom_weights']
             standard_weights = form.cleaned_data['standard_weights']
             groups = []
             questions = []
-            if custom and formset.is_valid():
+            if process == "cust_weight" and formset.is_valid():
                 if len(formset) < 1:
                     return HttpResponse(
                         "Error: Please specify your custom weights in the form."
@@ -105,13 +106,13 @@ def weight_data(request):
                     groups.append(sub_form.cleaned_data['group'])
                     questions.append(sub_form.cleaned_data['question'])
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for standard weights
-            if apply and not custom:
+            if process == "weight":
                 weighted_data = handle_weight_errors(
                     wgt.run_weighting, survey_data,
                     weight_proportions
                 )
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for custom weights
-            elif custom:
+            elif process == "cust_weight":
                 weighted_data = handle_weight_errors(
                     wgt.apply_custom_weight,
                     survey_data, weight_proportions,
@@ -119,7 +120,7 @@ def weight_data(request):
                     standard_weights=standard_weights
                 )
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for no weights
-            else:
+            elif process == "none":
                 weighted_data = wgt.apply_no_weight(survey_data)
             # ~~~~~~~~~ Cache the weighted data to be downloaded by user later
             excel_buffer = BytesIO()
