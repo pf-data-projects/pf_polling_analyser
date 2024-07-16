@@ -134,12 +134,25 @@ def scan_table(request):
         if form.is_valid():
             # ~~~~~~~~~~~~~~~~~~~ Fetches data from form & converts them to df
             table_data = request.FILES['data_file']
+            filename = table_data.name
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Input validation for data upload.
+            if "crossbreaks_data" not in filename:
+                messages.error(
+                request,
+                """
+                Invalid form data was submitted.
+                The file you uploaded did not have the name
+                "crossbreaks_data" and was rejected.
+                """
+                )
+                return redirect('home')
             table_data = pd.read_csv(table_data, encoding="utf-8-sig")
             # ~~~ Filters df to get only questions that have true rebase value
             filtered_df = table_data[
                 (table_data['Base Type'] == 'Question')
             ]
-            filtered_df = filtered_df[filtered_df['Rebase comment needed'].isin(['TRUE', 'True'])]
+            filtered_df = filtered_df[
+                filtered_df['Rebase comment needed'].isin(['TRUE', 'True'])]
             filtered_df.set_index('IDs', inplace=True)
 
             # ~~~~~~~~~~~~~~~~ remove html tags from questions for rebase form

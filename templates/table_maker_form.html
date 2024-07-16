@@ -20,11 +20,20 @@
                         {{ form }}
                     </fieldset>
                 {% endfor %}
-                <button class="btn btn-dark btn-spacing" type="submit">Run table-maker</button>
             </div>
         </div>
     </form>
-    <p><a class="btn btn-dark btn-spacing" href="{% url 'home' %}">Back</a></p>
+    <di class="row">
+        <div class="col-12 col-md-2 col-xl-2">
+            <button class="btn btn-dark btn-spacing" type="submit">Generate tables</button>
+        </div>
+        <div class="col-12 col-md-2 col-xl-1">
+            <p><a class="btn btn-dark btn-spacing" href="{% url 'home' %}">Back</a></p>
+        </div>
+        <div class="col-12 col-md-8 col-xl-9">
+            <!--empty column here to keep buttons on left side of form card-->
+        </div>
+    </div>
 </div>
 <script src="{% static 'js/addFormToStorage.js' %}"></script>
 
