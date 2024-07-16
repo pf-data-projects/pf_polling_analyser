@@ -51,8 +51,20 @@ def table_maker_form(request, arg1):
         if not form.is_valid():
             cache.set("test", form.errors, 300)
         if form.is_valid() and formset.is_valid():
-            # ~~~~~~~~~~~~~~~~~~~ Fetches data from form & converts them to df
+            # ~~~~~~~~~~~~~~~~~~~ Fetches data from form & converts them to df.
             table_data = request.FILES['data_file']
+            filename = table_data.name
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Input validation for data re-upload.
+            if "crossbreaks_data" not in filename:
+                messages.error(
+                request,
+                """
+                Invalid form data was submitted.
+                The file you uploaded did not have the name
+                "crossbreaks_data" and was rejected.
+                """
+                )
+                return redirect('home')
             table_data = pd.read_csv(table_data)
             rebased_headers = request.FILES['rebased_header_file']
             rebased_headers = json.load(rebased_headers)
@@ -61,7 +73,7 @@ def table_maker_form(request, arg1):
             start = form.cleaned_data['start']
             end = form.cleaned_data['end']
             id_column = form.cleaned_data['id_column']
-            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fetches data from formset
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fetches data from formset.
             edited_comments = []
             j = 0
             for sub_form in formset:

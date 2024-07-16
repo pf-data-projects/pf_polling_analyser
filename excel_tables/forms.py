@@ -19,10 +19,10 @@ from django import forms
 class TableUploadForm(forms.Form):
     """
     A class to handle the upload of the calculated table so
-    that it can be scanned to prompt user
+    that it can be scanned to prompt user.
     """
     data_file = forms.FileField(
-        label='Upload The Table',
+        label="Upload The results again (crossbreaks_data.csv)",
         validators=[],
         required=True
     )
