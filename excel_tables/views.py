@@ -57,12 +57,12 @@ def table_maker_form(request, arg1):
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Input validation for data re-upload.
             if "crossbreaks_data" not in filename:
                 messages.error(
-                request,
-                """
-                Invalid form data was submitted.
-                The file you uploaded did not have the name
-                "crossbreaks_data" and was rejected.
-                """
+                    request,
+                    """
+                    Invalid form data was submitted.
+                    The file you uploaded did not have the name
+                    "crossbreaks_data" and was rejected.
+                    """
                 )
                 return redirect('home')
             table_data = pd.read_csv(table_data)
@@ -88,15 +88,29 @@ def table_maker_form(request, arg1):
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run table maker modules
             trimmed = trim_table(table_data, start, end, edited_comments)
             if trimmed is False:
-                return HttpResponse(
-                    "Invalid start or end ID."
+                messages.error(
+                    request,
+                    """
+                    Invalid submission. 
+                    The start and end question IDs you selected for this
+                    table don't exist in the survey.
+                    Please double check and try again.
+                    """
                 )
+                return redirect('home')
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create/cache excel tables/title
-            cache_key = create_workbook(
-                request, trimmed[0], trimmed[1], trimmed[2], trimmed[3],
-                title, dates, edited_comments, start, end,
-                id_column, rebased_headers
-            )
+            try:
+                cache_key = create_workbook(
+                    request, trimmed[0], trimmed[1], trimmed[2], trimmed[3],
+                    title, dates, edited_comments, start, end,
+                    id_column, rebased_headers
+                )
+            except Exception as e:
+                messages.error(
+                    request,
+                    f"There was an error creating your tables: {e}"
+                )
+                return redirect('home')
             unique_id = "title_for_user_" + str(request.user.id)
             cache.set(unique_id, title, 3600)
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ auto-download for the excel tables
@@ -110,7 +124,7 @@ def table_maker_form(request, arg1):
         else:
             messages.error(
                 request,
-                "Invalid form data was submitted. please try again"
+                "Invalid form data was submitted. Please try again."
             )
             return redirect('home')
     else:
