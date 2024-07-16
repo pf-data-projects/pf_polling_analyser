@@ -91,20 +91,21 @@ def table_maker_form(request, arg1):
                 return HttpResponse(
                     "Invalid start or end ID."
                 )
-            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create and cache excel tables
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create/cache excel tables/title
             cache_key = create_workbook(
                 request, trimmed[0], trimmed[1], trimmed[2], trimmed[3],
-                title, dates, edited_comments, start, end, 
+                title, dates, edited_comments, start, end,
                 id_column, rebased_headers
             )
             unique_id = "title_for_user_" + str(request.user.id)
+            cache.set(unique_id, title, 3600)
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ auto-download for the excel tables
             excel_data = cache.get(cache_key)
             response = HttpResponse(
                 excel_data,
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
-            response['Content-Disposition'] = f'attachment; filename="{title}.xlsx"'
+            response['Content-Disposition'] = f'attachment; filename="Public First Poll For {title}.xlsx"'
             return response
         else:
             messages.error(
@@ -193,18 +194,19 @@ def scan_table(request):
 
 def download_tables(request):
     """
-    Handles retrieval of cached weighted data.
+    Handles retrieval of cached tables.
     """
     unique_id = "tables_for_user_" + str(request.user.id)
     unique_title = "title_for_user_" + str(request.user.id)
     excel_data = cache.get(unique_id)
     title = cache.get(unique_title)
+    print(title)
     if excel_data:
         response = HttpResponse(
             excel_data,
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response['Content-Disposition'] = f'attachment; filename="{title}.xlsx"'
+        response['Content-Disposition'] = f'attachment; filename="Public First Poll For {title}.xlsx"'
         messages.success(request, "Downloading tables...")
         return response
     else:

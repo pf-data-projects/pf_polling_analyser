@@ -22,18 +22,18 @@
                 {% endfor %}
             </div>
         </div>
+        <div class="row">
+            <div class="col-12 col-md-2 col-xl-2">
+                <button class="btn btn-dark btn-spacing" type="submit">Generate tables</button>
+            </div>
+            <div class="col-12 col-md-2 col-xl-1">
+                <p><a class="btn btn-dark btn-spacing" href="{% url 'home' %}">Back</a></p>
+            </div>
+            <div class="col-12 col-md-8 col-xl-9">
+                <!--empty column here to keep buttons on left side of form card-->
+            </div>
+        </div>
     </form>
-    <di class="row">
-        <div class="col-12 col-md-2 col-xl-2">
-            <button class="btn btn-dark btn-spacing" type="submit">Generate tables</button>
-        </div>
-        <div class="col-12 col-md-2 col-xl-1">
-            <p><a class="btn btn-dark btn-spacing" href="{% url 'home' %}">Back</a></p>
-        </div>
-        <div class="col-12 col-md-8 col-xl-9">
-            <!--empty column here to keep buttons on left side of form card-->
-        </div>
-    </div>
 </div>
 <script src="{% static 'js/addFormToStorage.js' %}"></script>
 

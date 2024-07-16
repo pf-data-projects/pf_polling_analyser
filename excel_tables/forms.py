@@ -29,18 +29,18 @@ class TableUploadForm(forms.Form):
     rebased_header_file = forms.FileField(
         label="""
         Upload the data for the rebased headers. 
-        Download this from the home page if you haven't already.
+        Download this from the home page if you haven't already
         """,
         required=True
     )
     title = forms.CharField(
-        label="Title you want to give to the survey",
+        label="Project title/client name",
         required=True,
     )
     dates = forms.CharField(
         label="""
         Please specify the dates in which this 
-        survey was in the field.
+        survey was in the field
         """,
         required=True
     )
