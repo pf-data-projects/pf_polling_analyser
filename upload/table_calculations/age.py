@@ -1,9 +1,15 @@
+"""
+This module contains functions used to handle the flow of function calls
+needed to calculate/rebase the categories within the age crossbreak.
+"""
+
 import pandas as pd
 
 from . import define_standard_crossbreaks as cb
 from . import helpers
 from . import calc
 from .rebase import rebase
+
 
 def calc_age(category, col_index, table, question_list, results, question_data):
     """
@@ -24,6 +30,7 @@ def calc_age(category, col_index, table, question_list, results, question_data):
     # print(category[0], "done!")
     return table
 
+
 def age_rebase(category, col_index, table, question_list, results, question_data):
     """
     Filters the results and then passes
@@ -38,6 +45,7 @@ def age_rebase(category, col_index, table, question_list, results, question_data
 
     table = rebase(question_data, filtered_df, question_list, table, col_index)
     return table
+
 
 def iterate_age_brackets(table, question_list, results, question_data):
     """ 
@@ -78,6 +86,7 @@ def iterate_age_brackets(table, question_list, results, question_data):
             question_data
         )
     return table
+
 
 def iterate_age_rebase(table, question_list, results, question_data):
     """ 
