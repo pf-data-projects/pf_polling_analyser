@@ -146,6 +146,13 @@ def run_weighting(survey_data, weight_proportions,
     ipf_result = ipf(survey_subset, weight_proportions)
     # ~~~~~~~~~~ Join weight column from ipf_result to the original survey_data
     survey_data['weighted_respondents'] = ipf_result['weight']
+    # adjust weighted respondents so that they add up to total respondents.
+    respondent_count = len(survey_data)
+    weighted_count = survey_data['weighted_respondents'].sum()
+    ratio = respondent_count / weighted_count
+    survey_data[
+        'weighted_respondents_adjusted_to_correct_total'
+    ] = survey_data['weighted_respondents'] * ratio
     return survey_data
 
 
@@ -246,4 +253,11 @@ def apply_custom_weight(survey_data, weight_proportions, questions, groups, stan
 
     ipf_result = custom_ipf(survey_subset, weight_proportions)
     survey_data['weighted_respondents'] = ipf_result['weight']
+    # adjust weighted respondents so that they add up to total respondents.
+    respondent_count = len(survey_data)
+    weighted_count = survey_data['weighted_respondents'].sum()
+    ratio = respondent_count / weighted_count
+    survey_data[
+        'weighted_respondents_adjusted_to_correct_total'
+    ] = survey_data['weighted_respondents'] * ratio
     return survey_data

@@ -36,6 +36,12 @@ CB_OPTIONS = (
     ('voting_intention', 'Voting Intention')
 )
 
+PROCESSES = (
+    ("weight", "Standard Weighting"),
+    ("cust_weight", "Custom Weighting"),
+    ("none", "No Weighting"),
+)
+
 STANDARD_WEIGHTS = (
     ('seg', 'Socio-economic Grade'),
     ('region', 'Region'),
@@ -118,19 +124,28 @@ class WeightForm(forms.Form):
         validators=[],
         required=False
     )
-    apply_weights = forms.BooleanField(
-        label="Weight the data with standard weighting:",
-        required=False
+    select_process = forms.ChoiceField(
+        label="""
+        Please select whether you would like to apply
+        the standard weights, custom weights, or no weights at all.
+        """,
+        choices=PROCESSES,
+        widget=forms.RadioSelect
     )
-    custom_weights = forms.BooleanField(
-        label="Customise your weights:",
-        help_text="Don't check this unless you're using custom weights",
-        required=False
-    )
+    # apply_weights = forms.BooleanField(
+    #     label="Weight the data with standard weighting:",
+    #     required=False
+    # )
+    # custom_weights = forms.BooleanField(
+    #     label="Customise your weights:",
+    #     help_text="Don't check this unless you're using custom weights",
+    #     required=False
+    # )
     standard_weights = forms.MultipleChoiceField(
         label="""
         Do you want to include any standard weights 
         in the custom weighting process?
+        (THIS FIELD IS UNNECESSARY IF YOU ARE DOING STANDARD WEIGHTS)
         """,
         choices=STANDARD_WEIGHTS,
         widget=forms.CheckboxSelectMultiple,
