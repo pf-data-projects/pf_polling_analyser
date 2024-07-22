@@ -31,6 +31,7 @@ def create_blank_table(question_data, standard_cb, non_standard_cb):
         'Base Type': ["Total", "Weighted"],
         'Answers': ["Total", "Weighted",],
         'Rebase comment needed': ["Total", "Weighted",],
+        'Randomised': ["Total", "Weighted"],
         'Total': [0, 0,],
     }
 
@@ -64,6 +65,9 @@ def create_blank_table(question_data, standard_cb, non_standard_cb):
         table['Rebase comment needed'].append(
             f'{questions.iloc[j, 4]}'
         )
+        table['Randomised'].append(
+            f'{questions.iloc[j, 5]}'
+        )
         table['Types'].append(
             f'{questions.iloc[j, 2]}'
         )
@@ -76,7 +80,8 @@ def create_blank_table(question_data, standard_cb, non_standard_cb):
 
     list_zeros = [0] * len(table['Answers'])
     protected_keys = [
-        'Answers', 'IDs', 'Types', 'Rebase comment needed', 'Base Type'
+        'Answers', 'IDs', 'Types', 'Rebase comment needed', 'Base Type',
+        'Randomised'
     ]
     for key, value in table.items():
         if key not in protected_keys:

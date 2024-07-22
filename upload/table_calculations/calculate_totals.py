@@ -61,15 +61,15 @@ def table_calculation(self, results, question_data, standard_cb, non_standard_cb
         if question['qid'] == "Weighted":
             continue
         # adds the total respondents to table
-        table.iat[0, 5] = len(results.index)
-        table.iat[1, 5] = results['weighted_respondents'].astype(float).sum()
+        table.iat[0, 6] = len(results.index)
+        table.iat[1, 6] = results['weighted_respondents'].astype(float).sum()
 
         # ~~~~~~~~~~~~~ Calculates responses for checkbox/multiselect questions
         self.update_state(
             state='PROGRESS',
             meta={'Totals': 'Calculating totals'}
         )
-        table = calc(results, 5, table, question, results, question_data, True)
+        table = calc(results, 6, table, question, results, question_data, True)
 
     # calculations for standard crossbreaks
     k = 0
@@ -159,11 +159,11 @@ def table_calculation(self, results, question_data, standard_cb, non_standard_cb
     # table.loc[1, numeric_cols] = table.loc[1, numeric_cols] * adjustment_ratio
 
     # Display all values as a percentage of the total for each crossbreak.
-    weighted_totals = table.iloc[1, 5:]
-    table.iloc[2:, 5:] = table.iloc[2:, 5:].div(weighted_totals) * 100
+    weighted_totals = table.iloc[1, 6:]
+    table.iloc[2:, 6:] = table.iloc[2:, 6:].div(weighted_totals) * 100
 
     # Get rebased values for totals column.
-    table = rebase(question_data, results, question_list, table, 5)
+    table = rebase(question_data, results, question_list, table, 6)
     # print("main rebase done")
 
     # rebase calculations for standard crossbreaks

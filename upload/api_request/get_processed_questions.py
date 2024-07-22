@@ -25,6 +25,7 @@ def extract_data_from_question_objects(question_list):
     question_types = []
     question_titles = []
     question_rebase = []
+    question_sort = []
 
     # makes previous question data available to
     # question in a loop.
@@ -40,6 +41,16 @@ def extract_data_from_question_objects(question_list):
                 question_rebase.append(False)
         else:
             question_rebase.append('N/A')
+
+        # checks if the question has randomised answer order
+        if 'option_sort' in question['properties']:
+            randomised = question['properties']['option_sort'] == 'SHUFFLE'
+            if randomised and question["type"] == 'RADIO':
+                question_sort.append(True)
+            else:
+                question_sort.append(False)
+        else:
+            question_sort.append(False)
 
         # adds data from json dictionary to the lists
         question_ids.append(question['id'])
@@ -74,18 +85,29 @@ def extract_data_from_question_objects(question_list):
                     question_types.append(question['type'])
                     question_titles.append(option['title']['English'])
                     question_rebase.append(False)
+                    question_sort.append(False)
                     for i in range(len(question['options'])):
                         question_ids.append(question['id'])
                         question_texts.append('sub_option')
                         question_types.append(question['type'])
                         question_titles.append(i + 1)
                         question_rebase.append(False)
+                        question_sort.append(False)
+
                 else:
                     question_ids.append(question['id'])
                     question_texts.append('Option')
                     question_types.append(question['type'])
                     question_titles.append(option['title']['English'])
                     question_rebase.append(False)
+                    if 'option_sort' in question['properties']:
+                        randomised = question['properties']['option_sort'] == 'SHUFFLE'
+                        if randomised and question["type"] == 'RADIO':
+                            question_sort.append(True)
+                        else:
+                            question_sort.append(False)
+                    else:
+                        question_sort.append(False)
 
         # checks if the question has subquestions
         # and adds their data to the lists.
@@ -101,6 +123,7 @@ def extract_data_from_question_objects(question_list):
                 question_texts.append(f"sub_{sub_question['base_type']}")
                 question_types.append(f"{question['type']} | {sub_question['type']}")
                 question_titles.append(sub_question['title']['English'])
+                question_sort.append(False)
 
                 # checks if the subquestion has options and
                 # adds their data to the lists
@@ -111,6 +134,8 @@ def extract_data_from_question_objects(question_list):
                         question_types.append(f"{question['type']} | {sub_question['type']}")
                         question_titles.append(option['title']['English'])
                         question_rebase.append(False)
+                        question_sort.append(False)
+
 
         # Code to handle edge case where a table question relies on options
         # of a question immediately before it.
@@ -156,21 +181,27 @@ def extract_data_from_question_objects(question_list):
                 question_titles.append(sub_question['title']['English'])
                 question_types.append(f"{question['type']} | RADIO")
                 question_rebase.append(False)
+                question_sort.append(False)
+
                 for option in question['options']:
                     question_ids.append(question['id'])
                     question_texts.append('sub_option')
                     question_types.append(f"{question['type']} | RADIO")
                     question_titles.append(option['title']['English'])
                     question_rebase.append(False)
+                    question_sort.append(False)
 
 
     # creates a dataframe from the lists and outputs to csv
+    print(len(question_ids))
+    print(len(question_sort))
     question_dict = {
         'question_id': question_ids,
         'question_text': question_texts,
         'question_type': question_types,
         'question_title': question_titles,
-        'question_rebase': question_rebase
+        'question_rebase': question_rebase,
+        'question_sort': question_sort
     }
     question_data = pd.DataFrame(question_dict)
 

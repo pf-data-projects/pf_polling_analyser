@@ -157,7 +157,7 @@ def calc(filtered_df, col_index, table, question, results, question_data, is_tot
                     if len(position) > 0:
                         position_int = int(position[0])
                         if is_total:
-                            table.iat[position_int, 5] = len(second_filtered_df.index)
+                            table.iat[position_int, col_index] = len(second_filtered_df.index)
                         else:
                             table.iat[position_int, col_index] = len(second_filtered_df.index)
                             table.iat[position_int, col_index] = second_filtered_df['weighted_respondents'].astype(float).sum()
