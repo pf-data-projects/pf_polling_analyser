@@ -13,6 +13,7 @@ from .define_non_standard_cb import calc_crossbreak, rebase_crossbreak
 from .calc import calc
 from .rebase import rebase
 from .rebase_headers import rebase_headers
+from .reorder import sort_answers
 
 
 def table_calculation(self, results, question_data, standard_cb, non_standard_cb):
@@ -251,5 +252,7 @@ def table_calculation(self, results, question_data, standard_cb, non_standard_cb
     rebased_json = json.dumps(rebased_header_data)
     cache_key = 'rebase_json'
     cache.set(cache_key, rebased_json, 300)
+
+    table = sort_answers(table)
 
     return [table, rebased_json]
