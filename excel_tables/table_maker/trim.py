@@ -27,7 +27,8 @@ def trim_table(data, start, end, comments):
     """
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ get rid of randomised column
 
-    data = data.drop("Randomised", axis=1)
+    if "Randomised" in data.columns:
+        data = data.drop("Randomised", axis=1)
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ remove any html tags from questions
     data["Answers"] = data["Answers"].str.replace(
