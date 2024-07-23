@@ -25,7 +25,7 @@ def sort_answers(df):
         # print(qid_df)
 
         # Check if the question has the value 'TRUE' in the 'Randomised' column
-        if qid_df['Randomised'].iloc[0] == 'True':
+        if qid_df['Randomised'].iloc[0] == 'True' or qid_df['Types'].iloc[0] == 'CHECKBOX':
             print("The statement is true")
             # Separate "Question" rows to keep them at the top
             question_rows = qid_df[(qid_df['Base Type'] == 'Question')]
@@ -36,11 +36,13 @@ def sort_answers(df):
 
             # Ensure "None of the above" and "Don't know" are at the bottom
             none_above = sorted_other_rows[sorted_other_rows['Answers'] == 'None of the above']
-            dont_know = sorted_other_rows[sorted_other_rows['Answers'] == "Don't know"]
+            # dont_know = sorted_other_rows[sorted_other_rows['Answers'] == "Don't know"]
+            dont_know = sorted_other_rows[sorted_other_rows['Answers'].isin(
+                ["Don't know", "Don’t know", "Don't Know"])]
 
             # Filter out "None of the above" and "Don't know" from the main sorted dataframe
             sorted_other_rows = sorted_other_rows[~sorted_other_rows['Answers'].isin(
-                ['None of the above', "Don't know"])]
+                ['None of the above', "Don't know", "Don’t know", "Don't Know"])]
 
             # Append "None of the above" and "Don't know" back at the bottom
             sorted_other_rows = pd.concat([sorted_other_rows, none_above, dont_know])
