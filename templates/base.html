@@ -24,6 +24,14 @@
         <!--Custom CSS-->
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
         <title>Polling Analyser</title>
+        <script>
+          function toggleCheckboxes(action) {
+              var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+              checkboxes.forEach(function(checkbox) {
+                  checkbox.checked = (action === 'select');
+              });
+          }
+        </script>
     </head>
     <body>
         <!--~~~~~~~~~~~~~~~~~~~Navigation~~~~~~~~~~~~~~~~~~~-->
