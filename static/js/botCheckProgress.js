@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (progressElement) {
             // Convert the JSON object to a string for display
             if (data.status === "No bot checks have been run yet") {
-              console.log("nope")
+              // console.log("nope")
               progressElement.textContent = "No checks are currently running"
             }
             else if (data.status === "PROGRESS" && "question" in data.details) {
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             else if (data.status === "PENDING") {
               progressElement.textContent = "Waiting for checks to start..."
-              console.log(data)
+              // console.log(data)
             }
             else if (data.status === "SUCCESS") {
               progressElement.textContent = "Data processing complete. Please download your files!"
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
               firstWrapper.style.border = "none"
               secondWrapper.style.height = "0px"
               secondWrapper.style.border = "none"
-              console.log("COMPLETED")
+              // console.log("COMPLETED")
             }
             else if (data.status === "FAILURE") {
               console.log(data)
@@ -73,14 +73,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             }
             else {
-              console.log("This one is always triggering")
+              // console.log("This one is always triggering")
               progressElement.textContent = JSON.stringify(data, null, 2);
             }
         }
   
         // Depending on your requirements, you may want to stop polling when the task completes
         if (data.status === 'SUCCESS' || data.status === 'FAILURE') {
-          console.log('Task completed or failed:', data);
+          // console.log('Task completed or failed:', data);
           clearInterval(pollingInterval); // Stop polling
         }
       })

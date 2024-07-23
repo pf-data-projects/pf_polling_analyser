@@ -11,6 +11,7 @@ from . import helpers
 from . import calc
 from .rebase import rebase
 
+
 def calc_crossbreak(table, question_list, results, question_data, crossbreak):
     """
     This function filters the results for the crossbreak
@@ -26,6 +27,7 @@ def calc_crossbreak(table, question_list, results, question_data, crossbreak):
             table.iat[1, col_index] = filtered_df['weighted_respondents'].astype(float).sum()
             table = calc.calc(filtered_df, col_index, table, question, results, question_data, False)
     return table
+
 
 def rebase_crossbreak(table, question_list, results, question_data, crossbreak):
     """

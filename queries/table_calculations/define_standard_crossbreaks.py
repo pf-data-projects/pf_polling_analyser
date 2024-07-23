@@ -6,6 +6,7 @@ from . import calc
 from . import helpers
 from .rebase import rebase
 
+
 CROSSBREAKS = {
     "gender": ["Male", "Female"],
     "age": ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"],
@@ -75,6 +76,7 @@ CROSSBREAKS = {
     ]
 }
 
+
 QUESTIONS = {
     "gender": "Which of the following best describes how you think of yourself?",
     "age" : "How old are you?",
@@ -103,6 +105,7 @@ def calc_standard(value, col_index, cb_question, table, question_list, results, 
         table.iat[1, col_index] = filtered_df['weighted_respondents'].astype(float).sum()
         table = calc.calc(filtered_df, col_index, table, question, results, question_data, False)
     return table
+
 
 def rebase_standard(value, col_index, cb_question, table, question_list, results, question_data):
     """

@@ -19,28 +19,28 @@ from django import forms
 class TableUploadForm(forms.Form):
     """
     A class to handle the upload of the calculated table so
-    that it can be scanned to prompt user
+    that it can be scanned to prompt user.
     """
     data_file = forms.FileField(
-        label='Upload The Table',
+        label="Upload The results again (crossbreaks_data.csv)",
         validators=[],
         required=True
     )
     rebased_header_file = forms.FileField(
         label="""
         Upload the data for the rebased headers. 
-        Download this from the home page if you haven't already.
+        Download this from the home page if you haven't already
         """,
         required=True
     )
     title = forms.CharField(
-        label="Title you want to give to the survey",
+        label="Project title/client name",
         required=True,
     )
     dates = forms.CharField(
         label="""
         Please specify the dates in which this 
-        survey was in the field.
+        survey was in the field
         """,
         required=True
     )

@@ -1,4 +1,7 @@
-import pandas as pd
+"""
+This module contains functions used to handle the flow of function calls
+needed to calculate/rebase the categories within the seg crossbreak.
+"""
 
 from . import define_standard_crossbreaks as cb
 from . import helpers
@@ -27,25 +30,24 @@ SEG_MAPPING = {
         ],
     }
 
+
 def calc_seg(category, col_index, table, question_list, results, question_data):
     """
     A function to run table calculations
     for gender crossbreaks.
     """
-
     seg_q = 'Think about the Chief Income Earner in your household'
     for question in question_list:
         get_seg = results[helpers.col_substr_partial(results, seg_q)]
         contains = get_seg.iloc[:, 0].isin(category)
         filtered_df = results[contains]
-        # filtered_df = results.loc[(results[get_seg.columns[0]] == category)]
         table.iat[0, col_index] = len(filtered_df.index)
         table.iat[1, col_index] = filtered_df['weighted_respondents'].astype(float).sum()
 
         table = calc.calc(filtered_df, col_index, table, question, results, question_data, False)
 
-    # print(category, "done!")
     return table
+
 
 def seg_rebase(category, col_index, table, question_list, results, question_data):
     """
@@ -59,6 +61,7 @@ def seg_rebase(category, col_index, table, question_list, results, question_data
 
     table = rebase(question_data, filtered_df, question_list, table, col_index)
     return table
+
 
 def iterate_seg(table, question_list, results, question_data):
     """
@@ -83,6 +86,7 @@ def iterate_seg(table, question_list, results, question_data):
             iteration['col'], table, question_list, results, question_data
             )
     return table
+
 
 def iterate_seg_rebase(table, question_list, results, question_data):
     """

@@ -8,8 +8,17 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <button class="btn btn-dark btn-spacing" type="submit">Scan table</button>
+        <div class="row">
+            <div class="col-12 col-md-2 col-xl-2">
+                <button class="btn btn-dark btn-spacing" type="submit">Scan table</button>
+            </div>
+            <div class="col-12 col-md-2 col-xl-1">
+                <p><a class="btn btn-dark btn-spacing" href="{% url 'home' %}">Back</a></p>
+            </div>
+            <div class="col-12 col-md-8 col-xl-9">
+                <!--empty column here to keep buttons on left side of form card-->
+            </div>
+        </div>
     </form>
-    <p><a class="btn btn-dark btn-spacing" href="{% url 'home' %}">Back</a></p>
 </div>
 {% endblock %}

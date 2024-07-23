@@ -51,8 +51,20 @@ def table_maker_form(request, arg1):
         if not form.is_valid():
             cache.set("test", form.errors, 300)
         if form.is_valid() and formset.is_valid():
-            # ~~~~~~~~~~~~~~~~~~~ Fetches data from form & converts them to df
+            # ~~~~~~~~~~~~~~~~~~~ Fetches data from form & converts them to df.
             table_data = request.FILES['data_file']
+            filename = table_data.name
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Input validation for data re-upload.
+            if "crossbreaks_data" not in filename:
+                messages.error(
+                    request,
+                    """
+                    Invalid form data was submitted.
+                    The file you uploaded did not have the name
+                    "crossbreaks_data" and was rejected.
+                    """
+                )
+                return redirect('home')
             table_data = pd.read_csv(table_data)
             rebased_headers = request.FILES['rebased_header_file']
             rebased_headers = json.load(rebased_headers)
@@ -61,7 +73,7 @@ def table_maker_form(request, arg1):
             start = form.cleaned_data['start']
             end = form.cleaned_data['end']
             id_column = form.cleaned_data['id_column']
-            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fetches data from formset
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fetches data from formset.
             edited_comments = []
             j = 0
             for sub_form in formset:
@@ -76,28 +88,43 @@ def table_maker_form(request, arg1):
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run table maker modules
             trimmed = trim_table(table_data, start, end, edited_comments)
             if trimmed is False:
-                return HttpResponse(
-                    "Invalid start or end ID."
+                messages.error(
+                    request,
+                    """
+                    Invalid submission. 
+                    The start and end question IDs you selected for this
+                    table don't exist in the survey.
+                    Please double check and try again.
+                    """
                 )
-            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create and cache excel tables
-            cache_key = create_workbook(
-                request, trimmed[0], trimmed[1], trimmed[2], trimmed[3],
-                title, dates, edited_comments, start, end, 
-                id_column, rebased_headers
-            )
+                return redirect('home')
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ create/cache excel tables/title
+            try:
+                cache_key = create_workbook(
+                    request, trimmed[0], trimmed[1], trimmed[2], trimmed[3],
+                    title, dates, edited_comments, start, end,
+                    id_column, rebased_headers
+                )
+            except Exception as e:
+                messages.error(
+                    request,
+                    f"There was an error creating your tables: {e}"
+                )
+                return redirect('home')
             unique_id = "title_for_user_" + str(request.user.id)
+            cache.set(unique_id, title, 3600)
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ auto-download for the excel tables
             excel_data = cache.get(cache_key)
             response = HttpResponse(
                 excel_data,
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
-            response['Content-Disposition'] = f'attachment; filename="{title}.xlsx"'
+            response['Content-Disposition'] = f'attachment; filename="Public First Poll For {title}.xlsx"'
             return response
         else:
             messages.error(
                 request,
-                "Invalid form data was submitted. please try again"
+                "Invalid form data was submitted. Please try again."
             )
             return redirect('home')
     else:
@@ -122,12 +149,25 @@ def scan_table(request):
         if form.is_valid():
             # ~~~~~~~~~~~~~~~~~~~ Fetches data from form & converts them to df
             table_data = request.FILES['data_file']
+            filename = table_data.name
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Input validation for data upload.
+            if "crossbreaks_data" not in filename:
+                messages.error(
+                request,
+                """
+                Invalid form data was submitted.
+                The file you uploaded did not have the name
+                "crossbreaks_data" and was rejected.
+                """
+                )
+                return redirect('home')
             table_data = pd.read_csv(table_data, encoding="utf-8-sig")
             # ~~~ Filters df to get only questions that have true rebase value
             filtered_df = table_data[
                 (table_data['Base Type'] == 'Question')
             ]
-            filtered_df = filtered_df[filtered_df['Rebase comment needed'].isin(['TRUE', 'True'])]
+            filtered_df = filtered_df[
+                filtered_df['Rebase comment needed'].isin(['TRUE', 'True'])]
             filtered_df.set_index('IDs', inplace=True)
 
             # ~~~~~~~~~~~~~~~~ remove html tags from questions for rebase form
@@ -168,18 +208,19 @@ def scan_table(request):
 
 def download_tables(request):
     """
-    Handles retrieval of cached weighted data.
+    Handles retrieval of cached tables.
     """
     unique_id = "tables_for_user_" + str(request.user.id)
     unique_title = "title_for_user_" + str(request.user.id)
     excel_data = cache.get(unique_id)
     title = cache.get(unique_title)
+    print(title)
     if excel_data:
         response = HttpResponse(
             excel_data,
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response['Content-Disposition'] = f'attachment; filename="{title}.xlsx"'
+        response['Content-Disposition'] = f'attachment; filename="Public First Poll For {title}.xlsx"'
         messages.success(request, "Downloading tables...")
         return response
     else:

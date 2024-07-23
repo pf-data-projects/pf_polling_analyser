@@ -14,8 +14,10 @@ def validate_cb_inputs(data, standard_cb):
         ['gender', "Which of the following best describes how you think of yourself?"],
         ['age', "How old are you?"],
         ['region', "In what region of the UK do you live?"],
+        ['region_gb', "In what region of the UK do you live?"],
         ['seg', "Think about the Chief Income Earner in your household"],
         ['children', "Do you have any children under the age of 18 living at home?"],
+        ["children(updated)", "Do you have any children? If so, how old are they?"],
         [
             'education', 
             [
@@ -29,6 +31,14 @@ def validate_cb_inputs(data, standard_cb):
         ["income", "What is the annual income of your household before tax?"],
         ["area", "Which of the following best describes the area where you live?"],
     ]
+
+    if "region" in standard_cb and "region_gb" in standard_cb:
+        return [False, "You cannot select both UK and GB region crossbreaks"]
+    if "children" in standard_cb and "children(updated)" in standard_cb:
+        return [
+            False,
+            "You cannot select both children and children (age breakdown) region crossbreaks"
+        ]
 
     for cb in crossbreaks:
         if cb[0] in standard_cb:

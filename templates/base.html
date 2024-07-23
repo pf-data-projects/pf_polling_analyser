@@ -24,6 +24,14 @@
         <!--Custom CSS-->
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
         <title>Polling Analyser</title>
+        <script>
+          function toggleCheckboxes(action) {
+              var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+              checkboxes.forEach(function(checkbox) {
+                  checkbox.checked = (action === 'select');
+              });
+          }
+        </script>
     </head>
     <body>
         <!--~~~~~~~~~~~~~~~~~~~Navigation~~~~~~~~~~~~~~~~~~~-->
@@ -75,8 +83,10 @@
         <main>
             <div class="container">
                 {% for message in messages %}
-                    <div id="msg" class="p-2 container {{ message.tags }}">
-                        {{ message | safe }}
+                    <div id="msg" class="p-3 container rounded {{ message.tags }}">
+                        <div class="text-center">
+                            {{ message | safe }}
+                        </div>
                     </div>
                 {% endfor %}
             </div>
