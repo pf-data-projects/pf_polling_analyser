@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (progressElement) {
             // Convert the JSON object to a string for display
             if (data.status === "No tasks have been run yet...") {
-              console.log("nope")
+              // console.log("nope")
               progressElement.textContent = "No data is currently processing"
             }
             else if (data.status === "PROGRESS" && data.details.Totals) {
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             else if (data.status === "PENDING") {
               progressElement.textContent = "Waiting for processing to start..."
-              console.log(data)
+              // console.log(data)
             }
             else if (data.status === "PROGRESS" && "CreatingHeaders" in data.details) {
               progressElement.textContent = "Creating rebase headers, preparing files for download."
@@ -89,10 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
               firstWrapper.style.border = "none"
               secondWrapper.style.height = "0px"
               secondWrapper.style.border = "none"
-              console.log("COMPLETED")
+              // console.log("COMPLETED")
             }
             else if (data.status === "FAILURE") {
-              console.log(data)
+              // console.log(data)
               html = `<p><strong>There was an error when running this code for crossbreaks.
                       The most likely cause of this error is entering a crossbreak that
                       doesn't exist in the data.
@@ -110,14 +110,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             }
             else {
-              console.log("This one is always triggering")
+              // console.log("This one is always triggering")
               progressElement.textContent = JSON.stringify(data, null, 2);
             }
         }
   
         // Depending on your requirements, you may want to stop polling when the task completes
         if (data.status === 'SUCCESS' || data.status === 'FAILURE') {
-          console.log('Task completed or failed:', data);
+          // console.log('Task completed or failed:', data);
           clearInterval(pollingInterval); // Stop polling
         }
       })

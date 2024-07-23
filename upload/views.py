@@ -203,6 +203,7 @@ def upload_csv(request):
             data_file = request.FILES['data_file']
             survey_id = form.cleaned_data['survey_id']
             standard_cb = form.cleaned_data['standard_cb']
+            
             non_standard_cb = []
             num_submitted_forms = 0
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ handle formset
@@ -227,12 +228,17 @@ def upload_csv(request):
             data.columns = [preprocess_header(col) for col in data.columns]
             data = strip_whitespace(data)
             if 'weighted_respondents' not in data.columns:
-                return HttpResponse('No weights found. Please weight your data first.')
-
+                messages.error(
+                    request, "No weights found. Please weight your data first."
+                )
+                return redirect('upload_data')
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ validate the standard crossbreaks
             is_valid = vld.validate_cb_inputs(data, standard_cb)
             if not is_valid[0]:
-                return HttpResponse(f"An error occured: {is_valid[1]}")
+                messages.error(
+                    request, f'An error occured: {is_valid[1]}'
+                )
+                return redirect('upload_data')
 
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ get question data from API
             survey_questions = get_questions_json(survey_id)
@@ -241,7 +247,8 @@ def upload_csv(request):
                     No data returned from Alchemer.
                     Did you enter a valid surveyID?
                     """
-                return HttpResponse(message)
+                messages.error(request, message)
+                return redirect('upload_data')
             questions = extract_questions_from_pages(survey_questions)
             # with open("questions_list.json", "w") as outfile:
             #     json.dump(survey_questions, outfile, indent=2)
