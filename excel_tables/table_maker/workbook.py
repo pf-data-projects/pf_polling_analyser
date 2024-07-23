@@ -127,7 +127,7 @@ def create_workbook(
             contents_sheet.write_url(
                 cell,
                 f"internal:'Full Results'!A{prev_question}",
-                string=f"row {question}"
+                string=f"{question}"
             )
             prev_question = question
 
@@ -166,7 +166,7 @@ def create_workbook(
         # create question style and loop to apply them
         for i in range(2, len(data)):
             question_value = data.iloc[i, 3]
-            question_value = question_value.strip('?')[0] + '?'
+            question_value = question_value.split('?')[0] + '?'
             if data.at[i, 'Base Type'] == 'Question' or data.at[i, 'Base Type'] == 'sub_Question':
                 results_sheet.write(i + 1, 0, question_value, question_format)
 
