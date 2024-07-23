@@ -21,6 +21,7 @@ error if not.
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Standard library
 import json
+import traceback
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 3rd party
 import pandas as pd
@@ -106,9 +107,10 @@ def table_maker_form(request, arg1):
                     id_column, rebased_headers
                 )
             except Exception as e:
+                tb = traceback.format_exc()
                 messages.error(
                     request,
-                    f"There was an error creating your tables: {e}"
+                    f"There was an error creating your tables: {e}\n{tb}"
                 )
                 return redirect('home')
             unique_id = "title_for_user_" + str(request.user.id)
