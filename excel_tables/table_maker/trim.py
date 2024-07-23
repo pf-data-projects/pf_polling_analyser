@@ -25,6 +25,9 @@ def trim_table(data, start, end, comments):
     are not needed.
     2. removes other unnecessary rows of the table.
     """
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ get rid of randomised column
+
+    data = data.drop("Randomised", axis=1)
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ remove any html tags from questions
     data["Answers"] = data["Answers"].str.replace(
