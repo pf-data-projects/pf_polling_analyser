@@ -132,15 +132,6 @@ class WeightForm(forms.Form):
         choices=PROCESSES,
         widget=forms.RadioSelect
     )
-    # apply_weights = forms.BooleanField(
-    #     label="Weight the data with standard weighting:",
-    #     required=False
-    # )
-    # custom_weights = forms.BooleanField(
-    #     label="Customise your weights:",
-    #     help_text="Don't check this unless you're using custom weights",
-    #     required=False
-    # )
     standard_weights = forms.MultipleChoiceField(
         label="""
         Do you want to include any standard weights 
