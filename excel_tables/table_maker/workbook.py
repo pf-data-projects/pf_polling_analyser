@@ -111,8 +111,10 @@ def create_workbook(
 
         # define cover sheet and add basic styles
         cover_sheet = writer.sheets['Cover Page']
+        left_align_format = workbook.add_format({'align': 'left'})
         cover_sheet.hide_gridlines(2)
-        cover_sheet.set_column(3, 3, 60)
+        # cover_sheet.set_column(3, 3, 60, left_align_format)
+        cover_sheet.set_column("D:D", 60, left_align_format)
         cover_sheet.set_zoom(115)
 
         # Create links to full results table rows in contents page
@@ -127,15 +129,16 @@ def create_workbook(
             contents_sheet.write_url(
                 cell,
                 f"internal:'Full Results'!A{prev_question}",
-                string=f"row {question}"
+                string=f"{question}",
+                cell_format=centre_format
             )
             prev_question = question
 
         results_sheet.set_zoom(85)
         header_format = workbook.add_format({
-            "bg_color": "#FFA500",
+            # "bg_color": "#FFA500",
             "bold": True,
-            "font_color": "#FFFFFF",
+            # "font_color": "#FFFFFF",
             "align": "center"
         })
         percent_format = workbook.add_format({
@@ -166,6 +169,7 @@ def create_workbook(
         # create question style and loop to apply them
         for i in range(2, len(data)):
             question_value = data.iloc[i, 3]
+            question_value = question_value.split('?')[0] + '?'
             if data.at[i, 'Base Type'] == 'Question' or data.at[i, 'Base Type'] == 'sub_Question':
                 results_sheet.write(i + 1, 0, question_value, question_format)
 
@@ -261,6 +265,7 @@ def create_workbook(
                 # format questions
                 for i in range(len(sub_table)):
                     question_value = concat_sub_table.iloc[i + 2, 0]
+                    question_value = question_value.split('?')[0] + '?'
                     if sub_table.loc[i, 'Base Type'] == 'Question' or sub_table.loc[i, 'Base Type'] == 'sub_Question':
                         question_sheet.write(
                             i + 3,
@@ -489,9 +494,9 @@ def create_workbook(
     # Add styles to the crossbreak headers.
     # (and grid headers)
 
-    fill = PatternFill(start_color='FFA500', end_color='FFA500', fill_type='solid')
-    font = Font(bold=True, color='FFFFFF', size=14)
-    smaller_font = Font(bold=True, color='FFFFFF', size=11)
+    # fill = PatternFill(start_color='FFA500', end_color='FFA500', fill_type='solid')
+    font = Font(bold=True, size=14)
+    smaller_font = Font(bold=True, size=11)
     alignment = Alignment(horizontal='center', vertical='center')
     left_align = Alignment(horizontal='left')
 
@@ -500,7 +505,7 @@ def create_workbook(
             ws = wb[sheet]
             ws['A3'] = " "
             for cell in ws['2']:
-                cell.fill = fill
+                # cell.fill = fill
                 cell.font = font
                 cell.alignment = alignment
             # remove brexit and intention prefixes in final table
@@ -514,7 +519,7 @@ def create_workbook(
         if 'Grid' in sheet:
             ws = wb[sheet]
             for cell in ws['2']:
-                cell.fill = fill
+                # cell.fill = fill
                 cell.font = smaller_font
                 cell.alignment = alignment
             ws['A2'].alignment = left_align

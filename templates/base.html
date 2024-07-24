@@ -84,7 +84,7 @@
             <div class="container">
                 {% for message in messages %}
                     <div id="msg" class="p-3 container rounded {{ message.tags }}">
-                        <div class="text-center">
+                        <div class="message text-center {{ message.tags }}">
                             {{ message | safe }}
                         </div>
                     </div>
