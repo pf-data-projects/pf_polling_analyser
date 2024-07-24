@@ -111,8 +111,10 @@ def create_workbook(
 
         # define cover sheet and add basic styles
         cover_sheet = writer.sheets['Cover Page']
+        left_align_format = workbook.add_format({'align': 'left'})
         cover_sheet.hide_gridlines(2)
-        cover_sheet.set_column(3, 3, 60)
+        # cover_sheet.set_column(3, 3, 60, left_align_format)
+        cover_sheet.set_column("D:D", 60, left_align_format)
         cover_sheet.set_zoom(115)
 
         # Create links to full results table rows in contents page
@@ -127,7 +129,8 @@ def create_workbook(
             contents_sheet.write_url(
                 cell,
                 f"internal:'Full Results'!A{prev_question}",
-                string=f"{question}"
+                string=f"{question}",
+                cell_format=centre_format
             )
             prev_question = question
 
