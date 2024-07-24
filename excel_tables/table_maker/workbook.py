@@ -102,6 +102,7 @@ def create_workbook(
             'align': 'center',
         })
         contents_sheet.set_column("D:D", 20, centre_format)
+        contents_sheet.set_column("B:B", None, centre_format)
         # contents_sheet.set_column(3, 3, 30)
         contents_sheet.set_column(4, 4, 40)
         right_format = workbook.add_format({
@@ -111,10 +112,14 @@ def create_workbook(
 
         # define cover sheet and add basic styles
         cover_sheet = writer.sheets['Cover Page']
-        left_align_format = workbook.add_format({'align': 'left'})
+        left_align_format = workbook.add_format({
+            'align': 'left',
+            'text_wrap': True
+        })
         cover_sheet.hide_gridlines(2)
         # cover_sheet.set_column(3, 3, 60, left_align_format)
         cover_sheet.set_column("D:D", 60, left_align_format)
+        # cover_sheet.set_row(10, 40)
         cover_sheet.set_zoom(115)
 
         # Create links to full results table rows in contents page
@@ -326,8 +331,8 @@ def create_workbook(
         cover_page.insert_cols(idx=1)
     cover_page['D2'].border = Border(
         left=None, right=None, top=None, bottom=None)
-    cover_page['D10'].alignment = Alignment(wrapText=True)
-    cover_page['D12'].alignment = Alignment(wrapText=True)
+    cover_page['D11'].alignment = Alignment(wrapText=True)
+    cover_page['D14'].alignment = Alignment(wrapText=True)
 
     # Add extra row and headers for the standard crossbreaks.
     protected_sheets = [

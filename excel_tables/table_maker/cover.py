@@ -12,8 +12,9 @@ def create_cover_page(data, title, dates):
     for polling table cover page.
     """
     cover_list = []
+    adjacent_list = []
     cover_list.append("")
-    cover_list.append(f"Fieldwork: {dates}")
+    cover_list.append(f"Fieldwork carried out: {dates}")
     cover_list.append("Interview method: Online Survey")
     cover_list.append("Population represented: UK Adults")
     cover_list.append(f"Sample size: {round(data.at[1, 'Total'])}")
@@ -21,7 +22,7 @@ def create_cover_page(data, title, dates):
     cover_list.append("")
     cover_list.append("Methodology:")
     # sorry, I tried to make the strings below multiline
-    # but ended up with some weird extra spaces in the excel output...
+    # but ended up with some weird extra spaces in the excel output
     # ~J
     cover_list.append(
         "All results are weighted using Iterative Proportional Fitting, or 'Raking'. The results are weighted by interlocking age & gender, region and social grade to Nationally Representative Proportions"
@@ -32,6 +33,8 @@ def create_cover_page(data, title, dates):
         "Public First is a member of the BPC and abides by its rules. For more information please contact the Public First polling team:"
     )
     cover_list.append("polling@publicfirst.co.uk")
-    cover = {f"Public First Poll For: {title}": cover_list}
+    cover = {
+        f"Public First Poll For: {title}": cover_list,
+    }
     cover_df = pd.DataFrame(cover)
     return cover_df
