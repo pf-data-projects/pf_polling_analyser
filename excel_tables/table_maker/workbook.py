@@ -612,7 +612,7 @@ def create_workbook(
                 cell.value = cell.value.split("BASE")[0]
             if "?" in old_val:
                 cell.value += "?"
-    
+
     for row in range(1, sheet.max_row + 1):
         if row == 2:
             continue
