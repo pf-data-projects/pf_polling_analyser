@@ -598,13 +598,26 @@ def create_workbook(
     # At the end of the process, tidy up question names
     # in the contents page/worksheet
     sheet = wb['Contents']
+    blue_font = Font(color="0000FF")
     for row in range(1, sheet.max_row + 1):
+        if row == 2:
+            continue
         cell = sheet[f"C{row}"]
+        cell.font = blue_font
         if cell.value and isinstance(cell.value, str):
-            # Strip the string after the "?" character
-            cell.value = cell.value.split("?")[0] + "?"
+            old_val = cell.value
+            cell.value = cell.value.split("?")[0]
+            cell.font = blue_font
             if "BASE" in cell.value:
                 cell.value = cell.value.split("BASE")[0]
+            if "?" in old_val:
+                cell.value += "?"
+    
+    for row in range(1, sheet.max_row + 1):
+        if row == 2:
+            continue
+        cell = sheet[f"D{row}"]
+        cell.font = blue_font
 
     output = io.BytesIO()
     wb.save(output)
