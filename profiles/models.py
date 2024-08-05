@@ -1,6 +1,6 @@
 """
 A model to handle data needed for user profiles.
-The Profile class has the handy django dunder method
+The Profile class has the django dunder method
 for easy identification
 
 This file also includes a function to handle the
