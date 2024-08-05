@@ -77,6 +77,39 @@ CROSSBREAKS = {
         "£80,000 - £89,999",
         "£90,000 - £99,999",
         "£100,000 or more",
+    ],
+    # business poll options
+    "employee_number": [
+        "2-4",
+        "5-9",
+        "10-24",
+        "25-49",
+        "50-99",
+        "100-249",
+        "250-499",
+        "500-999",
+        "1,000+",
+    ],
+    "company_age": [
+        "Less than 1 year",
+        "1-2 years",
+        "2-5 years",
+        "5-10 years",
+        "10-20 years",
+        "20-50 years",
+        "More than 50 years",
+    ],
+    "annual_revenue": [
+        "Under £85,000",
+        "£85,001 to £250,000",
+        "£250,001 to £500,000",
+        "£500,001 to £1 million",
+        "£1 million to £2 million",
+        "£2 million to £5 million",
+        "£5 million to £10 million",
+        "£10 million to £20 million",
+        "£20 million to £50 million",
+        "Over £50 million",
     ]
 }
 
@@ -94,6 +127,9 @@ QUESTIONS = {
     "voting_intention": "And, if a general election was called tomorrow, which party would you vote for?",
     "income": "What is the annual income of your household before tax?",
     "area": "Which of the following best describes the area where you live?",
+    "employee_number": "How many employees does your company currently employ across all locations, including yourself?",
+    "company_age": "How long has your business been operating for?",
+    "annual_revenue": "What is the approximate annual revenue of your business?",
 }
 
 

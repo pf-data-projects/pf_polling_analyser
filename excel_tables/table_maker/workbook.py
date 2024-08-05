@@ -1,7 +1,13 @@
 """ 
 This file handles the logic for building and styling the excel table
 outputs for the whole program. It takes trimmed table data as an
-input. The logic broadly follows these steps.
+input. 
+
+The data generated in the `upload` app needs to be
+1. input into an excel file, with a cover page, contents page, full results
+and individual question pages.
+
+The logic broadly follows these steps:
 
 1. call external functions to generate a cover page and contents page.
 2. create a writer object using pandas/xlsxwriter to create the main results.
@@ -10,12 +16,19 @@ input. The logic broadly follows these steps.
 5. Create links to each table and from each table back to contents in
 each sheet.
 6. cache the excel file for download later after the function has returned.
-
-#### AS OF 01/12/2023 ####
 7. re-opens cached file and carries out following edits using openpyxl.
     - add pf logo to top corners of all sheets.
     - add crossbreak headers to crossbreak groups.
     - Add some custom styles to these new rows/cols.
+
+### WARNING ###
+If you need to make edits to the first hslf of this function
+(the part that uses xlsxwriter to write the bulk of the data to worksheets),
+the formatting of the excel file may break. Usually you can fix this by adding
+extra lines of code at the end of the function using the openpyxl library.
+
+The reason this happens is likely that openpyxl and xlsxwriter conflict
+with eachother causing unexpected formatting.
 """
 
 import io
@@ -298,8 +311,15 @@ def create_workbook(
     output.seek(0)
     cache.set(cache_key, output.getvalue(), timeout=300)
 
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ EDITS WITH OPENPYXL
+    # ~~~~~~~~~~~~~~~~~~~~ EDITS WITH OPENPYXL
+
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    # N.B. changes to the code below this point may undo/replace
+    # formatting in the excel workbooks that may have already been done by xlsxwriter.
+
     cached_file_content = cache.get(cache_key)
 
     # Create a BytesIO object from your cached content
@@ -422,7 +442,7 @@ def create_workbook(
                     excel_coord = get_header_coords("London", trimmed_data)
                     excel_coord2 = get_header_coords("Wales", trimmed_data)
                     ws[excel_coord] = "Region"
-                    ws.merge_cells(f"{excel_coord}:{excel_coord2}")        
+                    ws.merge_cells(f"{excel_coord}:{excel_coord2}")   
             if "AB" in cols:
                 excel_coord = get_header_coords("AB", trimmed_data)
                 excel_coord2 = get_header_coords("DE", trimmed_data)
@@ -574,6 +594,30 @@ def create_workbook(
             ws['A3'].value = 'Back to Contents'
 
     wb = update_column_headers(wb, rebased_headers)
+
+    # At the end of the process, tidy up question names
+    # in the contents page/worksheet
+    sheet = wb['Contents']
+    blue_font = Font(color="0000FF")
+    for row in range(1, sheet.max_row + 1):
+        if row == 2:
+            continue
+        cell = sheet[f"C{row}"]
+        cell.font = blue_font
+        if cell.value and isinstance(cell.value, str):
+            old_val = cell.value
+            cell.value = cell.value.split("?")[0]
+            cell.font = blue_font
+            if "BASE" in cell.value:
+                cell.value = cell.value.split("BASE")[0]
+            if "?" in old_val:
+                cell.value += "?"
+
+    for row in range(1, sheet.max_row + 1):
+        if row == 2:
+            continue
+        cell = sheet[f"D{row}"]
+        cell.font = blue_font
 
     output = io.BytesIO()
     wb.save(output)

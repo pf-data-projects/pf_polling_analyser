@@ -33,7 +33,11 @@ CB_OPTIONS = (
     ('area', 'Area'),
     ('vote2019', 'Vote 2019'),
     ('eu2016', 'EU 2016 Vote'),
-    ('voting_intention', 'Voting Intention')
+    ('voting_intention', 'Voting Intention'),
+    # Business poll options
+    ("employee_number", "Employee Number (STILL IN DEVELOPMENT)"),
+    ("company_age", "Company Age (STILL IN DEVELOPMENT)"),
+    ("annual_revenue", "Annual Revenue (STILL IN DEVELOPMENT)"),
 )
 
 PROCESSES = (
@@ -132,15 +136,6 @@ class WeightForm(forms.Form):
         choices=PROCESSES,
         widget=forms.RadioSelect
     )
-    # apply_weights = forms.BooleanField(
-    #     label="Weight the data with standard weighting:",
-    #     required=False
-    # )
-    # custom_weights = forms.BooleanField(
-    #     label="Customise your weights:",
-    #     help_text="Don't check this unless you're using custom weights",
-    #     required=False
-    # )
     standard_weights = forms.MultipleChoiceField(
         label="""
         Do you want to include any standard weights 

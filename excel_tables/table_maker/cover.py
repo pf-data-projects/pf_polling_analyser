@@ -12,7 +12,6 @@ def create_cover_page(data, title, dates):
     for polling table cover page.
     """
     cover_list = []
-    adjacent_list = []
     cover_list.append("")
     cover_list.append(f"Fieldwork carried out: {dates}")
     cover_list.append("Interview method: Online Survey")
