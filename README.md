@@ -100,6 +100,82 @@ A faster bot-checker is currently in design/development, but please submit any i
 </details>
 
 
+## Technical Guide -- Common Errors -- Code Snippets
+
+Below are some common errors that can happen in the Table Maker when you process your data in the three steps.
+
+<details>
+<summary>Weighting your Data</summary>
+</details>
+
+<details>
+<summary>Calculating Crossbreaks</summary>
+
+### **Selecting a csv rather than excel file when uploading weighted data to calculate crossbreaks.**
+
+In the crossbreaks form, users should upload the file weighted_data.xlsx that they downloaded during the previous step.
+
+If for any reason, the user uploads a file that is not an excel file (e.g. if they re-saved the weighted_data file as a csv) you will get the following error:
+
+<img 
+    src="docs/errors/excel_upload_in_crossbreak_form.png" 
+    alt="A screenshot of django error message"
+/>
+
+The code that causes this error is found in the following location:
+````
+upload/views.py
+````
+
+<img 
+    src="docs/errors/excel_upload__code.png" 
+    alt="A screenshot of code that converts upload data to df"
+/>
+
+The reason this error happens is because the application expects to receive an excel file. We are using the Pandas library to do this, and trying to get pandas to read a csv using the .read_csv() method will result in a Pandas error.
+
+**HOW TO GET AROUND THIS:**
+
+*Make sure you're uploading the right file when filling out your Crossbreak form.*
+
+---
+
+### **Having the wrong answers in your Crossbreaks**
+
+In the crossbreaks form, you can currently select standard and non-standard crossbreaks so that you can see how different populations answered each question.
+
+Standard crossbreaks are hard-coded into the application. This means that the app expects a specific set of questions or answers to be in the data. If, for example, the polling team was to change the question wording or the selection of answers that respondents can select, it would mean that the data file has different questions from what the code expects. This will result in an error.
+
+This same error would happen if you made an error typing in the answers for a question when specifying a non-standard crossbreak in the form.
+
+<img 
+    src="docs/errors/missing_crossbreak_answer.png"
+    alt="screenshot of python error"
+/>
+
+The code that causes this error is found in the following location:
+````
+upload/table_calculations/define_standard_crossbreaks.py
+````
+<img
+src="docs/errors/missing_crossbreak_answer_code.png"
+alt="a screenshot of the code that throws this error"
+/>
+
+**HOW TO GET AROUND THIS:**
+
+*Make sure the answers you have in the standard crossbreaks and non-standard crossbreaks match exactly what is in the data you upload. You can check the standard crossbreaks in the code by checking the file: upload/table_calculations/define_standard_crossbreaks.py.* 
+
+*Also, make sure the questions match as well. There should be input validation for standard crossbreaks that stops the user uploading data that's missing a crossbreak that they asked for in the form.*
+
+---
+
+</details>
+
+<details>
+<summary>Generating Tables</summary>
+</details>
+
 ## Technical Design
 
 ### Project architecture
