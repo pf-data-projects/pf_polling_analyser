@@ -33,7 +33,11 @@ CB_OPTIONS = (
     ('area', 'Area'),
     ('vote2019', 'Vote 2019'),
     ('eu2016', 'EU 2016 Vote'),
-    ('voting_intention', 'Voting Intention')
+    ('voting_intention', 'Voting Intention'),
+    # Business poll options
+    ("employee_number", "Employee Number (STILL IN DEVELOPMENT)"),
+    ("company_age", "Company Age (STILL IN DEVELOPMENT)"),
+    ("annual_revenue", "Annual Revenue (STILL IN DEVELOPMENT)"),
 )
 
 PROCESSES = (
