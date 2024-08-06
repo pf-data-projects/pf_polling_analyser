@@ -158,8 +158,8 @@ The code that causes this error is found in the following location:
 upload/table_calculations/define_standard_crossbreaks.py
 ````
 <img
-src="docs/errors/missing_crossbreak_answer_code.png"
-alt="a screenshot of the code that throws this error"
+    src="docs/errors/missing_crossbreak_answer_code.png"
+    alt="a screenshot of the code that throws this error"
 />
 
 **HOW TO GET AROUND THIS:**
@@ -169,11 +169,36 @@ alt="a screenshot of the code that throws this error"
 *Also, make sure the questions match as well. There should be input validation for standard crossbreaks that stops the user uploading data that's missing a crossbreak that they asked for in the form.*
 
 ---
-
 </details>
 
 <details>
 <summary>Generating Tables</summary>
+
+### **Having the wrong standard crossbreak answers/missing headings in the data**
+
+If your data is missing certain answers expected in a demographics/crossbreaks question, the application may not pick it up can lead to an error when generating tables later on.
+
+This happens because the table generator part of the application expects certain columns to exist in the file crossbreaks_data.csv. If these columns aren't there (e.g. this would happen if you had used the UK region crossbreak for a GB poll and you were missing Northern Ireland).
+
+<img 
+    src="docs/errors/table_generating_error.png"
+    alt="screenshot of python error"
+/>
+
+The code that causes this error is found in the following location:
+````
+excel_tables/table_maker/workbook.py
+````
+<img
+    src="docs/errors/table_generating_headers_code.png"
+    alt="a screenshot of the code that throws this error"
+/>
+
+**HOW TO GET AROUND THIS:**
+
+*Make sure that your answer columns in crossbreaks_data.csv match the order of the answers in upload/table_calculations/define_standard_crossbreaks.py*
+
+---
 </details>
 
 ## Technical Design
