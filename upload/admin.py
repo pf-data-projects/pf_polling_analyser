@@ -1,3 +1,7 @@
+"""
+Class to register to admin
+"""
+
 from django.contrib import admin
 from .models import Crossbreak
 
