@@ -106,6 +106,27 @@ Below are some common errors that can happen in the Table Maker when you process
 
 <details>
 <summary>Weighting your Data</summary>
+
+<!-- ### **Incorrectly selecting a standard weighting category when using custom weights**
+
+In the weighting form you can select to include any of the standard weights (interlocking gender and age, UK region, SEG) as well as your own custom categories.
+
+The following error will occur if you try to use any of these standard weighting categories but don't have either the appropriate proportions in the Weight_proportions.xslx file.
+
+<img 
+    src="docs/errors/weight_standard_categories_in_custom.png" 
+    alt="A screenshot of django error message"
+/>
+The code that causes this error is found in the following location:
+````
+upload/views.py
+````
+
+<img 
+    src="docs/errors/weight_standard_custom_code.png" 
+    alt="A screenshot of code that reads in groups from weight formset"
+/> -->
+
 </details>
 
 <details>

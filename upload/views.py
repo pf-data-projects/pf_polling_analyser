@@ -99,21 +99,26 @@ def weight_data(request):
             questions = []
             if process == "cust_weight" and formset.is_valid():
                 if len(formset) < 1:
-                    return HttpResponse(
-                        "Error: Please specify your custom weights in the form."
-                        )
+                    message = "Error: Please specify your custom weights in the form."
+                    messages.error(request, message)
+                    return redirect(reverse('home'))
                 for sub_form in formset:
-                    groups.append(sub_form.cleaned_data['group'])
-                    questions.append(sub_form.cleaned_data['question'])
+                    if sub_form.cleaned_data.get('group') and sub_form.cleaned_data.get('question'):
+                        groups.append(sub_form.cleaned_data['group'])
+                        questions.append(sub_form.cleaned_data['question'])
+                    else:
+                        message = "Error: You can't do custom weighting without specifying groups or questions"
+                        messages.error(request, message)
+                        return redirect(reverse('home'))
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for standard weights
             if process == "weight":
-                weighted_data = handle_weight_errors(
+                weighted_data = handle_weight_errors(request,
                     wgt.run_weighting, survey_data,
                     weight_proportions
                 )
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Run ipf module for custom weights
             elif process == "cust_weight":
-                weighted_data = handle_weight_errors(
+                weighted_data = handle_weight_errors(request,
                     wgt.apply_custom_weight,
                     survey_data, weight_proportions,
                     questions=questions, groups=groups,
@@ -124,6 +129,7 @@ def weight_data(request):
                 weighted_data = wgt.apply_no_weight(survey_data)
             # ~~~~~~~~~ Cache the weighted data to be downloaded by user later
             excel_buffer = BytesIO()
+            print(weighted_data)
             weighted_data.to_excel(excel_buffer, index=False)
             excel_buffer.seek(0)
             unique_id = "weights_for_user_" + str(request.user.id)
@@ -148,7 +154,7 @@ def weight_data(request):
     })
 
 
-def handle_weight_errors(function, survey_data, weight_proportions,
+def handle_weight_errors(request, function, survey_data, weight_proportions,
     groups=None, questions=None, standard_weights=None):
     """ 
     A helper function to control the 
@@ -164,7 +170,9 @@ def handle_weight_errors(function, survey_data, weight_proportions,
             Have you checked that this question exists in the data,
             or that the wording hasn't changed?
             """
-        return HttpResponse(message)
+        # return HttpResponse(message)
+        messages.error(request, message)
+        return redirect(reverse('home'))
     except Exception as e:
         message=f"""
             There was an error in the weighting calculation.
@@ -173,7 +181,8 @@ def handle_weight_errors(function, survey_data, weight_proportions,
 
             This is the error the code returned: {e}
             """
-        return HttpResponse(message)
+        messages.error(request, message)
+        return redirect(reverse('home'))
     return weighted_data
 
 
@@ -432,3 +441,10 @@ def strip_whitespace(df):
     A helper function to clear data of whitespace.
     """
     return df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+
+
+def create_crossbreak():
+    """
+    A function to handle saving a new crossbreak
+    to the database.
+    """

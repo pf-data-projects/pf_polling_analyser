@@ -170,3 +170,31 @@ class CustomWeightForm(forms.Form):
     )
 
 CustomWeightFormSet = formset_factory(CustomWeightForm, extra=1)
+
+
+class CustomCrossbreakForm(forms.Form):
+    """
+    A form to handle the saving of reusable
+    crossbreaks to the database.
+    """
+    name = forms.CharField(
+        label="Name of Crossbreak",
+        help_text="Name you want to give this column in the table, i.e voted leave EU",
+        required=True
+    )
+    question = forms.CharField(
+        label="Question text",
+        help_text="""
+            Please put the exact text of the question
+            that determines this crossbreak here
+            (and don't include the question id number).
+            """,
+        required=True)
+    answers = forms.CharField(
+        label="Answers",
+        help_text="""
+        Enter the answers for this question which you would like to check,
+        separated by | e.g., Yes|No|Maybe
+        """,
+        required=True
+    )
