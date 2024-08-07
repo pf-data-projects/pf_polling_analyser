@@ -18,11 +18,11 @@ def calc_age(category, col_index, table, question_list, results, question_data):
     """
     age_q = 'How old are you?'
     for question in question_list:
-        get_age = results[helpers.col_with_substr_q(results, age_q)].astype(int)
+        get_age = results[helpers.col_with_substr_q(results, age_q)].astype(float)
         filtered_df = results.loc[
-            (results[get_age.columns[0]].astype(int) >= category[0])
+            (results[get_age.columns[0]].astype(float) >= category[0])
             ]
-        filtered_df = filtered_df.loc[(filtered_df[get_age.columns[0]].astype(int) <= category[1])]
+        filtered_df = filtered_df.loc[(filtered_df[get_age.columns[0]].astype(float) <= category[1])]
         table.iat[0, col_index] = len(filtered_df.index)
         table.iat[1, col_index] = filtered_df['weighted_respondents'].astype(float).sum()
         table = calc.calc(filtered_df, col_index, table, question, results, question_data, False)
@@ -37,11 +37,11 @@ def age_rebase(category, col_index, table, question_list, results, question_data
     relevant data to rebase function.
     """
     age_q = 'How old are you?'
-    get_age = results[helpers.col_with_substr_q(results, age_q)].astype(int)
+    get_age = results[helpers.col_with_substr_q(results, age_q)].astype(float)
     filtered_df = results.loc[
-        (results[get_age.columns[0]].astype(int) >= category[0])
+        (results[get_age.columns[0]].astype(float) >= category[0])
         ]
-    filtered_df = filtered_df.loc[(filtered_df[get_age.columns[0]].astype(int) <= category[1])]
+    filtered_df = filtered_df.loc[(filtered_df[get_age.columns[0]].astype(float) <= category[1])]
 
     table = rebase(question_data, filtered_df, question_list, table, col_index)
     return table
