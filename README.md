@@ -106,6 +106,27 @@ Below are some common errors that can happen in the Table Maker when you process
 
 <details>
 <summary>Weighting your Data</summary>
+
+<!-- ### **Incorrectly selecting a standard weighting category when using custom weights**
+
+In the weighting form you can select to include any of the standard weights (interlocking gender and age, UK region, SEG) as well as your own custom categories.
+
+The following error will occur if you try to use any of these standard weighting categories but don't have either the appropriate proportions in the Weight_proportions.xslx file.
+
+<img 
+    src="docs/errors/weight_standard_categories_in_custom.png" 
+    alt="A screenshot of django error message"
+/>
+The code that causes this error is found in the following location:
+````
+upload/views.py
+````
+
+<img 
+    src="docs/errors/weight_standard_custom_code.png" 
+    alt="A screenshot of code that reads in groups from weight formset"
+/> -->
+
 </details>
 
 <details>
@@ -158,8 +179,8 @@ The code that causes this error is found in the following location:
 upload/table_calculations/define_standard_crossbreaks.py
 ````
 <img
-src="docs/errors/missing_crossbreak_answer_code.png"
-alt="a screenshot of the code that throws this error"
+    src="docs/errors/missing_crossbreak_answer_code.png"
+    alt="a screenshot of the code that throws this error"
 />
 
 **HOW TO GET AROUND THIS:**
@@ -169,11 +190,36 @@ alt="a screenshot of the code that throws this error"
 *Also, make sure the questions match as well. There should be input validation for standard crossbreaks that stops the user uploading data that's missing a crossbreak that they asked for in the form.*
 
 ---
-
 </details>
 
 <details>
 <summary>Generating Tables</summary>
+
+### **Having the wrong standard crossbreak answers/missing headings in the data**
+
+If your data is missing certain answers expected in a demographics/crossbreaks question, the application may not pick it up can lead to an error when generating tables later on.
+
+This happens because the table generator part of the application expects certain columns to exist in the file crossbreaks_data.csv. If these columns aren't there (e.g. this would happen if you had used the UK region crossbreak for a GB poll and you were missing Northern Ireland).
+
+<img 
+    src="docs/errors/table_generating_error.png"
+    alt="screenshot of python error"
+/>
+
+The code that causes this error is found in the following location:
+````
+excel_tables/table_maker/workbook.py
+````
+<img
+    src="docs/errors/table_generating_headers_code.png"
+    alt="a screenshot of the code that throws this error"
+/>
+
+**HOW TO GET AROUND THIS:**
+
+*Make sure that your answer columns in crossbreaks_data.csv match the order of the answers in upload/table_calculations/define_standard_crossbreaks.py*
+
+---
 </details>
 
 ## Technical Design

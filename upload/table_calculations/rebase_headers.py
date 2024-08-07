@@ -96,11 +96,11 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
                                         age_brackets.append(bracket)
                                 for bracket in age_brackets:
                                     age_q = 'How old are you?'
-                                    get_age = results[helpers.col_with_substr_q(results, age_q)].astype(int)
+                                    get_age = results[helpers.col_with_substr_q(results, age_q)].astype(float)
                                     filtered_df = results.loc[
-                                        (results[get_age.columns[0]].astype(int) >= bracket['num1'])
+                                        (results[get_age.columns[0]].astype(float) >= bracket['num1'])
                                         ]
-                                    filtered_df = filtered_df.loc[(filtered_df[get_age.columns[0]].astype(int) <= bracket['num2'])]
+                                    filtered_df = filtered_df.loc[(filtered_df[get_age.columns[0]].astype(float) <= bracket['num2'])]
                                     sum_figures = find_sums_for_multi(filtered_df, results, question['qid'])
                                     if sum_figures is not None:
                                         header_data[question['qid']][bracket['name']] = sum_figures
@@ -176,11 +176,11 @@ def rebase_headers(results, question_list, standard_cb, non_standard_cb):
                                         age_brackets.append(bracket)
                                 for bracket in age_brackets:
                                     age_q = 'How old are you?'
-                                    get_age = results[helpers.col_with_substr_q(results, age_q)].astype(int)
+                                    get_age = results[helpers.col_with_substr_q(results, age_q)].astype(float)
                                     filtered_df = results.loc[
-                                        (results[get_age.columns[0]].astype(int) >= bracket['num1'])
+                                        (results[get_age.columns[0]].astype(float) >= bracket['num1'])
                                         ]
-                                    filtered_df = filtered_df.loc[(filtered_df[get_age.columns[0]].astype(int) <= bracket['num2'])]
+                                    filtered_df = filtered_df.loc[(filtered_df[get_age.columns[0]].astype(float) <= bracket['num2'])]
                                     sum_figures = find_sums_for_single(filtered_df, results, question['qid'])
                                     if sum_figures is not None:
                                         header_data[question['qid']][bracket['name']] = sum_figures  
