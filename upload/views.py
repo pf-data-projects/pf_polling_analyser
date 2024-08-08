@@ -82,7 +82,12 @@ def weight_data(request):
         if form.is_valid():
             # Handles all the form data
             survey_data = request.FILES['results']
-            survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
+            try:
+                survey_data = pd.read_excel(survey_data, header=0, sheet_name="Worksheet")
+            except Exception:
+                message = "Error: please rename the sheet to 'Worksheet'"
+                messages.error(request, message)
+                return redirect(reverse('home'))
             survey_data.columns = [
                 preprocess_header(col) for col in survey_data.columns
             ]
@@ -232,9 +237,10 @@ def upload_csv(request):
                     cb_data = [cb_name, cb_question, cb_answer]
                     non_standard_cb.append(cb_data)
 
-            # ~~~~~~~~~~~~~~~~~~~~~~~ convert data to python-readable formats
+            # ~~~~~~~~~~~~~ convert data to python-readable formats & clean up
             data = pd.read_excel(data_file, header=0, sheet_name="Sheet1")
             data.columns = [preprocess_header(col) for col in data.columns]
+            data.rename(columns=lambda x: x.strip(), inplace=True)
             data = strip_whitespace(data)
             if 'weighted_respondents' not in data.columns:
                 messages.error(
