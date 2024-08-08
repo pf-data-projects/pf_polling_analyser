@@ -571,6 +571,7 @@ def create_workbook(
     title_font = Font(bold=True, size=25)
     title_font_smaller = Font(bold=True, size=18)
     title_align = Alignment(vertical='center')
+    blue_font = Font(color="0000FF")
 
     full_results = wb['Full Results']
     full_results['C1'] = 'Full Results'
@@ -592,13 +593,14 @@ def create_workbook(
             ws['B1'].alignment = title_align
             ws['A3'].hyperlink = '#Contents!A1'
             ws['A3'].value = 'Back to Contents'
+            ws['A3'].font = blue_font
 
     wb = update_column_headers(wb, rebased_headers)
 
     # At the end of the process, tidy up question names
     # in the contents page/worksheet
     sheet = wb['Contents']
-    blue_font = Font(color="0000FF")
+    
     for row in range(1, sheet.max_row + 1):
         if row == 2:
             continue
