@@ -32,7 +32,7 @@ import pandas as pd
 from celery.result import AsyncResult
 
 from django.shortcuts import render, redirect, reverse
-from django.views import View
+from django.views import View, generic
 from django.contrib import messages
 from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
@@ -43,13 +43,14 @@ from .api_request.get_processed_questions import (
     extract_questions_from_pages,
     extract_data_from_question_objects
 )
-
 from .forms import (
     CSVUploadForm,
     WeightForm,
     CrossbreakFormSet,
-    CustomWeightFormSet
+    CustomWeightFormSet,
+    CustomCrossbreakForm
 )
+from .models import Crossbreak
 from . import weight as wgt
 from . import validation as vld
 from .tasks import handle_crossbreaks
@@ -134,7 +135,6 @@ def weight_data(request):
                 weighted_data = wgt.apply_no_weight(survey_data)
             # ~~~~~~~~~ Cache the weighted data to be downloaded by user later
             excel_buffer = BytesIO()
-            print(weighted_data)
             weighted_data.to_excel(excel_buffer, index=False)
             excel_buffer.seek(0)
             unique_id = "weights_for_user_" + str(request.user.id)
@@ -449,8 +449,28 @@ def strip_whitespace(df):
     return df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
 
 
-def create_crossbreak():
+class CreateCrossbreak(generic.CreateView):
     """
-    A function to handle saving a new crossbreak
+    A class to handle saving a new crossbreak
     to the database.
     """
+    model = Crossbreak
+    form_class = CustomCrossbreakForm
+    template_name = 'crossbreak_form.html'
+
+    def post(self, request, *args, **kwargs):
+        crossbreak_form = CustomCrossbreakForm(request.POST)
+        if crossbreak_form.is_valid():
+            messages.success(request, "Crossbreak successfully saved!")
+            crossbreak_form.save()
+            return redirect('home')
+        else:
+            messages.error(
+                request,
+                """
+                Crossbreak was not submitted. 
+                Please check you have uploaded valid data
+                """
+            )
+            crossbreak_form = CustomCrossbreakForm()
+            return redirect('create_crossbreak')
