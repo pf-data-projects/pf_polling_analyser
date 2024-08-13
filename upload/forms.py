@@ -212,5 +212,5 @@ class CustomCrossbreakForm(forms.ModelForm):
         labels = {
             'name': 'Name: the name you want to give your crossbreak',
             'question': 'Question: the exact question associated with the crossbreak in the data',
-            'Answers': 'Answers: the different breakdowns you want to see, separated by | eg. Yes|No|Maybe'
+            'Answers': 'Answers: the different breakdowns you want to see, separated by | e.g. Yes|No|Maybe'
         }

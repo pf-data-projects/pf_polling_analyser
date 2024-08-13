@@ -461,6 +461,7 @@ class CreateCrossbreak(generic.CreateView):
     def post(self, request, *args, **kwargs):
         crossbreak_form = CustomCrossbreakForm(request.POST)
         if crossbreak_form.is_valid():
+            crossbreak_form.instance.user = request.user
             messages.success(request, "Crossbreak successfully saved!")
             crossbreak_form.save()
             return redirect('home')
