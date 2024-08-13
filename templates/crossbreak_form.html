@@ -1,7 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div>
-    <h1>HELLO WORLD!</h1>
+<div class="container">
+    <h1><strong>Save a crossbreak to use later</strong></h1>
+    <form method="post" class="container feature-card rounded mt-5 p-5">
+        <h3><strong>New crossbreak</strong></h3>
+        <div class="container border border-dark rounded p-5">
+            {% csrf_token %}
+            {{ form.as_p }}
+        </div>
+        <button class="btn btn-dark btn-less-spacing" type="submit">Submit</button>
+    </form>
 </div>
 {% endblock %}
