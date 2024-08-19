@@ -214,3 +214,16 @@ class CustomCrossbreakForm(forms.ModelForm):
             'question': 'Question: the exact question associated with the crossbreak in the data',
             'Answers': 'Answers: the different breakdowns you want to see, separated by | e.g. Yes|No|Maybe'
         }
+
+
+class CrossbreakSelectForm(forms.Form):
+    """
+    A form to handle
+    selecting pre-saved crossbreaks
+    from the database.
+    """
+    crossbreak_1 = forms.ModelChoiceField(queryset=Crossbreak.objects.all(), empty_label="Select an item")
+    crossbreak_2 = forms.ModelChoiceField(queryset=Crossbreak.objects.all(), empty_label="Select an item")
+    crossbreak_3 = forms.ModelChoiceField(queryset=Crossbreak.objects.all(), empty_label="Select an item")
+    crossbreak_4 = forms.ModelChoiceField(queryset=Crossbreak.objects.all(), empty_label="Select an item")
+    crossbreak_5 = forms.ModelChoiceField(queryset=Crossbreak.objects.all(), empty_label="Select an item")

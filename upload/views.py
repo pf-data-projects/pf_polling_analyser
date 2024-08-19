@@ -48,7 +48,8 @@ from .forms import (
     WeightForm,
     CrossbreakFormSet,
     CustomWeightFormSet,
-    CustomCrossbreakForm
+    CustomCrossbreakForm,
+    CrossbreakSelectForm
 )
 from .models import Crossbreak
 from . import weight as wgt
@@ -211,14 +212,29 @@ def upload_csv(request):
                 "You cannot access this feature until you are logged in"
             )
             return redirect(reverse('home'))
-        form = CSVUploadForm(request.POST, request.FILES)
+        form_a = CSVUploadForm(request.POST, request.FILES)
+        form_b = CrossbreakSelectForm(request.POST)
         formset = CrossbreakFormSet(request.POST, prefix="crossbreaks")
-        if form.is_valid() and formset.is_valid():
+        if form_a.is_valid() and form_b.is_valid() and formset.is_valid():
             data_file = request.FILES['data_file']
-            survey_id = form.cleaned_data['survey_id']
-            standard_cb = form.cleaned_data['standard_cb']
+            survey_id = form_a.cleaned_data['survey_id']
+            standard_cb = form_a.cleaned_data['standard_cb']
             
             non_standard_cb = []
+
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ handle pre saved crossbreaks
+            for i in range(1, 6):
+                crossbreak = form_b.cleaned_data[f'crossbreak_{i}']
+                if crossbreak is not None:
+                    if "|" in crossbreak.Answers:
+                        answers = crossbreak.Answers.split("|")
+                    else:
+                        answers = [crossbreak.Answers]
+                    non_standard_cb.append(
+                        [crossbreak.name, crossbreak.question, answers]
+                    )
+
+
             num_submitted_forms = 0
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ handle formset
             for form in formset:
@@ -291,11 +307,13 @@ def upload_csv(request):
             )
             return redirect('home')
     else:
-        form = CSVUploadForm()
+        form_a = CSVUploadForm()
+        form_b = CrossbreakSelectForm()
         formset = CrossbreakFormSet(prefix="crossbreaks")
 
     return render(request, 'upload_form.html', {
-        'form': form,
+        'form_a': form_a,
+        'form_b': form_b,
         'formset': formset
     })
 
