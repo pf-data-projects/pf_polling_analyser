@@ -234,6 +234,8 @@ def upload_csv(request):
                         [crossbreak.name, crossbreak.question, answers]
                     )
 
+            print(non_standard_cb)
+
 
             num_submitted_forms = 0
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ handle formset
