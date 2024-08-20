@@ -13,16 +13,19 @@
             <div class="col-md">
                 <h4>Data & Standard Crossbreaks</h4>
                 {% csrf_token %}
-                {{ form.as_p }}
+                {{ form_a.as_p }}
+                
                 <button class="btn btn-dark btn-spacing" type="button" onclick="toggleCheckboxes('select')">Select All</button>
                 <button class="btn btn-dark btn-spacing" type="button" onclick="toggleCheckboxes('deselect')">Deselect All</button>
             </div>
             <div class="col-md">
+                <h4>Choose from saved non-standard crossbreaks</h4>
+                {{ form_b.as_p }}
                 <div id="formset-wrapper">
                     {{ formset.management_form }}
                     {% for sub_form in formset %}
                         <div class="formset-form">
-                            <h4>Non-standard crossbreak</h4>
+                            <h4 class="mt-5">Or manually enter Non-standard crossbreaks</h4>
                             {{ sub_form.as_p }}
                             <button type="button" class="remove-form btn btn-dark btn-less-spacing">Remove crossbreak</button>
                         </div>

@@ -32,7 +32,7 @@ import pandas as pd
 from celery.result import AsyncResult
 
 from django.shortcuts import render, redirect, reverse
-from django.views import View
+from django.views import View, generic
 from django.contrib import messages
 from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
@@ -43,13 +43,15 @@ from .api_request.get_processed_questions import (
     extract_questions_from_pages,
     extract_data_from_question_objects
 )
-
 from .forms import (
     CSVUploadForm,
     WeightForm,
     CrossbreakFormSet,
-    CustomWeightFormSet
+    CustomWeightFormSet,
+    CustomCrossbreakForm,
+    CrossbreakSelectForm
 )
+from .models import Crossbreak
 from . import weight as wgt
 from . import validation as vld
 from .tasks import handle_crossbreaks
@@ -134,7 +136,6 @@ def weight_data(request):
                 weighted_data = wgt.apply_no_weight(survey_data)
             # ~~~~~~~~~ Cache the weighted data to be downloaded by user later
             excel_buffer = BytesIO()
-            print(weighted_data)
             weighted_data.to_excel(excel_buffer, index=False)
             excel_buffer.seek(0)
             unique_id = "weights_for_user_" + str(request.user.id)
@@ -211,14 +212,31 @@ def upload_csv(request):
                 "You cannot access this feature until you are logged in"
             )
             return redirect(reverse('home'))
-        form = CSVUploadForm(request.POST, request.FILES)
+        form_a = CSVUploadForm(request.POST, request.FILES)
+        form_b = CrossbreakSelectForm(request.POST)
         formset = CrossbreakFormSet(request.POST, prefix="crossbreaks")
-        if form.is_valid() and formset.is_valid():
+        if form_a.is_valid() and form_b.is_valid() and formset.is_valid():
             data_file = request.FILES['data_file']
-            survey_id = form.cleaned_data['survey_id']
-            standard_cb = form.cleaned_data['standard_cb']
+            survey_id = form_a.cleaned_data['survey_id']
+            standard_cb = form_a.cleaned_data['standard_cb']
             
             non_standard_cb = []
+
+            # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ handle pre saved crossbreaks
+            for i in range(1, 6):
+                crossbreak = form_b.cleaned_data[f'crossbreak_{i}']
+                if crossbreak is not None:
+                    if "|" in crossbreak.Answers:
+                        answers = crossbreak.Answers.split("|")
+                    else:
+                        answers = [crossbreak.Answers]
+                    non_standard_cb.append(
+                        [crossbreak.name, crossbreak.question, answers]
+                    )
+
+            print(non_standard_cb)
+
+
             num_submitted_forms = 0
             # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ handle formset
             for form in formset:
@@ -291,11 +309,13 @@ def upload_csv(request):
             )
             return redirect('home')
     else:
-        form = CSVUploadForm()
+        form_a = CSVUploadForm()
+        form_b = CrossbreakSelectForm()
         formset = CrossbreakFormSet(prefix="crossbreaks")
 
     return render(request, 'upload_form.html', {
-        'form': form,
+        'form_a': form_a,
+        'form_b': form_b,
         'formset': formset
     })
 
@@ -449,8 +469,29 @@ def strip_whitespace(df):
     return df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
 
 
-def create_crossbreak():
+class CreateCrossbreak(generic.CreateView):
     """
-    A function to handle saving a new crossbreak
+    A class to handle saving a new crossbreak
     to the database.
     """
+    model = Crossbreak
+    form_class = CustomCrossbreakForm
+    template_name = 'crossbreak_form.html'
+
+    def post(self, request, *args, **kwargs):
+        crossbreak_form = CustomCrossbreakForm(request.POST)
+        if crossbreak_form.is_valid():
+            crossbreak_form.instance.user = request.user
+            messages.success(request, "Crossbreak successfully saved!")
+            crossbreak_form.save()
+            return redirect('home')
+        else:
+            messages.error(
+                request,
+                """
+                Crossbreak was not submitted. 
+                Please check you have uploaded valid data
+                """
+            )
+            crossbreak_form = CustomCrossbreakForm()
+            return redirect('create_crossbreak')

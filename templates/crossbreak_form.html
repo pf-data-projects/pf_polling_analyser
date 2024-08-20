@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if user.is_authenticated %}
+{% for profile in profiles %}
+{% if profile.user == user %}
+{% if profile.approved == True %}
+
+
+<div class="container">
+    <h1><strong>Save a crossbreak to use later</strong></h1>
+    <form method="post" class="container feature-card rounded mt-5 p-5">
+        <h3><strong>New crossbreak</strong></h3>
+        <div class="container border border-dark rounded p-5">
+            {% csrf_token %}
+            {{ form.as_p }}
+        </div>
+        <button class="btn btn-dark btn-less-spacing" type="submit">Submit</button>
+    </form>
+</div>
+
+
+{% else %}
+
+<hr/>
+<p class="m-5 warning-text">Your profile is awaiting approval. Please ask an admin to approve it for you.</p>
+
+{% endif %}
+{% endif %}
+{% endfor %}
+
+{% else %}
+<hr/>
+<p class="m-5 warning-text">Please log in to access the features of this site.</p>
+
+{% endif %}
+{% endblock %}
