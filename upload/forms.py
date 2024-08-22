@@ -36,10 +36,16 @@ CB_OPTIONS = (
     ('vote2019', 'Vote 2019'),
     ('eu2016', 'EU 2016 Vote'),
     ('voting_intention', 'Voting Intention'),
-    # Business poll options
-    ("employee_number", "Employee Number (STILL IN DEVELOPMENT)"),
-    ("company_age", "Company Age (STILL IN DEVELOPMENT)"),
-    ("annual_revenue", "Annual Revenue (STILL IN DEVELOPMENT)"),
+
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Business poll options
+    # These won't work just yet until the polling team
+    # can standardise the question titles and answers
+    # Currently there are different breakdowns for
+    # company age/revenue/headcount across the polls.
+
+    # ("employee_number", "Employee Number (STILL IN DEVELOPMENT)"),
+    # ("company_age", "Company Age (STILL IN DEVELOPMENT)"),
+    # ("annual_revenue", "Annual Revenue (STILL IN DEVELOPMENT)"),
 )
 
 PROCESSES = (
