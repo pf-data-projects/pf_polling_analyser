@@ -192,21 +192,7 @@ def extract_data_from_question_objects(question_list):
                     question_rebase.append(False)
                     question_sort.append(False)
 
-        if question['id'] == 250:
-            print(len(question_ids))
-            print(len(question_sort))
-        if len(question_sort) < len(question_types):
-            print("question", question['id'])
-            print(len(question['options']))
-            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-
     # creates a dataframe from the lists and outputs to csv
-    print(len(question_ids))
-    print(len(question_texts))
-    print(len(question_types))
-    print(len(question_titles))
-    print(len(question_rebase))
-    print(len(question_sort))
 
     question_dict = {
         'question_id': question_ids,

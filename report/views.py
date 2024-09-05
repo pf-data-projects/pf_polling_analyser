@@ -1,5 +1,6 @@
 """
-A module to handle 
+A module to handle submitting bug reports
+to the database.
 """
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Django

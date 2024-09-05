@@ -20,7 +20,7 @@ def check_for_bots_task(self, email, essay_list, data, check):
     Handles the logic for bot checks using Celery
     instead of Django.
     """
-    print("CELERY TASK STARTED")
+    # print("CELERY TASK STARTED")
     data = pd.read_csv(StringIO(data))
     check_for_bots(self, essay_list, data, check)
     data = data.to_csv(index=False)

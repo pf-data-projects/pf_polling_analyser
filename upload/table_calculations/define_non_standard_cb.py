@@ -19,7 +19,6 @@ def calc_crossbreak(table, question_list, results, question_data, crossbreak):
     """
     crossbreak_q = crossbreak[1]
     for answer in crossbreak[2]:
-        print("ANSWER",answer)
         col_index = table.columns.get_loc(f'{crossbreak[0]}: {answer}')
         for question in question_list:
             get_crossbreak = results[helpers.col_with_substr_q(results, crossbreak_q)]

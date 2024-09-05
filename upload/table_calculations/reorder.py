@@ -15,8 +15,6 @@ def sort_answers(df):
     answer.
     """
     question_ids = df['IDs'].unique()
-    print(df.dtypes)
-
     sorted_df_list = []
 
     for qid in question_ids:
@@ -26,7 +24,6 @@ def sort_answers(df):
 
         # Check if the question has the value 'TRUE' in the 'Randomised' column
         if qid_df['Randomised'].iloc[0] == 'True' or qid_df['Types'].iloc[0] == 'CHECKBOX':
-            print("The statement is true")
             # Separate "Question" rows to keep them at the top
             question_rows = qid_df[(qid_df['Base Type'] == 'Question')]
             other_rows = qid_df[(qid_df['Base Type'] != 'Question')]

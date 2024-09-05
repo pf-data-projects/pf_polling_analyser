@@ -216,7 +216,7 @@ def download_tables(request):
     unique_title = "title_for_user_" + str(request.user.id)
     excel_data = cache.get(unique_id)
     title = cache.get(unique_title)
-    print(title)
+    # print(title)
     if excel_data:
         response = HttpResponse(
             excel_data,
